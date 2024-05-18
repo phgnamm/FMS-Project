@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240518141727_AddEntities")]
+    partial class AddEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -841,7 +844,7 @@ namespace Repositories.Migrations
                         .HasForeignKey("FreelancerId");
 
                     b.HasOne("Repositories.Entities.Skill", "Skill")
-                        .WithMany("FreelancerSkills")
+                        .WithMany("Skills")
                         .HasForeignKey("SkillId");
 
                     b.Navigation("Freelancer");
@@ -952,7 +955,7 @@ namespace Repositories.Migrations
 
             modelBuilder.Entity("Repositories.Entities.Skill", b =>
                 {
-                    b.Navigation("FreelancerSkills");
+                    b.Navigation("Skills");
                 });
 #pragma warning restore 612, 618
         }
