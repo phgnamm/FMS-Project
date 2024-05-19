@@ -1,0 +1,26 @@
+image: docker:24.0.7
+
+services:
+  - docker:24.0.7-dind
+
+stages:
+  - build
+
+before_script:
+  - docker version
+  - docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD"
+
+build:
+  stage: build
+  script:
+    - docker build --tag $DOCKERHUB_REPO:$CI_COMMIT_SHA --tag $DOCKERHUB_REPO:latest .
+    - docker push $DOCKERHUB_REPO:$CI_COMMIT_SHA
+    - docker push $DOCKERHUB_REPO:latest
+    only:
+    - master  
+    - main    
+
+variables:
+  DOCKERHUB_USERNAME: "trancao134@gmail.com"
+  DOCKERHUB_PASSWORD: "0962146755"
+  DOCKERHUB_REPO: "tinhcao/fms-backend"
