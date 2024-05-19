@@ -11,11 +11,11 @@ COPY ["Services/Services.csproj", "Services/"]
 COPY ["Repositories/Repositories.csproj", "Repositories/"]
 RUN dotnet restore API/API.csproj
 COPY . .
-WORKDIR "/API/API.csproj"
+WORKDIR "/API"
 RUN dotnet build API.csproj -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-WORKDIR /API/API.csproj
+WORKDIR /API
 RUN dotnet publish API.csproj -c $BUILD_CONFIGURATION -o /app/publish
 
 FROM base AS final
