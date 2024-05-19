@@ -6,17 +6,23 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Repositories.Migrations
 {
     /// <inheritdoc />
-    public partial class AddEntities : Migration
+    public partial class UpdateEntities : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<string>(
+                name: "Code",
+                table: "AspNetUsers",
+                type: "nvarchar(450)",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "DeliverableType",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -36,17 +42,17 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: true),
                     Gender = table.Column<int>(type: "int", nullable: false),
                     Dob = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Wallet = table.Column<float>(type: "real", nullable: true),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -65,7 +71,7 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -85,9 +91,9 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -106,12 +112,12 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<float>(type: "real", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     AccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -142,9 +148,8 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FrelancerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     FreelancerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SkillId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -174,9 +179,8 @@ namespace Repositories.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    FrelancerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FreelancerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ModificationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -205,9 +209,9 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SubmisstionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    SubmissionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     DeliverableTypeId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -238,7 +242,7 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<bool>(type: "bit", nullable: false),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
@@ -271,9 +275,10 @@ namespace Repositories.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     URL = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Feedback = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ProjectApplyId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     ProjectDeliverableId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -300,6 +305,13 @@ namespace Repositories.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Code",
+                table: "AspNetUsers",
+                column: "Code",
+                unique: true,
+                filter: "[Code] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DeliverableProduct_ProjectApplyId",
                 table: "DeliverableProduct",
                 column: "ProjectApplyId");
@@ -308,6 +320,13 @@ namespace Repositories.Migrations
                 name: "IX_DeliverableProduct_ProjectDeliverableId",
                 table: "DeliverableProduct",
                 column: "ProjectDeliverableId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Freelancer_Code",
+                table: "Freelancer",
+                column: "Code",
+                unique: true,
+                filter: "[Code] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FreelancerSkill_FreelancerId",
@@ -330,6 +349,13 @@ namespace Repositories.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Project_Code",
+                table: "Project",
+                column: "Code",
+                unique: true,
+                filter: "[Code] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ProjectApply_FreelancerId",
                 table: "ProjectApply",
                 column: "FreelancerId");
@@ -348,6 +374,13 @@ namespace Repositories.Migrations
                 name: "IX_ProjectDeliverable_ProjectId",
                 table: "ProjectDeliverable",
                 column: "ProjectId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transaction_Code",
+                table: "Transaction",
+                column: "Code",
+                unique: true,
+                filter: "[Code] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transaction_FreelancerId",
@@ -392,6 +425,14 @@ namespace Repositories.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProjectCategory");
+
+            migrationBuilder.DropIndex(
+                name: "IX_AspNetUsers_Code",
+                table: "AspNetUsers");
+
+            migrationBuilder.DropColumn(
+                name: "Code",
+                table: "AspNetUsers");
         }
     }
 }

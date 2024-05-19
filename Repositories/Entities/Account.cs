@@ -11,6 +11,7 @@ namespace Repositories.Entities
 		public DateTime DateOfBirth { get; set; }
 		public string? Address { get; set; }
 		public string? Image { get; set; }
+		public string? Code { get; set; }
 
 		// Refresh Token
 		public string? RefreshToken { get; set; }
