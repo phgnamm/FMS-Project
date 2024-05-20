@@ -10,11 +10,15 @@ namespace Repositories.Entities
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public Gender Gender { get; set; }
-        public DateTime? Dob { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         public string? Address { get; set; }
         public float? Wallet { get; set; }
         public string? Image { get; set; }
         public string? Status { get; set; }
+        
+        // Refresh Token
+        public string? RefreshToken { get; set; }
+        public DateTime? RefreshTokenExpiryTime { get; set; }
 
         // Relationship
         public virtual ICollection<FreelancerSkill> FreelancerSkills { get; set; } = new List<FreelancerSkill>();
