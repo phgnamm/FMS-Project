@@ -20,26 +20,26 @@ builder.Services.AddSwaggerGen(x =>
 });
 
 // Local Database
-//builder.Services.AddDbContext<AppDbContext>(options =>
-//{
-//	options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
-//});
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+	options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
+});
 
 // ===================== FOR DEPLOY AZURE =======================
 
-var connection = String.Empty;
-if (builder.Environment.IsDevelopment())
-{
-	builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-	connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-}
-else
-{
-	connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
-}
+//var connection = String.Empty;
+//if (builder.Environment.IsDevelopment())
+//{
+//	builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+//	connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+//}
+//else
+//{
+//	connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+//}
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-  options.UseSqlServer(connection));
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//  options.UseSqlServer(connection));
 
 // ==================== NO EDIT OR REMOVE COMMENT =======================
 
