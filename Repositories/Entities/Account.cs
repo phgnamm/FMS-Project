@@ -11,6 +11,7 @@ namespace Repositories.Entities
 		public DateTime DateOfBirth { get; set; }
 		public string? Address { get; set; }
 		public string? Image { get; set; }
+		public string? Code { get; set; }
 
 		// Refresh Token
 		public string? RefreshToken { get; set; }
@@ -29,5 +30,8 @@ namespace Repositories.Entities
 		public DateTime? DeletionDate { get; set; }
 		public Guid? DeletedBy { get; set; }
 		public bool IsDeleted { get; set; } = false;
+
+		//Relationship
+		public virtual ICollection<Project> Projects { get; set; } = new List<Project>();
 	}
 }
