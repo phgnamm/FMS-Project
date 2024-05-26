@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Repositories.Entities;
 using Repositories.ViewModels.AccountModels;
+using Repositories.ViewModels.FreelancerModels;
 
 namespace Repositories.Common
 {
@@ -8,8 +9,12 @@ namespace Repositories.Common
 	{
 		public MapperProfile()
 		{
-			//Account
+			// Account
 			CreateMap<AccountRegisterModel, Account>();
+			CreateMap<Account, AccountModel>();
+			
+			// Freelancer
+			CreateMap<Freelancer, FreelancerModel>();
 		}
 	}
 }
