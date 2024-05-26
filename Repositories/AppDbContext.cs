@@ -9,6 +9,8 @@ namespace Repositories
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
 		}
+		
+		public DbSet<Freelancer> Freelancer { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{

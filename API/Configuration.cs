@@ -48,6 +48,10 @@ namespace API
 			// Account
 			services.AddScoped<IAccountService, AccountService>();
 			services.AddScoped<IAccountRepository, AccountRepository>();
+			
+			// Freelancer
+			services.AddScoped<IFreelancerService, FreelancerService>();
+			services.AddScoped<IFreelancerRepository, FreelancerRepository>();
 
 			return services;
 		}
