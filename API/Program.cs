@@ -87,7 +87,7 @@ builder.Services.AddCors(options =>
 		{
 			builder
 			//.AllowAnyOrigin()
-			.WithOrigins("http://localhost:5173", "https://fms-nextbean-edition.vercel.app")
+			.WithOrigins("http://localhost:5173", "https://fms-nextbean-edition.vercel.app", "http://localhost:63661")
 			.AllowAnyHeader()
 			.WithExposedHeaders("X-Pagination")
 			.AllowAnyMethod()
