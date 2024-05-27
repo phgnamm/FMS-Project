@@ -17,8 +17,9 @@ namespace API.Controllers
 		{
 			_accountService = accountService;
 		}
-
+		
 		[HttpPost("register")]
+		[Authorize(Roles = "Administrator")]
 		public async Task<IActionResult> Register([FromBody] AccountRegisterModel accountRegisterModel)
 		{
 			try
@@ -39,6 +40,7 @@ namespace API.Controllers
 			}
 		}
 
+		// This API is used for Email + Password login and can be used for Web only
 		[HttpPost("login")]
 		public async Task<IActionResult> Login([FromBody] AccountLoginModel accountLoginModel)
 		{
@@ -212,6 +214,7 @@ namespace API.Controllers
 			}
 		}
 
+		// This API is used for Freelancer login only
 		[HttpPost("login-google")]
 		public async Task<IActionResult> LoginGoogle([FromBody] LoginGoogleIdTokenModel loginGoogleIdTokenModel)
 		{
@@ -220,18 +223,39 @@ namespace API.Controllers
 				var result = await _accountService.LoginGoogle(loginGoogleIdTokenModel);
 				if (result.Status)
 				{
-					HttpContext.Response.Cookies.Append("refreshToken", result.Data.RefreshToken,
-						new CookieOptions
-						{
-							Expires = DateTimeOffset.UtcNow.AddDays(7),
-							HttpOnly = true,
-							IsEssential = true,
-							Secure = true,
-							SameSite = SameSiteMode.None
-						});
+					// HttpContext.Response.Cookies.Append("refreshToken", result.Data.RefreshToken,
+					// 	new CookieOptions
+					// 	{
+					// 		Expires = DateTimeOffset.UtcNow.AddDays(7),
+					// 		HttpOnly = true,
+					// 		IsEssential = true,
+					// 		Secure = true,
+					// 		SameSite = SameSiteMode.None
+					// 	});
+					//
+					// result.Data.RefreshToken = null;
 
-					result.Data.RefreshToken = null;
-
+					return Ok(result);
+				}
+				else
+				{
+					return BadRequest(result);
+				}
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex);
+			}
+		}
+		
+		[HttpPost("mobile-refresh-token")]
+		public async Task<IActionResult> MobileRefreshToken([FromBody] RefreshTokenModel refreshTokenModel)
+		{
+			try
+			{
+				var result = await _accountService.RefreshToken(refreshTokenModel, refreshTokenModel.RefreshToken);
+				if (result.Status)
+				{
 					return Ok(result);
 				}
 				else

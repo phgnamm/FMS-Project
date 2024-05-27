@@ -1,6 +1,14 @@
-﻿namespace Repositories.Interfaces
+﻿using Repositories.Common;
+using Repositories.Entities;
+using Repositories.ViewModels.AccountModels;
+
+namespace Repositories.Interfaces
 {
-	public interface IAccountRepository
-	{
-	}
+    public interface IAccountRepository
+    {
+        Task<Account> GetAccountByCode(string code);
+
+        public Task<List<Account>> GetAccountsByFilter(PaginationParameter paginationParameter,
+            AccountFilterModel accountFilterModel);
+    }
 }
