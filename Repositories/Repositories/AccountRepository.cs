@@ -50,27 +50,26 @@ namespace Repositories.Repositories
                                 x.LastName.ToLower().Contains(accountFilterModel.Search.ToLower())).ToList();
             }
 
-            // Sort
-            if (accountFilterModel.Sort != null)
+            switch (accountFilterModel.Sort.ToLower())
             {
-                switch (accountFilterModel.Sort.ToLower())
-                {
-                    case "firstname":
-                        accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
-                            ? accountList.OrderBy(a => a.FirstName).ToList()
-                            : accountList.OrderByDescending(a => a.FirstName).ToList();
-                        break;
-                    case "lastname":
-                        accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
-                            ? accountList.OrderBy(a => a.LastName).ToList()
-                            : accountList.OrderByDescending(a => a.LastName).ToList();
-                        break;
-                    case "dateofbirth":
-                        accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
-                            ? accountList.OrderBy(a => a.DateOfBirth).ToList()
-                            : accountList.OrderByDescending(a => a.DateOfBirth).ToList();
-                        break;
-                }
+                case "firstname":
+                    accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
+                        ? accountList.OrderBy(x => x.FirstName).ToList()
+                        : accountList.OrderByDescending(x => x.FirstName).ToList();
+                    break;
+                case "lastname":
+                    accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
+                        ? accountList.OrderBy(x => x.LastName).ToList()
+                        : accountList.OrderByDescending(x => x.LastName).ToList();
+                    break;
+                case "dateofbirth":
+                    accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
+                        ? accountList.OrderBy(x => x.DateOfBirth).ToList()
+                        : accountList.OrderByDescending(x => x.DateOfBirth).ToList();
+                    break;
+                default:
+                    accountList = accountList.OrderByDescending(x => x.CreationDate).ToList();
+                    break;
             }
 
             return accountList;
