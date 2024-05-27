@@ -69,8 +69,10 @@ namespace Services.Services
             // Create new Account
             var user = _mapper.Map<Account>(accountRegisterModel);
             user.UserName = user.Email;
-            user.VerificationCode = AuthenticationTools.GenerateVerificationCode(6);
-            user.VerificationCodeExpiryTime = DateTime.Now.AddMinutes(15);
+            user.CreationDate = DateTime.UtcNow;
+            user.CreatedBy = _claimsService.GetCurrentUserId;
+            // user.VerificationCode = AuthenticationTools.GenerateVerificationCode(6);
+            // user.VerificationCodeExpiryTime = DateTime.Now.AddMinutes(15);
 
             var result = await _userManager.CreateAsync(user, accountRegisterModel.Password);
 

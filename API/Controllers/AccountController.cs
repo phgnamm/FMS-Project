@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Repositories.Common;
@@ -39,7 +40,8 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAccountByFilters([FromQuery] PaginationParameter paginationParameter,
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> GetAccountsByFilter([FromQuery] PaginationParameter paginationParameter,
             [FromQuery] AccountFilterModel accountFilterModel)
         {
             try
