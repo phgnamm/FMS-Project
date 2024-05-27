@@ -21,4 +21,5 @@ RUN dotnet publish API.csproj -c $BUILD_CONFIGURATION -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+ENV PORT=8080
 ENTRYPOINT ["dotnet", "API.dll"]
