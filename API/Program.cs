@@ -25,6 +25,26 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
 });
 
+// ===================== FOR DEPLOY AZURE =======================
+
+//var connection = String.Empty;
+//if (builder.Environment.IsDevelopment())
+//{
+//  builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
+//  connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
+//}
+//else
+//{
+//  connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
+//}
+
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//  options.UseSqlServer(connection));
+
+// ==================== NO EDIT OR REMOVE COMMENT =======================
+
+
+
 // Add API Configuration
 builder.Services.AddAPIConfiguration();
 
@@ -67,7 +87,7 @@ builder.Services.AddCors(options =>
 		{
 			builder
 			//.AllowAnyOrigin()
-			.WithOrigins("http://localhost:5173")
+			.WithOrigins("http://localhost:5173", "https://fms-nextbean-edition.vercel.app")
 			.AllowAnyHeader()
 			.WithExposedHeaders("X-Pagination")
 			.AllowAnyMethod()

@@ -29,5 +29,11 @@ namespace Repositories.ViewModels.AccountModels
 		[StringLength(128, MinimumLength = 8, ErrorMessage = "Confirm Password must be from 8 to 128 characters")]
 		[Compare("Password", ErrorMessage = "Password and Confirm Password does not match")]
 		public string ConfirmPassword { get; set; }
+		[Required(ErrorMessage = "Code is required")]
+		[StringLength(50, ErrorMessage = "Code must be no more than 50 characters")]
+		public string Code { get; set; }
+		[Required(ErrorMessage = "Role is required")]
+		[EnumDataType(typeof(Role), ErrorMessage = "Invalid Role")]
+		public Role Role { get; set; }
 	}
 }
