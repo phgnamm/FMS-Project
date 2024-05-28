@@ -40,7 +40,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Administrator")]
+        // [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> GetAccountsByFilter([FromQuery] PaginationParameter paginationParameter,
             [FromQuery] AccountFilterModel accountFilterModel)
         {
