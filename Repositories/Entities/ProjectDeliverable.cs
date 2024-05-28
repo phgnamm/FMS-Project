@@ -6,7 +6,7 @@
         public DateTime? SubmissionDate { get; set; }
         public string? Status { get; set; }
 
-        // ForeignKey Key
+        // Foreign Key
         public Guid? ProjectId { get; set; }
         public Guid? DeliverableTypeId { get; set; }
 
