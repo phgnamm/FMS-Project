@@ -15,6 +15,7 @@ namespace Repositories.Entities
         public float? Wallet { get; set; }
         public string? Image { get; set; }
         public string? Status { get; set; }
+        public int? Warning { get; set; }
         
         // Refresh Token
         public string? RefreshToken { get; set; }
