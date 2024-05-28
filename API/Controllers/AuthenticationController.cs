@@ -19,7 +19,7 @@ namespace API.Controllers
 		}
 		
 		[HttpPost("register")]
-		[Authorize(Roles = "Administrator")]
+		// [Authorize(Roles = "Administrator")]
 		public async Task<IActionResult> Register([FromBody] AccountRegisterModel accountRegisterModel)
 		{
 			try
