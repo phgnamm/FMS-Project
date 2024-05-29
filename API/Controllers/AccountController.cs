@@ -66,5 +66,49 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut("{id}")]
+        // [Authorize(Roles = "Administrator, Staff")]
+        public async Task<IActionResult> UpdateAccount([FromBody] AccountUpdateModel accountUpdateModel, Guid id)
+        {
+            try
+            {
+                var result = await _accountService.UpdateAccount(accountUpdateModel, id);
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        // [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> DeleteAccount(Guid id)
+        {
+            try
+            {
+                var result = await _accountService.DeleteAccount(id);
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
