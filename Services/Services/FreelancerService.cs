@@ -188,7 +188,7 @@ public class FreelancerService : IFreelancerService
                 return new ResponseDataModel<List<FreelancerModel>>()
                 {
                     Status = true,
-                    Message = "Delete freelancer(s) successfully",
+                    Message = "Delete freelancer successfully",
                     Data = result
                 };
             }
@@ -196,7 +196,7 @@ public class FreelancerService : IFreelancerService
         return new ResponseDataModel<List<FreelancerModel>>()
         {
             Status = false,
-            Message = "Delete freelancer(s) failed"
+            Message = "Delete freelancer failed"
         };
     }
 
