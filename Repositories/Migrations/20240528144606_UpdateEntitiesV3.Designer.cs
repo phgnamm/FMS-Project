@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240528144606_UpdateEntitiesV3")]
+    partial class UpdateEntitiesV3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -302,14 +305,13 @@ namespace Repositories.Migrations
                     b.Property<string>("URL")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id")
-                        .HasName("DeliverableProduct_pk");
+                    b.HasKey("Id");
 
                     b.HasIndex("ProjectApplyId");
 
                     b.HasIndex("ProjectDeliverableId");
 
-                    b.ToTable("DeliverableProduct", (string)null);
+                    b.ToTable("DeliverableProduct");
                 });
 
             modelBuilder.Entity("Repositories.Entities.DeliverableType", b =>
@@ -346,10 +348,9 @@ namespace Repositories.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.HasKey("Id")
-                        .HasName("DeliverableType_pk");
+                    b.HasKey("Id");
 
-                    b.ToTable("DeliverableType", (string)null);
+                    b.ToTable("DeliverableType");
                 });
 
             modelBuilder.Entity("Repositories.Entities.Freelancer", b =>
@@ -432,7 +433,7 @@ namespace Repositories.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.ToTable("Freelancer", (string)null);
+                    b.ToTable("Freelancer");
                 });
 
             modelBuilder.Entity("Repositories.Entities.FreelancerSkill", b =>
@@ -468,14 +469,13 @@ namespace Repositories.Migrations
                     b.Property<Guid?>("SkillId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("Id")
-                        .HasName("FreelancerSkill_pk");
+                    b.HasKey("Id");
 
                     b.HasIndex("FreelancerId");
 
                     b.HasIndex("SkillId");
 
-                    b.ToTable("FreelancerSkill", (string)null);
+                    b.ToTable("FreelancerSkill");
                 });
 
             modelBuilder.Entity("Repositories.Entities.Project", b =>
@@ -531,8 +531,7 @@ namespace Repositories.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("Id")
-                        .HasName("Project_pk");
+                    b.HasKey("Id");
 
                     b.HasIndex("AccountId");
 
@@ -542,7 +541,7 @@ namespace Repositories.Migrations
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
 
-                    b.ToTable("Project", (string)null);
+                    b.ToTable("Project");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectApply", b =>
@@ -588,8 +587,7 @@ namespace Repositories.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("Id")
-                        .HasName("ProjectApply_pk");
+                    b.HasKey("Id");
 
                     b.HasIndex("FreelancerId");
 
@@ -632,10 +630,9 @@ namespace Repositories.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.HasKey("Id")
-                        .HasName("ProjectCategory_pk");
+                    b.HasKey("Id");
 
-                    b.ToTable("ProjectCategory", (string)null);
+                    b.ToTable("ProjectCategory");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectDeliverable", b =>
@@ -682,14 +679,13 @@ namespace Repositories.Migrations
                     b.Property<DateTime?>("SubmissionDate")
                         .HasColumnType("datetime2");
 
-                    b.HasKey("Id")
-                        .HasName("ProjectDeliverable_pk");
+                    b.HasKey("Id");
 
                     b.HasIndex("DeliverableTypeId");
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("ProjectDeliverable", (string)null);
+                    b.ToTable("ProjectDeliverable");
                 });
 
             modelBuilder.Entity("Repositories.Entities.Role", b =>
@@ -762,10 +758,9 @@ namespace Repositories.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.HasKey("Id")
-                        .HasName("Skill_pk");
+                    b.HasKey("Id");
 
-                    b.ToTable("Skill", (string)null);
+                    b.ToTable("Skill");
                 });
 
             modelBuilder.Entity("Repositories.Entities.Transaction", b =>
@@ -810,8 +805,7 @@ namespace Repositories.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.HasKey("Id")
-                        .HasName("Transaction_pk");
+                    b.HasKey("Id");
 
                     b.HasIndex("Code")
                         .IsUnique()
@@ -821,7 +815,7 @@ namespace Repositories.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("Transaction", (string)null);
+                    b.ToTable("Transaction");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -879,13 +873,11 @@ namespace Repositories.Migrations
                 {
                     b.HasOne("Repositories.Entities.ProjectApply", "ProjectApply")
                         .WithMany("DeliverableProducts")
-                        .HasForeignKey("ProjectApplyId")
-                        .HasConstraintName("DeliverableProduct_ProjectApply_ProjectApplyId_fk");
+                        .HasForeignKey("ProjectApplyId");
 
                     b.HasOne("Repositories.Entities.ProjectDeliverable", "ProjectDeliverable")
                         .WithMany("DeliverableProducts")
-                        .HasForeignKey("ProjectDeliverableId")
-                        .HasConstraintName("DeliverableProduct_ProjectDeliverable_ProjectDeliverableId_fk");
+                        .HasForeignKey("ProjectDeliverableId");
 
                     b.Navigation("ProjectApply");
 
@@ -896,13 +888,11 @@ namespace Repositories.Migrations
                 {
                     b.HasOne("Repositories.Entities.Freelancer", "Freelancer")
                         .WithMany("FreelancerSkills")
-                        .HasForeignKey("FreelancerId")
-                        .HasConstraintName("FreelancerSkill_Freelancer_FreelancerId_fk");
+                        .HasForeignKey("FreelancerId");
 
                     b.HasOne("Repositories.Entities.Skill", "Skill")
                         .WithMany("FreelancerSkills")
-                        .HasForeignKey("SkillId")
-                        .HasConstraintName("FreelancerSkill_Skill_SkillId_fk");
+                        .HasForeignKey("SkillId");
 
                     b.Navigation("Freelancer");
 
@@ -913,47 +903,41 @@ namespace Repositories.Migrations
                 {
                     b.HasOne("Repositories.Entities.Account", "Account")
                         .WithMany("Projects")
-                        .HasForeignKey("AccountId")
-                        .HasConstraintName("Project_Account_ProjectId_fk");
+                        .HasForeignKey("AccountId");
 
-                    b.HasOne("Repositories.Entities.ProjectCategory", "ProjectCategory")
+                    b.HasOne("Repositories.Entities.ProjectCategory", "Category")
                         .WithMany("Projects")
-                        .HasForeignKey("CategoryId")
-                        .HasConstraintName("Project_ProjectCategory_ProjectId_fk");
+                        .HasForeignKey("CategoryId");
 
                     b.Navigation("Account");
 
-                    b.Navigation("ProjectCategory");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectApply", b =>
                 {
                     b.HasOne("Repositories.Entities.Freelancer", "Freelancer")
                         .WithMany("ProjectApplies")
-                        .HasForeignKey("FreelancerId")
-                        .HasConstraintName("ProjectApply_Freelancer_FreelancerId_fk");
+                        .HasForeignKey("FreelancerId");
 
-                    b.HasOne("Repositories.Entities.Project", "Project")
+                    b.HasOne("Repositories.Entities.Project", "ApplyProject")
                         .WithMany("ProjectApplies")
-                        .HasForeignKey("ProjectId")
-                        .HasConstraintName("ProjectApply_Project_ProjectId_fk");
+                        .HasForeignKey("ProjectId");
+
+                    b.Navigation("ApplyProject");
 
                     b.Navigation("Freelancer");
-
-                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectDeliverable", b =>
                 {
                     b.HasOne("Repositories.Entities.DeliverableType", "DeliverableType")
                         .WithMany("ProjectDeliverable")
-                        .HasForeignKey("DeliverableTypeId")
-                        .HasConstraintName("ProjectDeliverable_DeliverableType_DeliverableTypeId_fk");
+                        .HasForeignKey("DeliverableTypeId");
 
                     b.HasOne("Repositories.Entities.Project", "Project")
                         .WithMany("ProjectDeliverables")
-                        .HasForeignKey("ProjectId")
-                        .HasConstraintName("ProjectDeliverable_Project_ProjectId_fk");
+                        .HasForeignKey("ProjectId");
 
                     b.Navigation("DeliverableType");
 
@@ -963,14 +947,12 @@ namespace Repositories.Migrations
             modelBuilder.Entity("Repositories.Entities.Transaction", b =>
                 {
                     b.HasOne("Repositories.Entities.Freelancer", "Freelancer")
-                        .WithMany("Transactions")
-                        .HasForeignKey("FreelancerId")
-                        .HasConstraintName("Transaction_Freelancer_FreelancerId_fk");
+                        .WithMany()
+                        .HasForeignKey("FreelancerId");
 
                     b.HasOne("Repositories.Entities.Project", "Project")
                         .WithMany("Transactions")
-                        .HasForeignKey("ProjectId")
-                        .HasConstraintName("Transaction_Project_ProjectId_fk");
+                        .HasForeignKey("ProjectId");
 
                     b.Navigation("Freelancer");
 
@@ -992,8 +974,6 @@ namespace Repositories.Migrations
                     b.Navigation("FreelancerSkills");
 
                     b.Navigation("ProjectApplies");
-
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Repositories.Entities.Project", b =>

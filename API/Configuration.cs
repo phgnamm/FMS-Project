@@ -53,6 +53,9 @@ namespace API
 			// Freelancer
 			services.AddScoped<IFreelancerService, FreelancerService>();
 			services.AddScoped<IFreelancerRepository, FreelancerRepository>();
+			
+			// Project
+			services.AddScoped<IProjectRepository, ProjectRepository>();
 
             //Skill
             services.AddScoped<ISkillService, SkillService>();

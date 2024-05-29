@@ -2,7 +2,8 @@
 
 public enum ProjectApplyStatus
 {
-    Checking,
+    Invited, // Staff mời Freelancer tham gia dự án
+    Checking, // Freelancer apply vào dự án public
     Accepted,
     Rejected
 }
