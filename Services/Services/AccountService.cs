@@ -13,6 +13,7 @@ using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Repositories.Common;
+using Repositories.Enums;
 using Role = Repositories.Enums.Role;
 
 namespace Services.Services
@@ -556,7 +557,7 @@ namespace Services.Services
             AccountFilterModel accountFilterModel)
         {
             var accountList = await _accountRepository.GetAccountsByFilter(paginationParameter, accountFilterModel);
-            
+
             // Pagination
             if (accountList != null)
             {
@@ -567,12 +568,130 @@ namespace Services.Services
                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                     .Take(paginationParameter.PageSize)
                     .ToList();
-                
+
                 return new Pagination<AccountModel>(paginationList, totalCount, paginationParameter.PageIndex,
                     paginationParameter.PageSize);
             }
-            
+
             return null;
+        }
+
+        public async Task<ResponseModel> UpdateAccount(AccountUpdateModel accountUpdateModel, Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return new ResponseModel()
+                {
+                    Status = false,
+                    Message = "User not found"
+                };
+            }
+
+            // Check if Email already exists
+            if (accountUpdateModel.Email != user.Email)
+            {
+                var existedEmail = await _userManager.FindByEmailAsync(accountUpdateModel.Email);
+
+                if (existedEmail != null)
+                {
+                    return new ResponseModel
+                    {
+                        Status = false,
+                        Message = "Email already exists"
+                    };
+                }
+            }
+
+            // Check if Code already exists
+            if (accountUpdateModel.Code != user.Code)
+            {
+                var existedCode = await _unitOfWork.AccountRepository.GetAccountByCode(accountUpdateModel.Code);
+
+                if (existedCode != null)
+                {
+                    return new ResponseModel
+                    {
+                        Status = false,
+                        Message = "Code already exists"
+                    };
+                }
+            }
+
+            user.FirstName = accountUpdateModel.FirstName;
+            user.LastName = accountUpdateModel.LastName;
+            user.Gender = accountUpdateModel.Gender;
+            user.DateOfBirth = accountUpdateModel.DateOfBirth;
+            user.PhoneNumber = accountUpdateModel.PhoneNumber;
+            user.Email = accountUpdateModel.Email;
+            user.Code = accountUpdateModel.Code;
+            user.ModificationDate = DateTime.UtcNow;
+            user.ModifiedBy = _claimsService.GetCurrentUserId;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return new ResponseModel
+                {
+                    Status = true,
+                    Message = "Update Account successfully",
+                };
+            }
+
+            return new ResponseModel
+            {
+                Status = false,
+                Message = "Cannot update Account",
+            };
+        }
+
+        public async Task<ResponseModel> DeleteAccount(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return new ResponseModel()
+                {
+                    Status = false,
+                    Message = "User not found"
+                };
+            }
+
+            var projectList = await _unitOfWork.ProjectRepository.GetProjectByAccount(id, false,
+                [ProjectStatus.Pending, ProjectStatus.Processing, ProjectStatus.Checking]);
+            
+            if (projectList.Count > 0)
+            {
+                return new ResponseModel()
+                {
+                    Status = false,
+                    Message = "Can not delete this Account because he/she is working on a project"
+                };
+            }
+
+            user.IsDeleted = true;
+            user.DeletionDate = DateTime.UtcNow;
+            user.DeletedBy = _claimsService.GetCurrentUserId;
+            
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return new ResponseModel
+                {
+                    Status = true,
+                    Message = "Delete Account successfully",
+                };
+            }
+
+            return new ResponseModel
+            {
+                Status = false,
+                Message = "Cannot delete Account",
+            };
         }
     }
 }
