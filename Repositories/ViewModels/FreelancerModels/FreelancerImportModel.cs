@@ -11,28 +11,24 @@ namespace Repositories.ViewModels.FreelancerModels
 {
     public class FreelancerImportModel
     {
-        [Required(ErrorMessage = "First Name is required!")]
-        [Display(Name = "FirstName")]
+        [Required(ErrorMessage = "FirstName is required")]
+        [StringLength(50, ErrorMessage = "FirstName must be no more than 50 characters")]
         public string FirstName { get; set; } = "";
 
-        [Required(ErrorMessage = "Last Name is required!")]
-        [Display(Name = "LastName")]
+        [Required(ErrorMessage = "LastName is required")]
+        [StringLength(50, ErrorMessage = "LastName must be no more than 50 characters")]
         public string LastName { get; set; } = "";
 
         [Required(ErrorMessage = "Email is required!"), EmailAddress(ErrorMessage = "Must be email format!")]
         [StringLength(256, ErrorMessage = "Email must be no more than 256 characters")]
-        [Display(Name = "Email Address")]
         public string? Email { get; set; }
 
         [Required(ErrorMessage = "Phone number is required!")]
         [DataType(DataType.PhoneNumber, ErrorMessage = "Invalid Phone Number!")]
         [RegularExpression(@"^([0-9]{10})$", ErrorMessage = "Invalid Phone Number!")]
-
-        [Display(Name = "Phone Number")]
         public string? PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Date of Birth is required!")]
-        [Display(Name = "Date of Birth")]
         public DateTime? DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Gender is required")]
@@ -40,15 +36,11 @@ namespace Repositories.ViewModels.FreelancerModels
         public Gender Gender { get; set; } 
       
         [Required(ErrorMessage = "Freelancer code is required!")]
-        [Display(Name = "FreelancerCode")]
-        [RegularExpression(@"^FR\d{5}$", ErrorMessage = "Freelancer code must be in the format 'FRXXXXX' where XXXXX is 5 digits.")]
         public string? Code { get; set; }
     
-        [Display(Name = "Address")]
         public string? Address { get; set; }
 
         [Required(ErrorMessage = "Skill is required!")]
-        [Display(Name = "Skill")]
         public required string Skill { get; set; }
 
     }

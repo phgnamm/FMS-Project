@@ -15,7 +15,7 @@ namespace Repositories.Common
 			
 			// Freelancer
 			CreateMap<Freelancer, FreelancerModel>();
-			CreateMap<Freelancer, FreelancerImportModel>().ForMember(dest => dest.Code, opt => opt.Ignore()).ReverseMap();
+			CreateMap<Freelancer, FreelancerImportModel>().ReverseMap();
 		}
 	}
 }

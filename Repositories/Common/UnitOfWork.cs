@@ -10,8 +10,7 @@ namespace Repositories.Common
 		private readonly IProjectRepository _projectRepository;
 		private readonly ISkillRepository _skillRepository;
 
-		public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IFreelancerRepository freelancerRepository, IProjectRepository projectRepository)
-		public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IFreelancerRepository freelancerRepository, ISkillRepository skillRepository)
+		public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IFreelancerRepository freelancerRepository, IProjectRepository projectRepository, ISkillRepository skillRepository)
 		{
 			_dbContext = dbContext;
 			_accountRepository = accountRepository;

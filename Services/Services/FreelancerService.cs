@@ -44,7 +44,7 @@ public class FreelancerService : IFreelancerService
         };
     }
 
-    public async Task<FreelancerImportResponseModel> AddRangeFeelancer(List<FreelancerImportModel> freelancers)
+    public async Task<FreelancerImportResponseModel> AddRangeFreelancer(List<FreelancerImportModel> freelancers)
     {
         try
         {

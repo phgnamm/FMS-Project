@@ -46,7 +46,7 @@ namespace API.Controllers
                 {
                     return ValidationProblem(ModelState);
                 }
-                var result = await _freelancerService.AddRangeFeelancer(freelancers);
+                var result = await _freelancerService.AddRangeFreelancer(freelancers);
                 if (result.Status)
                 {
                     return Ok(result);
