@@ -49,11 +49,18 @@ namespace API
 			services.AddScoped<IAccountService, AccountService>();
 			services.AddScoped<IAccountRepository, AccountRepository>();
 			
+			
 			// Freelancer
 			services.AddScoped<IFreelancerService, FreelancerService>();
 			services.AddScoped<IFreelancerRepository, FreelancerRepository>();
 
-			return services;
+            //Skill
+            services.AddScoped<ISkillService, SkillService>();
+            services.AddScoped<ISkillRepository, SkillRepository>();
+
+
+
+            return services;
 		}
 	}
 }

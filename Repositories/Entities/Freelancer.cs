@@ -23,5 +23,6 @@ namespace Repositories.Entities
         // Relationship
         public virtual ICollection<FreelancerSkill> FreelancerSkills { get; set; } = new List<FreelancerSkill>();
         public virtual ICollection<ProjectApply> ProjectApplies { get; set; } = new List<ProjectApply>();
+        public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }
