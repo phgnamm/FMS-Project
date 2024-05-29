@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Entities;
 using Repositories.Enums;
 using Repositories.Interfaces;
@@ -136,7 +137,7 @@ public class FreelancerService : IFreelancerService
 
     public async Task<ResponseDataModel<FreelancerModel>> UpdateFreelancerAsync(Guid id, FreelancerImportModel updateFreelancer)
     {
-        var existingFreelancer = await _unitOfWork.FreelancerRepository.GetFreelancerById(id);
+        var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAsync(id);
         if (existingFreelancer != null)
         {
             //cần fe khóa cứng cột Code lại
@@ -165,4 +166,38 @@ public class FreelancerService : IFreelancerService
             Message = "Freelancer not found"
         };
     }
+
+    public async Task<ResponseDataModel<List<FreelancerModel>>> DeleteFreelancer(List<Guid> freelancerIds)
+    {
+        var deleteList = new List<Freelancer>();
+        foreach (Guid freelancerId in freelancerIds)
+        {
+            var freelancer = await _unitOfWork.FreelancerRepository.GetAsync(freelancerId);
+            if (freelancer != null)
+            {
+                deleteList.Add(freelancer);
+            }
+        }
+        if (deleteList.Count > 0)
+        {
+            _unitOfWork.FreelancerRepository.SoftDeleteRange(deleteList);
+            await _unitOfWork.SaveChangeAsync();
+            var result = _mapper.Map<List<FreelancerModel>>(deleteList);
+            if (result != null)
+            {
+                return new ResponseDataModel<List<FreelancerModel>>()
+                {
+                    Status = true,
+                    Message = "Delete freelancer(s) successfully",
+                    Data = result
+                };
+            }
+        }
+        return new ResponseDataModel<List<FreelancerModel>>()
+        {
+            Status = false,
+            Message = "Delete freelancer(s) failed"
+        };
+    }
+
 }

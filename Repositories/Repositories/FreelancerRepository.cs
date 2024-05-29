@@ -17,9 +17,4 @@ public class FreelancerRepository : GenericRepository<Freelancer>, IFreelancerRe
     {
         return await _dbContext.Freelancer.FirstOrDefaultAsync(x => x.Email == email);
     }
-
-    public async Task<Freelancer> GetFreelancerById(Guid id)
-    {
-        return await _dbContext.Freelancer.FirstOrDefaultAsync(x => x.Id == id);
-    }
 }

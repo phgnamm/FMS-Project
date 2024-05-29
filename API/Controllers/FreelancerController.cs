@@ -80,5 +80,26 @@ namespace API.Controllers
                 return BadRequest(ex);
             }
         }
+
+        [HttpDelete()]
+        public async Task<IActionResult> DeleteFreelancer(List<Guid> ids)
+        {
+            try
+            {
+                var result = await _freelancerService.DeleteFreelancer(ids);
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
