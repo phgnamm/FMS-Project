@@ -12,9 +12,9 @@ namespace Repositories.ViewModels.FreelancerModels
     {
         public string Sort { get; set; } = "creationdate";
         public string SortDirection { get; set; } = "desc";
-        public required string SkillName { get; set; }
-        public required string SkillType { get; set; }
-        public bool IsDeleted { get; set; } = false;
+        public  string? SkillName { get; set; }
+        public  string? SkillType { get; set; }
+        public FreelancerStatus? Status { get; set; }
         public Gender? Gender { get; set; }
         public string? Search { get; set; }
     }

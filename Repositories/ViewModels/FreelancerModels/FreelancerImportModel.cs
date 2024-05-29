@@ -40,8 +40,17 @@ namespace Repositories.ViewModels.FreelancerModels
     
         public string? Address { get; set; }
 
-        [Required(ErrorMessage = "Skill is required!")]
-        public required string Skill { get; set; }
+        [Required(ErrorMessage = "Skills are required!")]
+        public List<SkillInputModel> Skills { get; set; } = new List<SkillInputModel>();
+    }
+
+    public class SkillInputModel
+    {
+        [Required(ErrorMessage = "SkillType is required")]
+        public string SkillType { get; set; } = "";
+
+        [Required(ErrorMessage = "SkillName is required")]
+        public List<string> SkillNames { get; set; } = new List<string>();
 
     }
 }

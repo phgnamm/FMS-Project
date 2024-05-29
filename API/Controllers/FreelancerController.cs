@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Repositories.Common;
+using Repositories.ViewModels.AccountModels;
 using Repositories.ViewModels.FreelancerModels;
 using Services.Interfaces;
 using Services.Services;
@@ -34,6 +37,33 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFreelancersByFilter([FromQuery] PaginationParameter paginationParameter,
+            [FromQuery] FreelancerFilterModel freelancerFilterModel)
+        {
+            try
+            {
+                var result = await _freelancerService.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
+                var metadata = new
+                {
+                    result.TotalCount,
+                    result.PageSize,
+                    result.CurrentPage,
+                    result.TotalPages,
+                    result.HasNext,
+                    result.HasPrevious
+                };
+
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 

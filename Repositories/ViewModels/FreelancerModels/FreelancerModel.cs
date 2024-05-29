@@ -4,5 +4,7 @@ namespace Repositories.ViewModels.FreelancerModels;
 
 public class FreelancerModel : AccountModel
 {
-    
+ 
 }
+
+

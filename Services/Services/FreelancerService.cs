@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Repositories.Common;
 using Repositories.Entities;
 using Repositories.Enums;
 using Repositories.Interfaces;
+using Repositories.Repositories;
+using Repositories.ViewModels.AccountModels;
 using Repositories.ViewModels.FreelancerModels;
 using Repositories.ViewModels.ResponseModels;
 using Services.Interfaces;
@@ -45,6 +48,29 @@ public class FreelancerService : IFreelancerService
         };
     }
 
+    public async Task<Pagination<FreelancerDetailModel>> GetFreelancersByFilter(PaginationParameter paginationParameter,
+          FreelancerFilterModel freelancerFilterModel)
+    {
+        var freelancerList = await _unitOfWork.FreelancerRepository.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
+
+        // Pagination
+        if (freelancerList != null)
+        {
+            var totalCount = freelancerList.Count();
+           // var freelancerListModel = _mapper.Map<List<FreelancerModel>>(freelancerList);
+
+            var paginationList = freelancerList
+                .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+                .Take(paginationParameter.PageSize)
+                .ToList();
+
+            return new Pagination<FreelancerDetailModel>(paginationList, totalCount, paginationParameter.PageIndex,
+                paginationParameter.PageSize);
+        }
+
+        return null;
+    }
+
     public async Task<FreelancerImportResponseModel> AddRangeFreelancer(List<FreelancerImportModel> freelancers)
     {
         try
@@ -82,9 +108,12 @@ public class FreelancerService : IFreelancerService
                         CreatedBy = _claimsService.GetCurrentUserId,
                     };
                     // Check and add skills
-                    if (newFreelancers.Skill != null && newFreelancers.Skill.Any())
+                    foreach (var skillTypeModel in newFreelancers.Skills)
                     {
-                        var validSkills = existingSkills.Where(skill => newFreelancers.Skill.Contains(skill.Name)).ToList();
+                        var validSkills = existingSkills
+                            .Where(skill => skillTypeModel.SkillNames.Contains(skill.Name) && skill.Type == skillTypeModel.SkillType)
+                            .ToList();
+
                         foreach (var skill in validSkills)
                         {
                             newFreelancer.FreelancerSkills.Add(new FreelancerSkill
@@ -170,11 +199,13 @@ public class FreelancerService : IFreelancerService
     public async Task<ResponseDataModel<List<FreelancerModel>>> DeleteFreelancer(List<Guid> freelancerIds)
     {
         var deleteList = new List<Freelancer>();
+        var freelancerStatus = FreelancerStatus.NotAvailable.ToString();
         foreach (Guid freelancerId in freelancerIds)
         {
             var freelancer = await _unitOfWork.FreelancerRepository.GetAsync(freelancerId);
             if (freelancer != null)
             {
+                freelancer.Status = freelancerStatus;
                 deleteList.Add(freelancer);
             }
         }
@@ -183,15 +214,12 @@ public class FreelancerService : IFreelancerService
             _unitOfWork.FreelancerRepository.SoftDeleteRange(deleteList);
             await _unitOfWork.SaveChangeAsync();
             var result = _mapper.Map<List<FreelancerModel>>(deleteList);
-            if (result != null)
+            return new ResponseDataModel<List<FreelancerModel>>()
             {
-                return new ResponseDataModel<List<FreelancerModel>>()
-                {
-                    Status = true,
-                    Message = "Delete freelancer successfully",
-                    Data = result
-                };
-            }
+                Status = true,
+                Message = "Delete freelancer successfully",
+                Data = result
+            };
         }
         return new ResponseDataModel<List<FreelancerModel>>()
         {
@@ -199,5 +227,6 @@ public class FreelancerService : IFreelancerService
             Message = "Delete freelancer failed"
         };
     }
+
 
 }
