@@ -15,6 +15,10 @@ using System.Security.Claims;
 using Repositories.Common;
 using Repositories.Enums;
 using Role = Repositories.Enums.Role;
+using FirebaseAdmin.Auth;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace Services.Services
 {
@@ -443,27 +447,64 @@ namespace Services.Services
             };
         }
 
+        public bool IsGoogleIdToken(string idToken)
+        {
+            var parts = idToken.Split('.');
+            if (parts.Length != 3)
+            {
+                return false;
+            }
+            var payload = parts[1];
+            var decodedPayload = Base64UrlEncoder.DecodeBytes(payload);
+            if (decodedPayload == null)
+            {
+                return false;
+            }
+            var payloadJson = Encoding.UTF8.GetString(decodedPayload);
+            var jsonObject = JObject.Parse(payloadJson);
+            var audience = jsonObject["aud"]?.ToString();
+            var googleClientId = _configuration["OAuth2:Google:ClientId"];
+            if (audience == googleClientId)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public async Task<ResponseDataModel<TokenModel>> LoginGoogle(LoginGoogleIdTokenModel loginGoogleIdTokenModel)
         {
-            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            FirebaseToken decodedToken = null;
+            GoogleJsonWebSignature.Payload payload = null;
+            var validToken = false;
+
+            var isGoogleIdToken = IsGoogleIdToken(loginGoogleIdTokenModel.IdToken);
+
+            if (isGoogleIdToken)
             {
-                Audience = new List<string> { _configuration["OAuth2:Google:ClientId"] }
-            };
+                var settings = new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new List<string> { _configuration["OAuth2:Google:ClientId"] }
+                };
 
-            var payload = await GoogleJsonWebSignature.ValidateAsync(loginGoogleIdTokenModel.IdToken, settings);
+                payload = await GoogleJsonWebSignature.ValidateAsync(loginGoogleIdTokenModel.IdToken, settings);
+                validToken = true;
+            }
+            else
+            {
+                decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(loginGoogleIdTokenModel.IdToken);
+                validToken = true;
+            }
 
-            if (payload == null)
+            if (!validToken)
             {
                 return new ResponseDataModel<TokenModel>
                 {
                     Status = false,
-                    Message = "Invalid credentials",
+                    Message = "Invalid credentials"
                 };
             }
-
-            // Use payload based on need
-            var user = await _unitOfWork.FreelancerRepository.GetFreelancerByEmail(payload.Email);
-
+            var email = payload != null ? payload.Email : decodedToken.Claims["email"].ToString();
+            var user = await _unitOfWork.FreelancerRepository.GetFreelancerByEmail(email);
             if (user == null)
             {
                 return new ResponseDataModel<TokenModel>
@@ -480,13 +521,6 @@ namespace Services.Services
                 new Claim("userEmail", user.Email.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
-
-            // var userRoles = await _userManager.GetRolesAsync(user);
-            //
-            // foreach (var userRole in userRoles)
-            // {
-            // 	authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            // }
 
             authClaims.Add(new Claim(ClaimTypes.Role, "Freelancer"));
 
