@@ -23,23 +23,23 @@ namespace Repositories.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(x => x.Code == code);
         }
 
-        public async Task<List<Account>> GetAccountsByFilter(PaginationParameter paginationParameter,
+        public async Task<List<AccountModel>> GetAccountsByFilter(PaginationParameter paginationParameter,
             AccountFilterModel accountFilterModel)
         {
-            var accountList = await _dbContext.Users.ToListAsync();
+            var accountList = _dbContext.Users.AsQueryable();
 
             // Filter
-            accountList = accountList.Where(x => x.IsDeleted == accountFilterModel.IsDeleted).ToList();
+            accountList = accountList.Where(x => x.IsDeleted == accountFilterModel.IsDeleted);
 
             if (accountFilterModel.Gender != null)
             {
-                accountList = accountList.Where(x => x.Gender == accountFilterModel.Gender).ToList();
+                accountList = accountList.Where(x => x.Gender == accountFilterModel.Gender);
             }
 
             if (accountFilterModel.Role != null)
             {
                 var usersInRole = await _userManager.GetUsersInRoleAsync(accountFilterModel.Role.ToString());
-                accountList = accountList.Where(x => usersInRole.Contains(x)).ToList();
+                accountList = accountList.Where(x => usersInRole.Contains(x));
             }
 
             // Search
@@ -49,37 +49,60 @@ namespace Repositories.Repositories
                     .Where(x => x.FirstName.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
                                 x.LastName.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
                                 x.Code.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
-                                x.Email.ToLower().Contains(accountFilterModel.Search.ToLower())).ToList();
+                                x.Email.ToLower().Contains(accountFilterModel.Search.ToLower()));
             }
 
             switch (accountFilterModel.Sort.ToLower())
             {
                 case "firstname":
                     accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
-                        ? accountList.OrderBy(x => x.FirstName).ToList()
-                        : accountList.OrderByDescending(x => x.FirstName).ToList();
+                        ? accountList.OrderBy(x => x.FirstName)
+                        : accountList.OrderByDescending(x => x.FirstName);
                     break;
                 case "lastname":
                     accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
-                        ? accountList.OrderBy(x => x.LastName).ToList()
-                        : accountList.OrderByDescending(x => x.LastName).ToList();
+                        ? accountList.OrderBy(x => x.LastName)
+                        : accountList.OrderByDescending(x => x.LastName);
                     break;
                 case "code":
                     accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
-                        ? accountList.OrderBy(x => x.Code).ToList()
-                        : accountList.OrderByDescending(x => x.Code).ToList();
+                        ? accountList.OrderBy(x => x.Code)
+                        : accountList.OrderByDescending(x => x.Code);
                     break;
                 case "dateofbirth":
                     accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
-                        ? accountList.OrderBy(x => x.DateOfBirth).ToList()
-                        : accountList.OrderByDescending(x => x.DateOfBirth).ToList();
+                        ? accountList.OrderBy(x => x.DateOfBirth)
+                        : accountList.OrderByDescending(x => x.DateOfBirth);
                     break;
                 default:
-                    accountList = accountList.OrderByDescending(x => x.CreationDate).ToList();
+                    accountList = accountList.OrderByDescending(x => x.CreationDate);
                     break;
             }
 
-            return accountList;
+            var accountModelList = await accountList
+                .Select(f => new AccountModel()
+                {
+                    Id = f.Id,
+                    FirstName = f.FirstName,
+                    LastName = f.LastName,
+                    Gender = f.Gender.ToString(),
+                    DateOfBirth = f.DateOfBirth,
+                    Address = f.Address,
+                    Image = f.Image,
+                    Code = f.Code,
+                    Email = f.Email,
+                    PhoneNumber = f.PhoneNumber,
+                    Role = _dbContext.UserRoles
+                        .Where(ur => ur.UserId == f.Id)
+                        .Join(_dbContext.Roles,
+                            ur => ur.RoleId,
+                            r => r.Id,
+                            (ur, r) => r.Name)
+                        .FirstOrDefault()
+                })
+                .ToListAsync();
+
+            return accountModelList;
         }
     }
 }

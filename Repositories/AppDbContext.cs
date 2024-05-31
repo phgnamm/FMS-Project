@@ -15,7 +15,7 @@ namespace Repositories
         public DbSet<DeliverableProduct> DeliverableProduct { get; set; }
         public DbSet<FreelancerSkill> FreelancerSkill { get; set; }
         public DbSet<Project> Project { get; set; }
-        public DbSet<ProjectApply> ProjectApplie { get; set; }
+        public DbSet<ProjectApply> ProjectApply { get; set; }
         public DbSet<ProjectCategory> ProjectCategory { get; set; }
         public DbSet<ProjectDeliverable> ProjectDeliverable { get; set; }
         public DbSet<Skill> Skill { get; set; }
