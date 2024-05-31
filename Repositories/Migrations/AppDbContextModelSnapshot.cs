@@ -484,9 +484,6 @@ namespace Repositories.Migrations
                     b.Property<Guid?>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(450)");
 
@@ -593,7 +590,7 @@ namespace Repositories.Migrations
 
                     b.HasIndex("ProjectId");
 
-                    b.ToTable("ProjectApplie");
+                    b.ToTable("ProjectApply");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectCategory", b =>

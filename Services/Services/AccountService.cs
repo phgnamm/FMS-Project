@@ -662,7 +662,7 @@ namespace Services.Services
             var projectList = await _unitOfWork.ProjectRepository.GetProjectByAccount(id, false,
                 [ProjectStatus.Pending, ProjectStatus.Processing, ProjectStatus.Checking]);
             
-            if (projectList != null)
+            if (projectList.Count > 0)
             {
                 return new ResponseModel()
                 {

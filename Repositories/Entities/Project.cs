@@ -11,7 +11,7 @@
 
         // Foreign key
         public Guid? AccountId { get; set; }
-        public Guid? CategoryId { get; set; }
+        public Guid? ProjectCategoryId { get; set; }
 
         // Relationship
         public virtual Account? Account { get; set; }
