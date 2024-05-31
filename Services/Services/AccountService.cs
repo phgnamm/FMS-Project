@@ -618,6 +618,29 @@ namespace Services.Services
                 }
             }
 
+            var role = await _userManager.GetRolesAsync(user);
+            if (accountUpdateModel.Role.ToString() != role[0])
+            {
+                // Check if old role is Staff and he/she is working on a project
+                if (role[0] == Role.Staff.ToString())
+                {
+                    var projectList = await _unitOfWork.ProjectRepository.GetProjectByAccount(id, false,
+                        [ProjectStatus.Pending, ProjectStatus.Processing, ProjectStatus.Checking]);
+
+                    if (projectList.Count > 0)
+                    {
+                        return new ResponseModel()
+                        {
+                            Status = false,
+                            Message = "Can not change role because he/she is working on a project"
+                        };
+                    }
+                }
+
+                await _userManager.RemoveFromRoleAsync(user, role[0]);
+                await _userManager.AddToRoleAsync(user, accountUpdateModel.Role.ToString());
+            }
+
             user.FirstName = accountUpdateModel.FirstName;
             user.LastName = accountUpdateModel.LastName;
             user.Gender = accountUpdateModel.Gender;
@@ -661,7 +684,7 @@ namespace Services.Services
 
             var projectList = await _unitOfWork.ProjectRepository.GetProjectByAccount(id, false,
                 [ProjectStatus.Pending, ProjectStatus.Processing, ProjectStatus.Checking]);
-            
+
             if (projectList.Count > 0)
             {
                 return new ResponseModel()
@@ -674,7 +697,7 @@ namespace Services.Services
             user.IsDeleted = true;
             user.DeletionDate = DateTime.UtcNow;
             user.DeletedBy = _claimsService.GetCurrentUserId;
-            
+
             var result = await _userManager.UpdateAsync(user);
 
             if (result.Succeeded)
