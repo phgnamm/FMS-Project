@@ -13,7 +13,12 @@ using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Repositories.Common;
+using Repositories.Enums;
 using Role = Repositories.Enums.Role;
+using FirebaseAdmin.Auth;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
+using System.Text;
 
 namespace Services.Services
 {
@@ -442,27 +447,64 @@ namespace Services.Services
             };
         }
 
+        public bool IsGoogleIdToken(string idToken)
+        {
+            var parts = idToken.Split('.');
+            if (parts.Length != 3)
+            {
+                return false;
+            }
+            var payload = parts[1];
+            var decodedPayload = Base64UrlEncoder.DecodeBytes(payload);
+            if (decodedPayload == null)
+            {
+                return false;
+            }
+            var payloadJson = Encoding.UTF8.GetString(decodedPayload);
+            var jsonObject = JObject.Parse(payloadJson);
+            var audience = jsonObject["aud"]?.ToString();
+            var googleClientId = _configuration["OAuth2:Google:ClientId"];
+            if (audience == googleClientId)
+            {
+                return true;
+            }
+            return false;
+        }
+
         public async Task<ResponseDataModel<TokenModel>> LoginGoogle(LoginGoogleIdTokenModel loginGoogleIdTokenModel)
         {
-            var settings = new GoogleJsonWebSignature.ValidationSettings()
+            FirebaseToken decodedToken = null;
+            GoogleJsonWebSignature.Payload payload = null;
+            var validToken = false;
+
+            var isGoogleIdToken = IsGoogleIdToken(loginGoogleIdTokenModel.IdToken);
+
+            if (isGoogleIdToken)
             {
-                Audience = new List<string> { _configuration["OAuth2:Google:ClientId"] }
-            };
+                var settings = new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new List<string> { _configuration["OAuth2:Google:ClientId"] }
+                };
 
-            var payload = await GoogleJsonWebSignature.ValidateAsync(loginGoogleIdTokenModel.IdToken, settings);
+                payload = await GoogleJsonWebSignature.ValidateAsync(loginGoogleIdTokenModel.IdToken, settings);
+                validToken = true;
+            }
+            else
+            {
+                decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(loginGoogleIdTokenModel.IdToken);
+                validToken = true;
+            }
 
-            if (payload == null)
+            if (!validToken)
             {
                 return new ResponseDataModel<TokenModel>
                 {
                     Status = false,
-                    Message = "Invalid credentials",
+                    Message = "Invalid credentials"
                 };
             }
-
-            // Use payload based on need
-            var user = await _unitOfWork.FreelancerRepository.GetFreelancerByEmail(payload.Email);
-
+            var email = payload != null ? payload.Email : decodedToken.Claims["email"].ToString();
+            var user = await _unitOfWork.FreelancerRepository.GetFreelancerByEmail(email);
             if (user == null)
             {
                 return new ResponseDataModel<TokenModel>
@@ -479,13 +521,6 @@ namespace Services.Services
                 new Claim("userEmail", user.Email.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
-
-            // var userRoles = await _userManager.GetRolesAsync(user);
-            //
-            // foreach (var userRole in userRoles)
-            // {
-            // 	authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            // }
 
             authClaims.Add(new Claim(ClaimTypes.Role, "Freelancer"));
 
@@ -556,7 +591,7 @@ namespace Services.Services
             AccountFilterModel accountFilterModel)
         {
             var accountList = await _accountRepository.GetAccountsByFilter(paginationParameter, accountFilterModel);
-            
+
             // Pagination
             if (accountList != null)
             {
@@ -567,12 +602,130 @@ namespace Services.Services
                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                     .Take(paginationParameter.PageSize)
                     .ToList();
-                
+
                 return new Pagination<AccountModel>(paginationList, totalCount, paginationParameter.PageIndex,
                     paginationParameter.PageSize);
             }
-            
+
             return null;
+        }
+
+        public async Task<ResponseModel> UpdateAccount(AccountUpdateModel accountUpdateModel, Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return new ResponseModel()
+                {
+                    Status = false,
+                    Message = "User not found"
+                };
+            }
+
+            // Check if Email already exists
+            if (accountUpdateModel.Email != user.Email)
+            {
+                var existedEmail = await _userManager.FindByEmailAsync(accountUpdateModel.Email);
+
+                if (existedEmail != null)
+                {
+                    return new ResponseModel
+                    {
+                        Status = false,
+                        Message = "Email already exists"
+                    };
+                }
+            }
+
+            // Check if Code already exists
+            if (accountUpdateModel.Code != user.Code)
+            {
+                var existedCode = await _unitOfWork.AccountRepository.GetAccountByCode(accountUpdateModel.Code);
+
+                if (existedCode != null)
+                {
+                    return new ResponseModel
+                    {
+                        Status = false,
+                        Message = "Code already exists"
+                    };
+                }
+            }
+
+            user.FirstName = accountUpdateModel.FirstName;
+            user.LastName = accountUpdateModel.LastName;
+            user.Gender = accountUpdateModel.Gender;
+            user.DateOfBirth = accountUpdateModel.DateOfBirth;
+            user.PhoneNumber = accountUpdateModel.PhoneNumber;
+            user.Email = accountUpdateModel.Email;
+            user.Code = accountUpdateModel.Code;
+            user.ModificationDate = DateTime.UtcNow;
+            user.ModifiedBy = _claimsService.GetCurrentUserId;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return new ResponseModel
+                {
+                    Status = true,
+                    Message = "Update Account successfully",
+                };
+            }
+
+            return new ResponseModel
+            {
+                Status = false,
+                Message = "Cannot update Account",
+            };
+        }
+
+        public async Task<ResponseModel> DeleteAccount(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return new ResponseModel()
+                {
+                    Status = false,
+                    Message = "User not found"
+                };
+            }
+
+            var projectList = await _unitOfWork.ProjectRepository.GetProjectByAccount(id, false,
+                [ProjectStatus.Pending, ProjectStatus.Processing, ProjectStatus.Checking]);
+            
+            if (projectList.Count > 0)
+            {
+                return new ResponseModel()
+                {
+                    Status = false,
+                    Message = "Can not delete this Account because he/she is working on a project"
+                };
+            }
+
+            user.IsDeleted = true;
+            user.DeletionDate = DateTime.UtcNow;
+            user.DeletedBy = _claimsService.GetCurrentUserId;
+            
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return new ResponseModel
+                {
+                    Status = true,
+                    Message = "Delete Account successfully",
+                };
+            }
+
+            return new ResponseModel
+            {
+                Status = false,
+                Message = "Cannot delete Account",
+            };
         }
     }
 }

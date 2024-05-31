@@ -47,7 +47,9 @@ namespace Repositories.Repositories
             {
                 accountList = accountList
                     .Where(x => x.FirstName.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
-                                x.LastName.ToLower().Contains(accountFilterModel.Search.ToLower())).ToList();
+                                x.LastName.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
+                                x.Code.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
+                                x.Email.ToLower().Contains(accountFilterModel.Search.ToLower())).ToList();
             }
 
             switch (accountFilterModel.Sort.ToLower())
@@ -61,6 +63,11 @@ namespace Repositories.Repositories
                     accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
                         ? accountList.OrderBy(x => x.LastName).ToList()
                         : accountList.OrderByDescending(x => x.LastName).ToList();
+                    break;
+                case "code":
+                    accountList = (accountFilterModel.SortDirection.ToLower() == "asc")
+                        ? accountList.OrderBy(x => x.Code).ToList()
+                        : accountList.OrderByDescending(x => x.Code).ToList();
                     break;
                 case "dateofbirth":
                     accountList = (accountFilterModel.SortDirection.ToLower() == "asc")

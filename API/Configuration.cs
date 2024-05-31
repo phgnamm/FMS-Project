@@ -10,6 +10,8 @@ using Repositories.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Services.Common;
 using API.Services;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 namespace API
 {
@@ -31,9 +33,12 @@ namespace API
 			{
 				options.TokenLifespan = TimeSpan.FromMinutes(15);
 			});
-
-			// Middlewares
-			services.AddSingleton<GlobalExceptionMiddleware>();
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = GoogleCredential.FromFile("credentials.json"),
+            });
+            // Middlewares
+            services.AddSingleton<GlobalExceptionMiddleware>();
 			services.AddSingleton<PerformanceMiddleware>();
 			services.AddSingleton<Stopwatch>();
 
@@ -49,11 +54,21 @@ namespace API
 			services.AddScoped<IAccountService, AccountService>();
 			services.AddScoped<IAccountRepository, AccountRepository>();
 			
+			
 			// Freelancer
 			services.AddScoped<IFreelancerService, FreelancerService>();
 			services.AddScoped<IFreelancerRepository, FreelancerRepository>();
+			
+			// Project
+			services.AddScoped<IProjectRepository, ProjectRepository>();
 
-			return services;
+            //Skill
+            services.AddScoped<ISkillService, SkillService>();
+            services.AddScoped<ISkillRepository, SkillRepository>();
+
+
+
+            return services;
 		}
 	}
 }

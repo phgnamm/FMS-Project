@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repositories;
 
@@ -11,9 +12,11 @@ using Repositories;
 namespace Repositories.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240528144606_UpdateEntitiesV3")]
+    partial class UpdateEntitiesV3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -524,9 +527,6 @@ namespace Repositories.Migrations
                     b.Property<float?>("Price")
                         .HasColumnType("real");
 
-                    b.Property<Guid?>("ProjectCategoryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Status")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -535,11 +535,11 @@ namespace Repositories.Migrations
 
                     b.HasIndex("AccountId");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("Code")
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
-
-                    b.HasIndex("ProjectCategoryId");
 
                     b.ToTable("Project");
                 });
@@ -905,13 +905,13 @@ namespace Repositories.Migrations
                         .WithMany("Projects")
                         .HasForeignKey("AccountId");
 
-                    b.HasOne("Repositories.Entities.ProjectCategory", "ProjectCategory")
+                    b.HasOne("Repositories.Entities.ProjectCategory", "Category")
                         .WithMany("Projects")
-                        .HasForeignKey("ProjectCategoryId");
+                        .HasForeignKey("CategoryId");
 
                     b.Navigation("Account");
 
-                    b.Navigation("ProjectCategory");
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectApply", b =>
@@ -920,13 +920,13 @@ namespace Repositories.Migrations
                         .WithMany("ProjectApplies")
                         .HasForeignKey("FreelancerId");
 
-                    b.HasOne("Repositories.Entities.Project", "Project")
+                    b.HasOne("Repositories.Entities.Project", "ApplyProject")
                         .WithMany("ProjectApplies")
                         .HasForeignKey("ProjectId");
 
-                    b.Navigation("Freelancer");
+                    b.Navigation("ApplyProject");
 
-                    b.Navigation("Project");
+                    b.Navigation("Freelancer");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectDeliverable", b =>
@@ -947,7 +947,7 @@ namespace Repositories.Migrations
             modelBuilder.Entity("Repositories.Entities.Transaction", b =>
                 {
                     b.HasOne("Repositories.Entities.Freelancer", "Freelancer")
-                        .WithMany("Transactions")
+                        .WithMany()
                         .HasForeignKey("FreelancerId");
 
                     b.HasOne("Repositories.Entities.Project", "Project")
@@ -974,8 +974,6 @@ namespace Repositories.Migrations
                     b.Navigation("FreelancerSkills");
 
                     b.Navigation("ProjectApplies");
-
-                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Repositories.Entities.Project", b =>

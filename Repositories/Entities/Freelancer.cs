@@ -15,6 +15,7 @@ namespace Repositories.Entities
         public float? Wallet { get; set; }
         public string? Image { get; set; }
         public string? Status { get; set; }
+        public int? Warning { get; set; }
         
         // Refresh Token
         public string? RefreshToken { get; set; }
@@ -23,5 +24,6 @@ namespace Repositories.Entities
         // Relationship
         public virtual ICollection<FreelancerSkill> FreelancerSkills { get; set; } = new List<FreelancerSkill>();
         public virtual ICollection<ProjectApply> ProjectApplies { get; set; } = new List<ProjectApply>();
+        public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
     }
 }
