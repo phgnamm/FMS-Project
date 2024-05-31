@@ -16,19 +16,19 @@ public class ProjectRepository : GenericRepository<Project>, IProjectRepository
 
     public async Task<List<Project>> GetProjectByAccount(Guid id, bool isDeleted, ProjectStatus[] projectStatusList)
     {
-        var projectList = await _dbContext.Project.Where(x => x.AccountId == id).ToListAsync();
+        var projectList = _dbContext.Project.Where(x => x.AccountId == id);
 
         if (isDeleted != null)
         {
-            projectList = projectList.Where(x => x.IsDeleted == isDeleted).ToList();
+            projectList = projectList.Where(x => x.IsDeleted == isDeleted);
         }
 
         if (projectStatusList != null)
         {
             var statusStrings = projectStatusList.Select(ps => ps.ToString()).ToList();
-            projectList = projectList.Where(x => statusStrings.Contains(x.Status)).ToList();
+            projectList = projectList.Where(x => statusStrings.Contains(x.Status));
         }
 
-        return projectList;
+        return projectList.ToList();
     }
 }

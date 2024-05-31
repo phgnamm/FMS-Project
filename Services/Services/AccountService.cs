@@ -596,9 +596,8 @@ namespace Services.Services
             if (accountList != null)
             {
                 var totalCount = accountList.Count();
-                var accountListModel = _mapper.Map<List<AccountModel>>(accountList);
 
-                var paginationList = accountListModel
+                var paginationList = accountList
                     .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
                     .Take(paginationParameter.PageSize)
                     .ToList();
