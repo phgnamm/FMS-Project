@@ -1,4 +1,6 @@
-﻿namespace Repositories.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Repositories.Entities
 {
     public class Project : BaseEntity
     {
@@ -15,6 +17,7 @@
 
         // Relationship
         public virtual Account? Account { get; set; }
+        [ForeignKey("CategoryId")]
         public virtual ProjectCategory? ProjectCategory { get; set; }
         public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
         public virtual ICollection<ProjectApply> ProjectApplies { get; set; } = new List<ProjectApply>();
