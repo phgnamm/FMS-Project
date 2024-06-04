@@ -6,9 +6,9 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
 ARG BUILD_CONFIGURATION=Release
 
-COPY ["API/ChillDe.FMS.API.csproj", "ChillDe.FMS.API/"]
-COPY ["Services/ChillDe.FMS.Services.csproj", "ChillDe.FMS.Services/"]
-COPY ["Repositories/ChillDe.FMS.Repositories.csproj", "ChillDe.FMS.Repositories/"]
+COPY ["ChillDe.FMS.API/ChillDe.FMS.API.csproj", "ChillDe.FMS.API/"]
+COPY ["ChillDe.FMS.Services/ChillDe.FMS.Services.csproj", "ChillDe.FMS.Services/"]
+COPY ["ChillDe.FMS.Repositories/ChillDe.FMS.Repositories.csproj", "ChillDe.FMS.Repositories/"]
 RUN dotnet restore API/ChillDe.FMS.API.csproj
 COPY . .
 WORKDIR "/ChillDe.FMS.API"
