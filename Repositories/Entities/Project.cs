@@ -11,11 +11,11 @@
 
         // Foreign key
         public Guid? AccountId { get; set; }
-        public Guid? CategoryId { get; set; }
+        public Guid? ProjectCategoryId { get; set; }
 
         // Relationship
         public virtual Account? Account { get; set; }
-        public virtual ProjectCategory? Category { get; set; }
+        public virtual ProjectCategory? ProjectCategory { get; set; }
         public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
         public virtual ICollection<ProjectApply> ProjectApplies { get; set; } = new List<ProjectApply>();
 

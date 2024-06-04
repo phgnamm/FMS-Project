@@ -8,7 +8,7 @@ namespace Repositories.Interfaces
     {
         Task<Account> GetAccountByCode(string code);
 
-        public Task<List<Account>> GetAccountsByFilter(PaginationParameter paginationParameter,
+        public Task<List<AccountModel>> GetAccountsByFilter(PaginationParameter paginationParameter,
             AccountFilterModel accountFilterModel);
     }
 }

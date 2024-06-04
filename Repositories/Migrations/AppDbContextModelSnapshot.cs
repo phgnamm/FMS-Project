@@ -421,6 +421,9 @@ namespace Repositories.Migrations
                     b.Property<float?>("Wallet")
                         .HasColumnType("real");
 
+                    b.Property<int?>("Warning")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
@@ -481,9 +484,6 @@ namespace Repositories.Migrations
                     b.Property<Guid?>("AccountId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CategoryId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Code")
                         .HasColumnType("nvarchar(450)");
 
@@ -521,6 +521,9 @@ namespace Repositories.Migrations
                     b.Property<float?>("Price")
                         .HasColumnType("real");
 
+                    b.Property<Guid?>("ProjectCategoryId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Status")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -529,11 +532,11 @@ namespace Repositories.Migrations
 
                     b.HasIndex("AccountId");
 
-                    b.HasIndex("CategoryId");
-
                     b.HasIndex("Code")
                         .IsUnique()
                         .HasFilter("[Code] IS NOT NULL");
+
+                    b.HasIndex("ProjectCategoryId");
 
                     b.ToTable("Project");
                 });
@@ -556,6 +559,9 @@ namespace Repositories.Migrations
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid?>("FreelancerId")
                         .HasColumnType("uniqueidentifier");
 
@@ -570,6 +576,9 @@ namespace Repositories.Migrations
 
                     b.Property<Guid?>("ProjectId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
                         .HasMaxLength(50)
@@ -893,13 +902,13 @@ namespace Repositories.Migrations
                         .WithMany("Projects")
                         .HasForeignKey("AccountId");
 
-                    b.HasOne("Repositories.Entities.ProjectCategory", "Category")
+                    b.HasOne("Repositories.Entities.ProjectCategory", "ProjectCategory")
                         .WithMany("Projects")
-                        .HasForeignKey("CategoryId");
+                        .HasForeignKey("ProjectCategoryId");
 
                     b.Navigation("Account");
 
-                    b.Navigation("Category");
+                    b.Navigation("ProjectCategory");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectApply", b =>
@@ -908,13 +917,13 @@ namespace Repositories.Migrations
                         .WithMany("ProjectApplies")
                         .HasForeignKey("FreelancerId");
 
-                    b.HasOne("Repositories.Entities.Project", "ApplyProject")
+                    b.HasOne("Repositories.Entities.Project", "Project")
                         .WithMany("ProjectApplies")
                         .HasForeignKey("ProjectId");
 
-                    b.Navigation("ApplyProject");
-
                     b.Navigation("Freelancer");
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Repositories.Entities.ProjectDeliverable", b =>
@@ -935,7 +944,7 @@ namespace Repositories.Migrations
             modelBuilder.Entity("Repositories.Entities.Transaction", b =>
                 {
                     b.HasOne("Repositories.Entities.Freelancer", "Freelancer")
-                        .WithMany()
+                        .WithMany("Transactions")
                         .HasForeignKey("FreelancerId");
 
                     b.HasOne("Repositories.Entities.Project", "Project")
@@ -962,6 +971,8 @@ namespace Repositories.Migrations
                     b.Navigation("FreelancerSkills");
 
                     b.Navigation("ProjectApplies");
+
+                    b.Navigation("Transactions");
                 });
 
             modelBuilder.Entity("Repositories.Entities.Project", b =>
