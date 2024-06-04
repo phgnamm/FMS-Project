@@ -7,22 +7,27 @@ using Microsoft.OpenApi.Models;
 using Repositories;
 using Repositories.Common;
 using System.Text;
+using API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = new KebabCaseNamingPolicy();
+    options.JsonSerializerOptions.DictionaryKeyPolicy = new KebabCaseNamingPolicy();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(x =>
 {
-	x.SwaggerDoc("v1", new OpenApiInfo { Title = "FMS NextBean Edition", Version = "v1" });
+    x.SwaggerDoc("v1", new OpenApiInfo { Title = "FMS NextBean Edition", Version = "v1" });
 });
 
 // Local Database
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
 });
 
 // ===================== FOR DEPLOY AZURE =======================
@@ -44,55 +49,55 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
 // ==================== NO EDIT OR REMOVE COMMENT =======================
 
 
-
 // Add API Configuration
 builder.Services.AddAPIConfiguration();
 
 // JWT
 builder.Services.AddAuthentication(options =>
 {
-	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-	options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-	options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
 }).AddCookie(options =>
 {
-	options.Cookie.Name = "refreshToken";
-	options.Cookie.HttpOnly = true; // Ensure HTTP-only cookie
-	options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Make sure to send only over HTTPS
-	options.SlidingExpiration = true; // Renew the cookie expiration time on each request
+    options.Cookie.Name = "refreshToken";
+    options.Cookie.HttpOnly = true; // Ensure HTTP-only cookie
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Make sure to send only over HTTPS
+    options.SlidingExpiration = true; // Renew the cookie expiration time on each request
 }).AddGoogle(options =>
 {
-	options.ClientId = builder.Configuration["OAuth2:Google:ClientId"];
-	options.ClientSecret = builder.Configuration["OAuth2:Google:ClientSecret"];
+    options.ClientId = builder.Configuration["OAuth2:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["OAuth2:Google:ClientSecret"];
 }).AddJwtBearer(options =>
 {
-	options.SaveToken = true;
-	options.RequireHttpsMetadata = false;
-	options.TokenValidationParameters = new TokenValidationParameters
-	{
-		ValidateIssuer = true,
-		ValidateAudience = true,
-		ValidateLifetime = true,
-		ValidateIssuerSigningKey = true,
-		ValidAudience = builder.Configuration["JWT:ValidAudience"],
-		ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
-		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
-	};
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = false;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidAudience = builder.Configuration["JWT:ValidAudience"],
+        ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+    };
 });
 
 builder.Services.AddCors(options =>
 {
-	options.AddPolicy("cors",
-		builder =>
-		{
-			builder
-			//.AllowAnyOrigin()
-			.WithOrigins("http://localhost:5173", "https://fms-nextbean-edition.vercel.app", "http://localhost:63661")
-			.AllowAnyHeader()
-			.WithExposedHeaders("X-Pagination")
-			.AllowAnyMethod()
-			.AllowCredentials();
-		});
+    options.AddPolicy("cors",
+        builder =>
+        {
+            builder
+                //.AllowAnyOrigin()
+                .WithOrigins("http://localhost:5173", "https://fms-nextbean-edition.vercel.app",
+                    "http://localhost:63661")
+                .AllowAnyHeader()
+                .WithExposedHeaders("X-Pagination")
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
 });
 
 var app = builder.Build();
@@ -103,8 +108,8 @@ app.UseCors("cors");
 //Initial Seeding
 using (var scope = app.Services.CreateScope())
 {
-	var services = scope.ServiceProvider;
-	await InitialSeeding.Initialize(services);
+    var services = scope.ServiceProvider;
+    await InitialSeeding.Initialize(services);
 }
 
 // Middleware
