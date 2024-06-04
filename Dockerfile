@@ -9,7 +9,7 @@ ARG BUILD_CONFIGURATION=Release
 COPY ["ChillDe.FMS.API/ChillDe.FMS.API.csproj", "ChillDe.FMS.API/"]
 COPY ["ChillDe.FMS.Services/ChillDe.FMS.Services.csproj", "ChillDe.FMS.Services/"]
 COPY ["ChillDe.FMS.Repositories/ChillDe.FMS.Repositories.csproj", "ChillDe.FMS.Repositories/"]
-RUN dotnet restore API/ChillDe.FMS.API.csproj
+RUN dotnet restore ChillDe.FMS.API/ChillDe.FMS.API.csproj
 COPY . .
 WORKDIR "/ChillDe.FMS.API"
 RUN dotnet build ChillDe.FMS.API.csproj -c $BUILD_CONFIGURATION -o /app/build
