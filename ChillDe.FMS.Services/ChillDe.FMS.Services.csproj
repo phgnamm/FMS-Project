@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ChillDe.FMS.Services</AssemblyName>
+    <RootNamespace>ChillDe.FMS.Services</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ChillDe.FMS.Repositories\ChillDe.FMS.Repositories.csproj" />
+  </ItemGroup>
+
+</Project>
