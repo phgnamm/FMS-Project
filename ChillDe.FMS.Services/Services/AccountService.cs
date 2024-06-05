@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using AutoMapper;
+﻿using AutoMapper;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -15,6 +14,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Enums;
+using Microsoft.EntityFrameworkCore;
 using AccountModel = ChillDe.FMS.Repositories.Models.AccountModels.AccountModel;
 using Role = ChillDe.FMS.Repositories.Enums.Role;
 
@@ -557,10 +557,6 @@ namespace ChillDe.FMS.Services
 
         public async Task<Pagination<AccountModel>> GetAllAccounts(AccountFilterModel accountFilterModel)
         {
-            // Set up min max pagination size
-            accountFilterModel.MinPageSize = PaginationConstant.ACCOUNT_MIN_PAGE_SIZE;
-            accountFilterModel.MaxPageSize = PaginationConstant.ACCOUNT_MAX_PAGE_SIZE;
-
             var accountList = await _unitOfWork.AccountRepository.GetAllAsync(pageIndex: accountFilterModel.PageIndex,
                 pageSize: accountFilterModel.PageSize,
                 filter: (x =>
@@ -576,11 +572,11 @@ namespace ChillDe.FMS.Services
                 {
                     switch (accountFilterModel.Order.ToLower())
                     {
-                        case "firstname":
+                        case "first-name":
                             return accountFilterModel.OrderByDescending
                                 ? x.OrderByDescending(x => x.FirstName)
                                 : x.OrderBy(x => x.FirstName);
-                        case "lastname":
+                        case "last-name":
                             return accountFilterModel.OrderByDescending
                                 ? x.OrderByDescending(x => x.LastName)
                                 : x.OrderBy(x => x.LastName);
@@ -588,7 +584,7 @@ namespace ChillDe.FMS.Services
                             return accountFilterModel.OrderByDescending
                                 ? x.OrderByDescending(x => x.Code)
                                 : x.OrderBy(x => x.Code);
-                        case "dateofbirth":
+                        case "date-of-birth":
                             return accountFilterModel.OrderByDescending
                                 ? x.OrderByDescending(x => x.DateOfBirth)
                                 : x.OrderBy(x => x.DateOfBirth);
@@ -600,7 +596,7 @@ namespace ChillDe.FMS.Services
 
             if (accountList != null)
             {
-                var totalCount = accountList.Count();
+                var totalCount = await _userManager.Users.CountAsync();
                 return new Pagination<AccountModel>(accountList, totalCount, accountFilterModel.PageIndex,
                     accountFilterModel.PageSize);
             }
@@ -746,6 +742,43 @@ namespace ChillDe.FMS.Services
             {
                 Status = false,
                 Message = "Cannot delete Account",
+            };
+        }
+
+        public async Task<ResponseModel> RestoreAccount(Guid id)
+        {
+            var user = await _userManager.FindByIdAsync(id.ToString());
+
+            if (user == null)
+            {
+                return new ResponseModel()
+                {
+                    Status = false,
+                    Message = "User not found"
+                };
+            }
+            
+            user.IsDeleted = false;
+            user.DeletionDate = null;
+            user.DeletedBy = null;
+            user.ModificationDate = DateTime.UtcNow;
+            user.ModifiedBy = _claimsService.GetCurrentUserId;
+            
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return new ResponseModel
+                {
+                    Status = true,
+                    Message = "Restore Account successfully",
+                };
+            }
+
+            return new ResponseModel
+            {
+                Status = false,
+                Message = "Cannot restore Account",
             };
         }
     }

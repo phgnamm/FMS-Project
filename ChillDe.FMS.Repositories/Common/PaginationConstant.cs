@@ -6,5 +6,5 @@ public static class PaginationConstant
     public const int DEFAULT_MAX_PAGE_SIZE = 50;
 
     public const int ACCOUNT_MIN_PAGE_SIZE = 10;
-    public const int ACCOUNT_MAX_PAGE_SIZE = 200;
+    public const int ACCOUNT_MAX_PAGE_SIZE = 100;
 }

@@ -26,5 +26,6 @@ namespace Services.Interfaces
         Task<Pagination<AccountModel>> GetAllAccounts(AccountFilterModel accountFilterModel);
         Task<ResponseModel> UpdateAccount(AccountUpdateModel accountUpdateModel, Guid id);
         Task<ResponseModel> DeleteAccount(Guid id);
+        Task<ResponseModel> RestoreAccount(Guid id);
     }
 }

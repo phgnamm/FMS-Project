@@ -115,6 +115,7 @@ using (var scope = app.Services.CreateScope())
 // Middleware
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseMiddleware<PerformanceMiddleware>();
+app.UseMiddleware<KebabQueryStringMiddleware>();
 
 // Configure the HTTP request pipeline.
 //if (app.Environment.IsDevelopment())

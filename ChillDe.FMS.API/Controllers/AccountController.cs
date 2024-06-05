@@ -106,5 +106,46 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex);
             }
         }
+
+        [HttpPut("restore/{id}")]
+        // [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> RestoreAccount(Guid id)
+        {
+            try
+            {
+                var result = await _accountService.RestoreAccount(id);
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpPost("register")]
+        // [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Register([FromBody] List<AccountRegisterModel> accountRegisterModel)
+        {
+            try
+            {
+                foreach (var item in accountRegisterModel)
+                {
+                    await _accountService.Register(item);
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
     }
 }
