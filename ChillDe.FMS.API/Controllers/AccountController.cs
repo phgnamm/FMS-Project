@@ -128,24 +128,5 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex);
             }
         }
-
-        [HttpPost("register")]
-        // [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Register([FromBody] List<AccountRegisterModel> accountRegisterModel)
-        {
-            try
-            {
-                foreach (var item in accountRegisterModel)
-                {
-                    await _accountService.Register(item);
-                }
-
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex);
-            }
-        }
     }
 }
