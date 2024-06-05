@@ -34,9 +34,12 @@ namespace ChillDe.FMS.Repositories.Repositories
         {
             IQueryable<TEntity> query = _dbSet;
 
-            foreach (var include in includes)
+            if (includes != null)
             {
-                query = query.Include(include);
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
             }
 
             if (filter != null)
@@ -159,6 +162,11 @@ namespace ChillDe.FMS.Repositories.Repositories
         public void HardDeleteRange(List<TEntity> entities)
         {
             _dbSet.RemoveRange(entities);
+        }
+
+        public async Task<int> CountAsync()
+        {
+            return await _dbSet.CountAsync();
         }
     }
 }

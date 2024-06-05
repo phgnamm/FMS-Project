@@ -1,10 +1,10 @@
+using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 
 namespace ChillDe.FMS.Repositories.Models.AccountModels;
 
-public class AccountModel
+public class AccountModel : BaseEntity
 {
-    public Guid Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
     public Gender Gender { get; set; }
@@ -16,6 +16,5 @@ public class AccountModel
     public Guid RoleId { get; set; }
     public string Email { get; set; }
     public string PhoneNumber { get; set; }
-    public bool IsDeleted { get; set; }
     public DateTime CreationDate { get; set; }
 }
