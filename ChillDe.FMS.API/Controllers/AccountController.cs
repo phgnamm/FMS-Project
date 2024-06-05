@@ -41,20 +41,16 @@ namespace ChillDe.FMS.API.Controllers
 
         [HttpGet]
         // [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> GetAccountsByFilter([FromQuery] PaginationParameter paginationParameter,
-            [FromQuery] AccountFilterModel accountFilterModel)
+        public async Task<IActionResult> GetAllAccounts([FromQuery] AccountFilterModel accountFilterModel)
         {
             try
             {
-                var result = await _accountService.GetAccountsByFilter(paginationParameter, accountFilterModel);
+                var result = await _accountService.GetAllAccounts(accountFilterModel);
                 var metadata = new
                 {
-                    result.TotalCount,
                     result.PageSize,
                     result.CurrentPage,
                     result.TotalPages,
-                    result.HasNext,
-                    result.HasPrevious
                 };
 
                 Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));

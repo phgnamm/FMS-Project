@@ -51,22 +51,22 @@ public class FreelancerService : IFreelancerService
     public async Task<Pagination<FreelancerDetailModel>> GetFreelancersByFilter(PaginationParameter paginationParameter,
           FreelancerFilterModel freelancerFilterModel)
     {
-        var freelancerList = await _unitOfWork.FreelancerRepository.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
-
-        // Pagination
-        if (freelancerList != null)
-        {
-            var totalCount = freelancerList.Count();
-           // var freelancerListModel = _mapper.Map<List<FreelancerModel>>(freelancerList);
-
-            var paginationList = freelancerList
-                .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
-                .Take(paginationParameter.PageSize)
-                .ToList();
-
-            return new Pagination<FreelancerDetailModel>(paginationList, totalCount, paginationParameter.PageIndex,
-                paginationParameter.PageSize);
-        }
+        // var freelancerList = await _unitOfWork.FreelancerRepository.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
+        //
+        // // Pagination
+        // if (freelancerList != null)
+        // {
+        //     var totalCount = freelancerList.Count();
+        //    // var freelancerListModel = _mapper.Map<List<FreelancerModel>>(freelancerList);
+        //
+        //     var paginationList = freelancerList
+        //         .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+        //         .Take(paginationParameter.PageSize)
+        //         .ToList();
+        //
+        //     return new Pagination<FreelancerDetailModel>(paginationList, totalCount, paginationParameter.PageIndex,
+        //         paginationParameter.PageSize);
+        // }
 
         return null;
     }

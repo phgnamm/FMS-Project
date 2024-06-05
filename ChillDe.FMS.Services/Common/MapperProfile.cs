@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using ChillDe.FMS.Repositories.Entities;
+using ChillDe.FMS.Repositories.Models.AccountModels;
 using ChillDe.FMS.Repositories.ViewModels.AccountModels;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 

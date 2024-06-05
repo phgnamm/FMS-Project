@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Diagnostics;
+using AutoMapper;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Enums;
+using AccountModel = ChillDe.FMS.Repositories.Models.AccountModels.AccountModel;
 using Role = ChillDe.FMS.Repositories.Enums.Role;
 
 namespace ChillDe.FMS.Services
@@ -553,23 +555,54 @@ namespace ChillDe.FMS.Services
             };
         }
 
-        public async Task<Pagination<AccountModel>> GetAccountsByFilter(PaginationParameter paginationParameter,
-            AccountFilterModel accountFilterModel)
+        public async Task<Pagination<AccountModel>> GetAllAccounts(AccountFilterModel accountFilterModel)
         {
-            var accountList = await _accountRepository.GetAccountsByFilter(paginationParameter, accountFilterModel);
+            // Set up min max pagination size
+            accountFilterModel.MinPageSize = PaginationConstant.ACCOUNT_MIN_PAGE_SIZE;
+            accountFilterModel.MaxPageSize = PaginationConstant.ACCOUNT_MAX_PAGE_SIZE;
 
-            // Pagination
+            var accountList = await _unitOfWork.AccountRepository.GetAllAsync(pageIndex: accountFilterModel.PageIndex,
+                pageSize: accountFilterModel.PageSize,
+                filter: (x =>
+                    x.IsDeleted == accountFilterModel.IsDeleted &&
+                    (accountFilterModel.Gender == null || x.Gender == accountFilterModel.Gender) &&
+                    (accountFilterModel.Role == null || x.Role == accountFilterModel.Role.ToString()) &&
+                    (string.IsNullOrEmpty(accountFilterModel.Search) ||
+                     x.FirstName.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
+                     x.LastName.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
+                     x.Code.ToLower().Contains(accountFilterModel.Search.ToLower()) ||
+                     x.Email.ToLower().Contains(accountFilterModel.Search.ToLower()))),
+                orderBy: (x =>
+                {
+                    switch (accountFilterModel.Order.ToLower())
+                    {
+                        case "firstname":
+                            return accountFilterModel.OrderByDescending
+                                ? x.OrderByDescending(x => x.FirstName)
+                                : x.OrderBy(x => x.FirstName);
+                        case "lastname":
+                            return accountFilterModel.OrderByDescending
+                                ? x.OrderByDescending(x => x.LastName)
+                                : x.OrderBy(x => x.LastName);
+                        case "code":
+                            return accountFilterModel.OrderByDescending
+                                ? x.OrderByDescending(x => x.Code)
+                                : x.OrderBy(x => x.Code);
+                        case "dateofbirth":
+                            return accountFilterModel.OrderByDescending
+                                ? x.OrderByDescending(x => x.DateOfBirth)
+                                : x.OrderBy(x => x.DateOfBirth);
+                        default:
+                            return x.OrderBy(x => x.CreationDate);
+                    }
+                })
+            );
+
             if (accountList != null)
             {
                 var totalCount = accountList.Count();
-
-                var paginationList = accountList
-                    .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
-                    .Take(paginationParameter.PageSize)
-                    .ToList();
-
-                return new Pagination<AccountModel>(paginationList, totalCount, paginationParameter.PageIndex,
-                    paginationParameter.PageSize);
+                return new Pagination<AccountModel>(accountList, totalCount, accountFilterModel.PageIndex,
+                    accountFilterModel.PageSize);
             }
 
             return null;

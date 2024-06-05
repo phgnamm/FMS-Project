@@ -49,12 +49,9 @@ namespace ChillDe.FMS.API.Controllers
                 var result = await _freelancerService.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
                 var metadata = new
                 {
-                    result.TotalCount,
                     result.PageSize,
                     result.CurrentPage,
                     result.TotalPages,
-                    result.HasNext,
-                    result.HasPrevious
                 };
 
                 Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));

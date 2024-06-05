@@ -1,8 +1,6 @@
-﻿using ChillDe.FMS.Repositories.Entities;
+﻿namespace ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 
-namespace ChillDe.FMS.Repositories.ViewModels.AccountModels;
-
-public class AccountModel : BaseEntity
+public class FreelancerModel
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }

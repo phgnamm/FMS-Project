@@ -3,6 +3,7 @@ using ChillDe.FMS.Repositories.ViewModels.AccountModels;
 using ChillDe.FMS.Repositories.ViewModels.CommonModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Repositories.ViewModels.TokenModels;
+using AccountModel = ChillDe.FMS.Repositories.Models.AccountModels.AccountModel;
 
 namespace Services.Interfaces
 {
@@ -22,8 +23,7 @@ namespace Services.Interfaces
         Task<ResponseDataModel<TokenModel>> LoginGoogle(LoginGoogleIdTokenModel loginGoogleIdTokenModel);
         Task<ResponseDataModel<AccountModel>> GetAccount(Guid id);
 
-        Task<Pagination<AccountModel>> GetAccountsByFilter(PaginationParameter paginationParameter,
-            AccountFilterModel accountFilterModel);
+        Task<Pagination<AccountModel>> GetAllAccounts(AccountFilterModel accountFilterModel);
         Task<ResponseModel> UpdateAccount(AccountUpdateModel accountUpdateModel, Guid id);
         Task<ResponseModel> DeleteAccount(Guid id);
     }
