@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Identity;
 using Services.Common;
 using ChillDe.FMS.API.Middlewares;
 using ChillDe.FMS.API.Services;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 namespace ChillDe.FMS.API
 {
@@ -31,9 +33,12 @@ namespace ChillDe.FMS.API
 			{
 				options.TokenLifespan = TimeSpan.FromMinutes(15);
 			});
-
-			// Middlewares
-			services.AddSingleton<GlobalExceptionMiddleware>();
+            FirebaseApp.Create(new AppOptions
+            {
+                Credential = GoogleCredential.FromFile("credentials.json"),
+            });
+            // Middlewares
+            services.AddSingleton<GlobalExceptionMiddleware>();
 			services.AddSingleton<PerformanceMiddleware>();
 			services.AddSingleton<Stopwatch>();
 
