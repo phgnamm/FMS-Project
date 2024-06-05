@@ -47,6 +47,7 @@ namespace ChillDe.FMS.Repositories.Repositories
                     RoleId = userRole.RoleId,
                     IsDeleted = user.IsDeleted,
                     CreationDate = user.CreationDate,
+                    // todo add other base entity fields
                 };
 
             if (filter != null)

@@ -26,5 +26,6 @@ namespace ChillDe.FMS.Repositories.Interfaces
         void RestoreRange(List<TEntity> entities);
         void HardDelete(TEntity entity);
         void HardDeleteRange(List<TEntity> entities);
+        Task<int> CountAsync();
     }
 }
