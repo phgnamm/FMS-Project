@@ -69,22 +69,22 @@ namespace Services.Services
         public async Task<Pagination<ProjectDetailModel>> GetProjectsByFilter
             (PaginationParameter paginationParameter, ProjectDetailModel projectDetailModel)
         {
-            var projects = await _unitOfWork.FreelancerRepository.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
+            //var projects = await _unitOfWork.FreelancerRepository.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
 
-            // Pagination
-            if (freelancerList != null)
-            {
-                var totalCount = freelancerList.Count();
-                // var freelancerListModel = _mapper.Map<List<FreelancerModel>>(freelancerList);
+            //// Pagination
+            //if (freelancerList != null)
+            //{
+            //    var totalCount = freelancerList.Count();
+            //    // var freelancerListModel = _mapper.Map<List<FreelancerModel>>(freelancerList);
 
-                var paginationList = freelancerList
-                    .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
-                    .Take(paginationParameter.PageSize)
-                    .ToList();
+            //    var paginationList = freelancerList
+            //        .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
+            //        .Take(paginationParameter.PageSize)
+            //        .ToList();
 
-                return new Pagination<FreelancerDetailModel>(paginationList, totalCount, paginationParameter.PageIndex,
-                    paginationParameter.PageSize);
-            }
+            //    return new Pagination<FreelancerDetailModel>(paginationList, totalCount, paginationParameter.PageIndex,
+            //        paginationParameter.PageSize);
+            //}
 
             return null;
         }
