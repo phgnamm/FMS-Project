@@ -11,7 +11,6 @@ namespace ChillDe.FMS.Repositories.Interfaces
         Task<QueryResultModel<List<TEntity>>> GetAllAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            Expression<Func<TEntity, object>>[] includes = null,
             string includeProperties = "",
             int? pageIndex = null,
             int? pageSize = null

@@ -28,7 +28,6 @@ namespace ChillDe.FMS.Repositories.Repositories
         public async Task<QueryResultModel<List<TEntity>>> GetAllAsync(
             Expression<Func<TEntity, bool>> filter = null, // Các hàm filter
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, // Các hàm sort
-            Expression<Func<TEntity, object>>[] includes = null, // Include các bảng khác nếu cần
             string includeProperties = "", // Chỉ định lấy field nào của object
             int? pageIndex = null,
             int? pageSize = null)
@@ -36,14 +35,6 @@ namespace ChillDe.FMS.Repositories.Repositories
             int totalCount = 0;
             
             IQueryable<TEntity> query = _dbSet;
-
-            if (includes != null)
-            {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
-            }
 
             if (filter != null)
             {
