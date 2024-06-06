@@ -17,7 +17,6 @@ namespace ChillDe.FMS.Repositories.Interfaces
             int? pageSize = null
         );
 
-        Task<int> Count(Expression<Func<TEntity, bool>> filter = null);
         Task AddAsync(TEntity entity);
         Task AddRangeAsync(List<TEntity> entities);
         void Update(TEntity entity);

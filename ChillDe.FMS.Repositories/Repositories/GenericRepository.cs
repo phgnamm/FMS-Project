@@ -81,17 +81,6 @@ namespace ChillDe.FMS.Repositories.Repositories
                 Data = query.ToList(),
             };
         }
-        public async Task<int> Count(Expression<Func<TEntity, bool>> filter = null)
-        {
-            IQueryable<TEntity> query = _dbSet;
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            return await query.CountAsync();
-        }
 
         public async Task AddAsync(TEntity entity)
         {

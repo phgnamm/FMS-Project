@@ -1,17 +1,13 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
-using ChillDe.FMS.Repositories.Repositories;
-using ChillDe.FMS.Repositories.ViewModels.AccountModels;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using Services.Interfaces;
-using ChillDe.FMS.Repositories.Models.AccountModels;
-using Microsoft.AspNetCore.Identity;
 using System.Linq.Expressions;
+using System.Linq;
 
 namespace ChillDe.FMS.Services;
 
@@ -99,8 +95,7 @@ public class FreelancerService : IFreelancerService
 
         if (freelancerList != null)
         {
-            var totalCount = await _unitOfWork.FreelancerRepository.Count();
-            var freelancerDetailList = freelancerList.Select(f => new FreelancerDetailModel
+            var freelancerDetailList = freelancerList.Data.Select(f => new FreelancerDetailModel
             {
                 Id = f.Id,
                 FirstName = f.FirstName,
@@ -123,7 +118,7 @@ public class FreelancerService : IFreelancerService
                             }).ToList()
             }).ToList();
 
-            return new Pagination<FreelancerDetailModel>(freelancerDetailList, totalCount, freelancerFilterModel.PageIndex, freelancerFilterModel.PageSize);
+            return new Pagination<FreelancerDetailModel>(freelancerDetailList, freelancerList.TotalCount, freelancerFilterModel.PageIndex, freelancerFilterModel.PageSize);
         }
 
         return null;
@@ -136,12 +131,15 @@ public class FreelancerService : IFreelancerService
             var freelancerImportList = new List<Freelancer>();
             var response = new FreelancerImportResponseModel();
             var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAllAsync(
-                includes:
+              includes: new Expression<Func<Freelancer, object>>[]
+                            {
+                                x => x.FreelancerSkills,
+                            },
                 includeProperties: "FreelancerSkills.Skill");
             var existingSkills = await _unitOfWork.SkillRepository.GetAllAsync();
             foreach (FreelancerImportModel newFreelancers in freelancers)
             {
-                var freelancerChecking = existingFreelancer.FirstOrDefault(x => x.Email == newFreelancers.Email || x.Code == newFreelancers.Code);
+                var freelancerChecking = existingFreelancer.Data.FirstOrDefault(x => x.Email == newFreelancers.Email || x.Code == newFreelancers.Code);
 
                 if (freelancerChecking != null)
                 {
@@ -164,13 +162,14 @@ public class FreelancerService : IFreelancerService
                         Code = newFreelancers.Code,
                         Address = newFreelancers.Address,
                         Status = FreelancerStatus.Available,
+                        Wallet = newFreelancers.Wallet,
                         CreationDate = DateTime.UtcNow,
                         CreatedBy = _claimsService.GetCurrentUserId,
                     };
                     // Check and add skills
                     foreach (var skillTypeModel in newFreelancers.Skills)
                     {
-                        var validSkills = existingSkills
+                        var validSkills = existingSkills.Data
                             .Where(skill => skillTypeModel.SkillNames.Contains(skill.Name) && skill.Type == skillTypeModel.SkillType)
                             .ToList();
 
@@ -224,37 +223,78 @@ public class FreelancerService : IFreelancerService
         throw new NotImplementedException();
     }
 
-    public async Task<ResponseDataModel<FreelancerModel>> UpdateFreelancerAsync(Guid id, FreelancerImportModel updateFreelancer)
+    public async Task<ResponseDataModel<FreelancerDetailModel>> UpdateFreelancerAsync(Guid id, FreelancerImportModel updateFreelancer)
     {
         var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAsync(id);
-        if (existingFreelancer != null)
+        if (existingFreelancer == null)
         {
-            //cần fe khóa cứng cột Code lại
-            existingFreelancer = _mapper.Map(updateFreelancer, existingFreelancer);
-            _unitOfWork.FreelancerRepository.Update(existingFreelancer);
-            await _unitOfWork.SaveChangeAsync();
-            var result = _mapper.Map<FreelancerModel>(existingFreelancer);
-            if (result != null)
+            return new ResponseDataModel<FreelancerDetailModel>()
             {
-                return new ResponseDataModel<FreelancerModel>()
+                Status = false,
+                Message = "Freelancer not found"
+            };
+        }
+
+        if (updateFreelancer.Skills != null && updateFreelancer.Skills.Any())
+        {
+            var skillNames = new HashSet<string>(updateFreelancer.Skills.SelectMany(skill => skill.SkillNames).Distinct(), StringComparer.OrdinalIgnoreCase);
+            var validSkills = (await _unitOfWork.SkillRepository.GetAllAsync(skill => skillNames.Contains(skill.Name))).Data;
+
+            existingFreelancer.FreelancerSkills.Clear();
+
+            foreach (var skillTypeModel in updateFreelancer.Skills)
+            {
+                foreach (var skill in validSkills.Where(skill => skillTypeModel.SkillNames.Contains(skill.Name) && skill.Type == skillTypeModel.SkillType))
                 {
-                    Status = true,
-                    Message = "Update freelancer successfully",
-                    Data = result
-                };
+                    existingFreelancer.FreelancerSkills.Add(new FreelancerSkill
+                    {
+                        SkillId = skill.Id,
+                        FreelancerId = existingFreelancer.Id
+                    });
+                }
             }
-            return new ResponseDataModel<FreelancerModel>()
+        }
+
+        _mapper.Map(updateFreelancer, existingFreelancer);
+        _unitOfWork.FreelancerRepository.Update(existingFreelancer);
+        await _unitOfWork.SaveChangeAsync();
+        var result = _mapper.Map<FreelancerDetailModel>(existingFreelancer);
+        return result != null
+            ? new ResponseDataModel<FreelancerDetailModel>()
+            {
+                Status = true,
+                Message = "Update freelancer successfully",
+                Data = result
+            }
+            : new ResponseDataModel<FreelancerDetailModel>()
             {
                 Status = false,
                 Message = "Update freelancer fail"
             };
-        }
-        return new ResponseDataModel<FreelancerModel>()
-        {
-            Status = false,
-            Message = "Freelancer not found"
-        };
     }
+
+    private bool AreSkillsEqual(List<SkillInputModel> newSkills, ICollection<FreelancerSkill> existingSkills)
+    {
+        if (newSkills.Count != existingSkills.Count)
+        {
+            return false;
+        }
+
+        foreach (var newSkill in newSkills)
+        {
+            var existingSkill = existingSkills.FirstOrDefault(skill =>
+                skill.Skill.Name == newSkill.SkillNames.FirstOrDefault() && skill.Skill.Type == newSkill.SkillType);
+
+            if (existingSkill == null || !existingSkill.Skill.Name.Equals(newSkill.SkillNames.FirstOrDefault(), StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
 
     public async Task<ResponseDataModel<List<FreelancerModel>>> DeleteFreelancer(List<Guid> freelancerIds)
     {

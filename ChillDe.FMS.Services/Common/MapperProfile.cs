@@ -17,7 +17,15 @@ namespace ChillDe.FMS.Repositories.Common
 
             // Freelancer
             CreateMap<Freelancer, FreelancerModel>();
-            CreateMap<Freelancer, FreelancerImportModel>().ReverseMap();
+            CreateMap<Freelancer, FreelancerImportModel>()
+                 .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.FreelancerSkills
+                     .GroupBy(fs => fs.Skill.Type)
+                     .Select(group => new SkillInputModel
+                     {
+                         SkillType = group.Key,
+                         SkillNames = group.Select(fs => fs.Skill.Name).ToList()
+                     }).ToList()))
+                 .ReverseMap();
             CreateMap<AccountModel, FreelancerModel>()
                 .ForMember(dest => dest.Role, opt => opt.Ignore());
 
