@@ -4,6 +4,8 @@ using ChillDe.FMS.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ChillDe.FMS.Repositories.Enums;
+using System.Linq.Expressions;
+using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 
 namespace ChillDe.FMS.Repositories.Repositories;
 
@@ -111,4 +113,65 @@ public class FreelancerRepository : GenericRepository<Freelancer>, IFreelancerRe
     //
     //     return freelancerModelList;
     // }
+
+    public async Task<List<FreelancerDetailModel>> GetFreelancersByFilter(
+    Expression<Func<FreelancerDetailModel, bool>> filter = null,
+    Func<IQueryable<FreelancerDetailModel>, IOrderedQueryable<FreelancerDetailModel>> orderBy = null,
+    string includeProperties = "",
+    int? pageIndex = null,
+    int? pageSize = null)
+    {
+        IQueryable<FreelancerDetailModel> query =
+            from freelancer in _dbContext.Freelancer
+            join freelancerSkill in _dbContext.FreelancerSkill on freelancer.Id equals freelancerSkill.FreelancerId
+            join skill in _dbContext.Skill on freelancerSkill.SkillId equals skill.Id
+            select new FreelancerDetailModel
+            {
+                Id = freelancer.Id,
+                FirstName = freelancer.FirstName,
+                LastName = freelancer.LastName,
+                Gender = freelancer.Gender,
+                DateOfBirth = freelancer.DateOfBirth,
+                Address = freelancer.Address,
+                Image = freelancer.Image,
+                Code = freelancer.Code,
+                Email = freelancer.Email,
+                PhoneNumber = freelancer.PhoneNumber,
+                Status = freelancer.Status,
+                Wallet = freelancer.Wallet,
+                CreationDate = freelancer.CreationDate,
+                Skills = new List<SkillSet>
+                             {
+                                 new SkillSet
+                                 {
+                                     SkillType = skill.Type,
+                                     SkillNames = new List<string> { skill.Name }
+                                 }
+                             }
+            };
+        // Apply filter
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+        // Apply includes
+        foreach (var includeProperty in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            query = query.Include(includeProperty);
+        }
+        // Apply order by
+        if (orderBy != null)
+        {
+            query = orderBy(query);
+        }
+        // Implement pagination
+        if (pageIndex.HasValue && pageSize.HasValue)
+        {
+            int validPageIndex = pageIndex.Value > 0 ? pageIndex.Value - 1 : 0;
+            int validPageSize = pageSize.Value > 0 ? pageSize.Value : PaginationConstant.DEFAULT_MIN_PAGE_SIZE;
+            query = query.Skip(validPageIndex * validPageSize).Take(validPageSize);
+        }
+        return await query.ToListAsync();
+    }
+
 }

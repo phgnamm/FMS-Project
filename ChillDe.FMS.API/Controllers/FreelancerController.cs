@@ -41,12 +41,11 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetFreelancersByFilter([FromQuery] PaginationParameter paginationParameter,
-            [FromQuery] FreelancerFilterModel freelancerFilterModel)
+        public async Task<IActionResult> GetFreelancersByFilter([FromQuery] FreelancerFilterModel freelancerFilterModel)
         {
             try
             {
-                var result = await _freelancerService.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
+                var result = await _freelancerService.GetFreelancersByFilter(freelancerFilterModel);
                 var metadata = new
                 {
                     result.PageSize,

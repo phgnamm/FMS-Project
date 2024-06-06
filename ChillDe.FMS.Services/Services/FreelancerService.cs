@@ -9,6 +9,9 @@ using ChillDe.FMS.Repositories.ViewModels.AccountModels;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using Services.Interfaces;
+using ChillDe.FMS.Repositories.Models.AccountModels;
+using Microsoft.AspNetCore.Identity;
+using System.Linq.Expressions;
 
 namespace ChillDe.FMS.Services;
 
@@ -48,25 +51,80 @@ public class FreelancerService : IFreelancerService
         };
     }
 
-    public async Task<Pagination<FreelancerDetailModel>> GetFreelancersByFilter(PaginationParameter paginationParameter,
-          FreelancerFilterModel freelancerFilterModel)
+    public async Task<Pagination<FreelancerDetailModel>> GetFreelancersByFilter(FreelancerFilterModel freelancerFilterModel)
     {
-        // var freelancerList = await _unitOfWork.FreelancerRepository.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
-        //
-        // // Pagination
-        // if (freelancerList != null)
-        // {
-        //     var totalCount = freelancerList.Count();
-        //    // var freelancerListModel = _mapper.Map<List<FreelancerModel>>(freelancerList);
-        //
-        //     var paginationList = freelancerList
-        //         .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
-        //         .Take(paginationParameter.PageSize)
-        //         .ToList();
-        //
-        //     return new Pagination<FreelancerDetailModel>(paginationList, totalCount, paginationParameter.PageIndex,
-        //         paginationParameter.PageSize);
-        // }
+        var freelancerList = await _unitOfWork.FreelancerRepository.GetAllAsync(
+            filter: x =>
+                x.Status == freelancerFilterModel.Status &&
+                (freelancerFilterModel.Gender == null || x.Gender == freelancerFilterModel.Gender) &&
+                (freelancerFilterModel.SkillType == null || x.FreelancerSkills.Any(fs => fs.Skill.Type == freelancerFilterModel.SkillType)) &&
+                (freelancerFilterModel.SkillName == null || x.FreelancerSkills.Any(fs => fs.Skill.Name.Contains(freelancerFilterModel.SkillName))) &&
+                (string.IsNullOrEmpty(freelancerFilterModel.Search) ||
+                 x.FirstName.ToLower().Contains(freelancerFilterModel.Search.ToLower()) ||
+                 x.LastName.ToLower().Contains(freelancerFilterModel.Search.ToLower()) ||
+                 x.Code.ToLower().Contains(freelancerFilterModel.Search.ToLower()) ||
+                 x.Email.ToLower().Contains(freelancerFilterModel.Search.ToLower())),
+            orderBy: x =>
+            {
+                switch (freelancerFilterModel.Order.ToLower())
+                {
+                    case "first-name":
+                        return freelancerFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.FirstName)
+                            : x.OrderBy(x => x.FirstName);
+                    case "last-name":
+                        return freelancerFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.LastName)
+                            : x.OrderBy(x => x.LastName);
+                    case "code":
+                        return freelancerFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.Code)
+                            : x.OrderBy(x => x.Code);
+                    case "date-of-birth":
+                        return freelancerFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.DateOfBirth)
+                            : x.OrderBy(x => x.DateOfBirth);
+                    default:
+                        return x.OrderBy(x => x.CreationDate);
+                }
+            },
+            pageIndex: freelancerFilterModel.PageIndex,
+            pageSize: freelancerFilterModel.PageSize,
+            includes: new Expression<Func<Freelancer, object>>[]
+                         {
+                             x => x.FreelancerSkills,
+                         },
+            includeProperties: "FreelancerSkills.Skill"
+        );
+
+        if (freelancerList != null)
+        {
+            var totalCount = await _unitOfWork.FreelancerRepository.Count();
+            var freelancerDetailList = freelancerList.Select(f => new FreelancerDetailModel
+            {
+                Id = f.Id,
+                FirstName = f.FirstName,
+                LastName = f.LastName,
+                Gender = f.Gender,
+                DateOfBirth = f.DateOfBirth,
+                Address = f.Address,
+                Image = f.Image,
+                Code = f.Code,
+                Email = f.Email,
+                PhoneNumber = f.PhoneNumber,
+                Wallet = f.Wallet,
+                Status = f.Status,
+                CreationDate = f.CreationDate,
+                Skills = f.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
+                            .Select(group => new SkillSet
+                            {
+                                SkillType = group.Key,
+                                SkillNames = group.Select(fs => fs.Skill.Name).ToList()
+                            }).ToList()
+            }).ToList();
+
+            return new Pagination<FreelancerDetailModel>(freelancerDetailList, totalCount, freelancerFilterModel.PageIndex, freelancerFilterModel.PageSize);
+        }
 
         return null;
     }
@@ -77,7 +135,9 @@ public class FreelancerService : IFreelancerService
         {
             var freelancerImportList = new List<Freelancer>();
             var response = new FreelancerImportResponseModel();
-            var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAllAsync();
+            var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAllAsync(
+                includes:
+                includeProperties: "FreelancerSkills.Skill");
             var existingSkills = await _unitOfWork.SkillRepository.GetAllAsync();
             foreach (FreelancerImportModel newFreelancers in freelancers)
             {
@@ -103,7 +163,7 @@ public class FreelancerService : IFreelancerService
                         Gender = newFreelancers.Gender,
                         Code = newFreelancers.Code,
                         Address = newFreelancers.Address,
-                        Status = FreelancerStatus.Available.ToString(),
+                        Status = FreelancerStatus.Available,
                         CreationDate = DateTime.UtcNow,
                         CreatedBy = _claimsService.GetCurrentUserId,
                     };
@@ -199,7 +259,7 @@ public class FreelancerService : IFreelancerService
     public async Task<ResponseDataModel<List<FreelancerModel>>> DeleteFreelancer(List<Guid> freelancerIds)
     {
         var deleteList = new List<Freelancer>();
-        var freelancerStatus = FreelancerStatus.NotAvailable.ToString();
+        var freelancerStatus = FreelancerStatus.NotAvailable;
         foreach (Guid freelancerId in freelancerIds)
         {
             var freelancer = await _unitOfWork.FreelancerRepository.GetAsync(freelancerId);
