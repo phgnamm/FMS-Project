@@ -8,6 +8,7 @@ using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using Services.Interfaces;
 using System.Linq.Expressions;
 using System.Linq;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChillDe.FMS.Services;
 
@@ -217,7 +218,7 @@ public class FreelancerService : IFreelancerService
 
     public async Task<ResponseDataModel<FreelancerDetailModel>> UpdateFreelancerAsync(Guid id, FreelancerImportModel updateFreelancer)
     {
-        var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAsync(id);
+        var existingFreelancer = await _unitOfWork.FreelancerRepository.GetFreelancerById(id);
         if (existingFreelancer == null)
         {
             return new ResponseDataModel<FreelancerDetailModel>()
@@ -231,61 +232,60 @@ public class FreelancerService : IFreelancerService
         {
             var skillNames = new HashSet<string>(updateFreelancer.Skills.SelectMany(skill => skill.SkillNames).Distinct());
             var validSkills = (await _unitOfWork.SkillRepository.GetAllAsync(skill => skillNames.Contains(skill.Name))).Data;
-
-            existingFreelancer.FreelancerSkills.Clear();
-
+            var freelancerSkillsToAdd = new List<FreelancerSkill>();
             foreach (var skillTypeModel in updateFreelancer.Skills)
             {
-                foreach (var skill in validSkills.Where(skill => skillTypeModel.SkillNames.Contains(skill.Name) && skill.Type == skillTypeModel.SkillType))
+                foreach (var skillName in skillTypeModel.SkillNames)
                 {
-                    existingFreelancer.FreelancerSkills.Add(new FreelancerSkill
+                    var existingSkill = validSkills.FirstOrDefault(skill =>
+                        skill.Name.Equals(skillName, StringComparison.OrdinalIgnoreCase) && skill.Type == skillTypeModel.SkillType);
+
+                    if (existingSkill != null)
                     {
-                        SkillId = skill.Id,
-                        FreelancerId = existingFreelancer.Id
-                    });
+                        var existingFreelancerSkill = existingFreelancer.FreelancerSkills.FirstOrDefault(fs =>
+                            fs.SkillId == existingSkill.Id && fs.FreelancerId == existingFreelancer.Id);
+
+                        if (existingFreelancerSkill == null)
+                        {
+                            freelancerSkillsToAdd.Add(new FreelancerSkill
+                            {
+                                SkillId = existingSkill.Id,
+                                FreelancerId = existingFreelancer.Id
+                            });
+                        }
+                    }
                 }
             }
-        }
 
+            foreach (var skill in freelancerSkillsToAdd)
+            {
+                existingFreelancer.FreelancerSkills.Add(skill);
+            }
+        }
         _mapper.Map(updateFreelancer, existingFreelancer);
-        _unitOfWork.FreelancerRepository.Update(existingFreelancer);
-        await _unitOfWork.SaveChangeAsync();
-        var result = _mapper.Map<FreelancerDetailModel>(existingFreelancer);
-        return result != null
-            ? new ResponseDataModel<FreelancerDetailModel>()
+
+        try
+        {
+            _unitOfWork.FreelancerRepository.Update(existingFreelancer);
+            await _unitOfWork.SaveChangeAsync();
+
+            var result = _mapper.Map<FreelancerDetailModel>(existingFreelancer);
+            return new ResponseDataModel<FreelancerDetailModel>()
             {
                 Status = true,
                 Message = "Update freelancer successfully",
                 Data = result
-            }
-            : new ResponseDataModel<FreelancerDetailModel>()
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ResponseDataModel<FreelancerDetailModel>()
             {
                 Status = false,
-                Message = "Update freelancer fail"
+                Message = $"Update freelancer fail. Error: {ex.Message}"
             };
-    }
-
-    private bool AreSkillsEqual(List<SkillInputModel> newSkills, ICollection<FreelancerSkill> existingSkills)
-    {
-        if (newSkills.Count != existingSkills.Count)
-        {
-            return false;
         }
-
-        foreach (var newSkill in newSkills)
-        {
-            var existingSkill = existingSkills.FirstOrDefault(skill =>
-                skill.Skill.Name == newSkill.SkillNames.FirstOrDefault() && skill.Skill.Type == newSkill.SkillType);
-
-            if (existingSkill == null || !existingSkill.Skill.Name.Equals(newSkill.SkillNames.FirstOrDefault(), StringComparison.OrdinalIgnoreCase))
-            {
-                return false;
-            }
-        }
-        return true;
     }
-
-
 
 
     public async Task<ResponseDataModel<List<FreelancerModel>>> DeleteFreelancer(List<Guid> freelancerIds)
@@ -320,5 +320,42 @@ public class FreelancerService : IFreelancerService
         };
     }
 
+    public async Task<ResponseModel> RestoreFreelancer(Guid id)
+    {
+        var freelancer = await _unitOfWork.FreelancerRepository.GetAsync(id);
 
+        if (freelancer == null)
+        {
+            return new ResponseModel()
+            {
+                Status = false,
+                Message = "Freelancer not found"
+            };
+        }
+
+        freelancer.IsDeleted = false;
+        freelancer.DeletionDate = null;
+        freelancer.Status = FreelancerStatus.Available;
+        freelancer.DeletedBy = null;
+        freelancer.ModificationDate = DateTime.UtcNow;
+        freelancer.ModifiedBy = _claimsService.GetCurrentUserId;
+
+        _unitOfWork.FreelancerRepository.Update(freelancer);
+        try
+        {
+            await _unitOfWork.SaveChangeAsync();
+            return new ResponseModel
+            {
+                Status = true,
+                Message = "Restore Freelancer successfully",
+            };
+        }catch (Exception ex)
+        {
+            return new ResponseModel
+            {
+                Status = false,
+                Message = "Cannot restore Freelancer",
+            };
+        }
+    }
 }

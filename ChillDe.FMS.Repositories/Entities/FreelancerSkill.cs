@@ -10,9 +10,7 @@ namespace ChillDe.FMS.Repositories.Entities
         public Guid? SkillId { get; set; }
 
         // Relationship
-        [JsonIgnore]
         public virtual Freelancer? Freelancer { get; set; }
-        [JsonIgnore]
         public virtual Skill? Skill { get; set; }
     }
 }
