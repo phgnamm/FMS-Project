@@ -48,9 +48,8 @@ namespace ChillDe.FMS.Services
 
             if (skillList != null)
             {
-                var skillModelList = _mapper.Map<List<SkillGroupModel>>(skillList);
-                var totalCount = await _unitOfWork.SkillRepository.CountAsync();
-                return new Pagination<SkillGroupModel>(skillModelList, totalCount, skillFilterModel.PageIndex,
+                var skillModelList = _mapper.Map<List<SkillGroupModel>>(skillList.Data);
+                return new Pagination<SkillGroupModel>(skillModelList, skillList.TotalCount, skillFilterModel.PageIndex,
                     skillFilterModel.PageSize);
             }
             
