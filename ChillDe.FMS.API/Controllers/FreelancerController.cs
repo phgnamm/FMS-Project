@@ -41,12 +41,11 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetFreelancersByFilter([FromQuery] PaginationParameter paginationParameter,
-            [FromQuery] FreelancerFilterModel freelancerFilterModel)
+        public async Task<IActionResult> GetFreelancersByFilter([FromQuery] FreelancerFilterModel freelancerFilterModel)
         {
             try
             {
-                var result = await _freelancerService.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
+                var result = await _freelancerService.GetFreelancersByFilter(freelancerFilterModel);
                 var metadata = new
                 {
                     result.PageSize,
@@ -114,6 +113,28 @@ namespace ChillDe.FMS.API.Controllers
             try
             {
                 var result = await _freelancerService.DeleteFreelancer(ids);
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
+        [HttpPut("restore/{id}")]
+        // [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> RestoreAccount(Guid id)
+        {
+            try
+            {
+                var result = await _freelancerService.RestoreFreelancer(id);
                 if (result.Status)
                 {
                     return Ok(result);
