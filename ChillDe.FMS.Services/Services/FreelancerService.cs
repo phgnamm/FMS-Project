@@ -86,10 +86,6 @@ public class FreelancerService : IFreelancerService
             },
             pageIndex: freelancerFilterModel.PageIndex,
             pageSize: freelancerFilterModel.PageSize,
-            includes: new Expression<Func<Freelancer, object>>[]
-                         {
-                             x => x.FreelancerSkills,
-                         },
             includeProperties: "FreelancerSkills.Skill"
         );
 
@@ -131,10 +127,6 @@ public class FreelancerService : IFreelancerService
             var freelancerImportList = new List<Freelancer>();
             var response = new FreelancerImportResponseModel();
             var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAllAsync(
-              includes: new Expression<Func<Freelancer, object>>[]
-                            {
-                                x => x.FreelancerSkills,
-                            },
                 includeProperties: "FreelancerSkills.Skill");
             var existingSkills = await _unitOfWork.SkillRepository.GetAllAsync();
             foreach (FreelancerImportModel newFreelancers in freelancers)
@@ -237,7 +229,7 @@ public class FreelancerService : IFreelancerService
 
         if (updateFreelancer.Skills != null && updateFreelancer.Skills.Any())
         {
-            var skillNames = new HashSet<string>(updateFreelancer.Skills.SelectMany(skill => skill.SkillNames).Distinct(), StringComparer.OrdinalIgnoreCase);
+            var skillNames = new HashSet<string>(updateFreelancer.Skills.SelectMany(skill => skill.SkillNames).Distinct());
             var validSkills = (await _unitOfWork.SkillRepository.GetAllAsync(skill => skillNames.Contains(skill.Name))).Data;
 
             existingFreelancer.FreelancerSkills.Clear();
