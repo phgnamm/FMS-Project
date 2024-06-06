@@ -1,12 +1,13 @@
 using ChillDe.FMS.Repositories.Entities;
+using ChillDe.FMS.Repositories.Enums;
 
 namespace ChillDe.FMS.Repositories.Models.AccountModels;
 
-public class AccountModel : BaseEntity
+public class AccountFilterResultModel : BaseEntity
 {
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public string Gender { get; set; }
+    public Gender Gender { get; set; }
     public DateTime DateOfBirth { get; set; }
     public string? Address { get; set; }
     public string? Image { get; set; }
