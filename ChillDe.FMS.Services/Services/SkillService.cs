@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using ChillDe.FMS.Repositories.Common;
-using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.Models.SkillModels;
 using ChillDe.FMS.Services.Models.SkillModels;
