@@ -29,7 +29,7 @@ namespace ChillDe.FMS.Repositories.ViewModels.FreelancerModels
         public string? PhoneNumber { get; set; }
 
         [Required(ErrorMessage = "Date of Birth is required!")]
-        public DateTime? DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
         [Required(ErrorMessage = "Gender is required")]
         [EnumDataType(typeof(Gender), ErrorMessage = "Invalid Gender")]
@@ -39,6 +39,7 @@ namespace ChillDe.FMS.Repositories.ViewModels.FreelancerModels
         public string? Code { get; set; }
     
         public string? Address { get; set; }
+        public float Wallet { get; set; } = 0;
 
         [Required(ErrorMessage = "Skills are required!")]
         public List<SkillInputModel> Skills { get; set; } = new List<SkillInputModel>();

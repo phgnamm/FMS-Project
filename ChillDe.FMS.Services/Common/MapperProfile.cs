@@ -18,11 +18,29 @@ namespace ChillDe.FMS.Repositories.Common
 
             // Freelancer
             CreateMap<Freelancer, FreelancerModel>();
-            CreateMap<Freelancer, FreelancerImportModel>().ReverseMap();
-            CreateMap<AccountModel, FreelancerModel>()
-                .ForMember(dest => dest.Role, opt => opt.Ignore());
+            CreateMap<Freelancer, FreelancerDetailModel>()
+                   .ForMember(dest => dest.Skills, opt => opt.MapFrom(src =>
+                       src.FreelancerSkills
+                           .GroupBy(fs => fs.Skill.Type)
+                           .Select(group => new SkillSet
+                           {
+                               SkillType = group.Key,
+                               SkillNames = group.Select(fs => fs.Skill.Name).ToList()
+                           }).ToList()
+                       )).ReverseMap()
+                   .ForMember(dest => dest.Code, opt => opt.Ignore()); 
+            CreateMap<Freelancer, FreelancerImportModel>()
+                  .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.FreelancerSkills
+                    .GroupBy(fs => fs.Skill.Type)
+                    .Select(group => new SkillInputModel
+                    {
+                        SkillType = group.Key,
+                        SkillNames = group.Select(fs => fs.Skill.Name).ToList()
+                    }).ToList()))
+                  .ReverseMap()
+                  .ForMember(dest => dest.Code, opt => opt.Ignore()); ;
 
-            // Skill
+            // Thêm cấu hình cho SkillModel và Skill
             CreateMap<Skill, SkillModel>();
             CreateMap<List<Skill>, List<SkillGroupModel>>()
                 .ConvertUsing((skills, skillModels, context) =>
