@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using ChillDe.FMS.Repositories.Entities;
+using ChillDe.FMS.Repositories.Models.QueryModels;
 
 namespace ChillDe.FMS.Repositories.Interfaces
 {
@@ -7,7 +8,7 @@ namespace ChillDe.FMS.Repositories.Interfaces
     {
         Task<TEntity?> GetAsync(Guid id);
 
-        Task<List<TEntity>> GetAllAsync(
+        Task<QueryResultModel<List<TEntity>>> GetAllAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             Expression<Func<TEntity, object>>[] includes = null,

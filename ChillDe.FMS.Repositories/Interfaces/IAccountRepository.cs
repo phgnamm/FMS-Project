@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Models.AccountModels;
+using ChillDe.FMS.Repositories.Models.QueryModels;
 
 namespace ChillDe.FMS.Repositories.Interfaces
 {
@@ -8,7 +9,7 @@ namespace ChillDe.FMS.Repositories.Interfaces
     {
         Task<Account> GetAccountByCode(string code);
         
-        Task<List<AccountModel>> GetAllAsync(
+        Task<QueryResultModel<List<AccountModel>>> GetAllAsync(
             Expression<Func<AccountModel, bool>> filter = null,
             Func<IQueryable<AccountModel>, IOrderedQueryable<AccountModel>> orderBy = null,
             string includeProperties = "",

@@ -62,7 +62,7 @@ namespace ChillDe.FMS.API
 			// Project
 			services.AddScoped<IProjectRepository, ProjectRepository>();
 
-            //Skill
+            // Skill
             services.AddScoped<ISkillService, SkillService>();
             services.AddScoped<ISkillRepository, SkillRepository>();
 
