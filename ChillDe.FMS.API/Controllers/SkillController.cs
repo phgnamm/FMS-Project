@@ -22,6 +22,7 @@ namespace ChillDe.FMS.API.Controllers
         {
             try
             {
+                // todo modify this function to return based on GroupByType
                 var result = await _skillService.GetAllSkillsGroupByType(skillFilterModel);
 
                 if (!skillFilterModel.GroupByType)

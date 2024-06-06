@@ -30,8 +30,8 @@ namespace ChillDe.FMS.Repositories.Common
                         .GroupBy(skill => skill.Type)
                         .Select(group => new SkillGroupModel
                         {
-                            Type = group.Key,
-                            Names = group.Select(skill => skill.Name).ToList()
+                            SkillType = group.Key,
+                            SkillNames = group.Select(skill => skill.Name).ToList()
                         })
                         .ToList();
                 });

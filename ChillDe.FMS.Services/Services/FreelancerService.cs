@@ -73,94 +73,94 @@ public class FreelancerService : IFreelancerService
 
     public async Task<FreelancerImportResponseModel> AddRangeFreelancer(List<FreelancerImportModel> freelancers)
     {
-        try
-        {
-            var freelancerImportList = new List<Freelancer>();
-            var response = new FreelancerImportResponseModel();
-            var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAllAsync();
-            var existingSkills = await _unitOfWork.SkillRepository.GetAllAsync();
-            foreach (FreelancerImportModel newFreelancers in freelancers)
-            {
-                var freelancerChecking = existingFreelancer.FirstOrDefault(x => x.Email == newFreelancers.Email || x.Code == newFreelancers.Code);
-
-                if (freelancerChecking != null)
-                {
-                    if (response.DuplicatedFreelancer == null)
-                    {
-                        response.DuplicatedFreelancer = new List<FreelancerImportModel>();
-                    }
-                    response.DuplicatedFreelancer.Add(newFreelancers);
-                }
-                else
-                {
-                    var newFreelancer = new Freelancer
-                    {
-                        FirstName = newFreelancers.FirstName,
-                        LastName = newFreelancers.LastName,
-                        Email = newFreelancers.Email,
-                        PhoneNumber = newFreelancers.PhoneNumber,
-                        DateOfBirth = newFreelancers.DateOfBirth,
-                        Gender = newFreelancers.Gender,
-                        Code = newFreelancers.Code,
-                        Address = newFreelancers.Address,
-                        Status = FreelancerStatus.Available.ToString(),
-                        CreationDate = DateTime.UtcNow,
-                        CreatedBy = _claimsService.GetCurrentUserId,
-                    };
-                    // Check and add skills
-                    foreach (var skillTypeModel in newFreelancers.Skills)
-                    {
-                        var validSkills = existingSkills
-                            .Where(skill => skillTypeModel.SkillNames.Contains(skill.Name) && skill.Type == skillTypeModel.SkillType)
-                            .ToList();
-
-                        foreach (var skill in validSkills)
-                        {
-                            newFreelancer.FreelancerSkills.Add(new FreelancerSkill
-                            {
-                                SkillId = skill.Id,
-                                FreelancerId = newFreelancer.Id
-                            });
-                        }
-                    }
-                    freelancerImportList.Add(newFreelancer);
-                }
-            }
-            if (freelancerImportList.Count > 0)
-            {
-                await _unitOfWork.FreelancerRepository.AddRangeAsync(freelancerImportList);
-                await _unitOfWork.SaveChangeAsync();
-                if (response.DuplicatedFreelancer != null)
-                {
-                    return new FreelancerImportResponseModel
-                    {
-                        DuplicatedFreelancer = response.DuplicatedFreelancer,
-                        AddedFreelancer = _mapper.Map<List<FreelancerImportModel>>(freelancerImportList),
-                        Message = "These freelancers have been successfully added and some freelancers are existed",
-                        Status = true
-                    };
-                }
-                else
-                {
-                    return new FreelancerImportResponseModel
-                    {
-                        AddedFreelancer = _mapper.Map<List<FreelancerImportModel>>(freelancerImportList),
-                        Message = "These freelancers have been successfully added",
-                        Status = true
-                    };
-                }
-            }
-            if (response.DuplicatedFreelancer != null)
-            {
-                response.Message = "Importing process have duplicated problems";
-                response.Status = false;
-                return response;
-            }
-        }
-        catch (Exception)
-        {
-            throw;
-        }
+        // try
+        // {
+        //     var freelancerImportList = new List<Freelancer>();
+        //     var response = new FreelancerImportResponseModel();
+        //     var existingFreelancer = await _unitOfWork.FreelancerRepository.GetAllAsync();
+        //     var existingSkills = await _unitOfWork.SkillRepository.GetAllAsync();
+        //     foreach (FreelancerImportModel newFreelancers in freelancers)
+        //     {
+        //         var freelancerChecking = existingFreelancer.FirstOrDefault(x => x.Email == newFreelancers.Email || x.Code == newFreelancers.Code);
+        //
+        //         if (freelancerChecking != null)
+        //         {
+        //             if (response.DuplicatedFreelancer == null)
+        //             {
+        //                 response.DuplicatedFreelancer = new List<FreelancerImportModel>();
+        //             }
+        //             response.DuplicatedFreelancer.Add(newFreelancers);
+        //         }
+        //         else
+        //         {
+        //             var newFreelancer = new Freelancer
+        //             {
+        //                 FirstName = newFreelancers.FirstName,
+        //                 LastName = newFreelancers.LastName,
+        //                 Email = newFreelancers.Email,
+        //                 PhoneNumber = newFreelancers.PhoneNumber,
+        //                 DateOfBirth = newFreelancers.DateOfBirth,
+        //                 Gender = newFreelancers.Gender,
+        //                 Code = newFreelancers.Code,
+        //                 Address = newFreelancers.Address,
+        //                 Status = FreelancerStatus.Available.ToString(),
+        //                 CreationDate = DateTime.UtcNow,
+        //                 CreatedBy = _claimsService.GetCurrentUserId,
+        //             };
+        //             // Check and add skills
+        //             foreach (var skillTypeModel in newFreelancers.Skills)
+        //             {
+        //                 var validSkills = existingSkills
+        //                     .Where(skill => skillTypeModel.SkillNames.Contains(skill.Name) && skill.Type == skillTypeModel.SkillType)
+        //                     .ToList();
+        //
+        //                 foreach (var skill in validSkills)
+        //                 {
+        //                     newFreelancer.FreelancerSkills.Add(new FreelancerSkill
+        //                     {
+        //                         SkillId = skill.Id,
+        //                         FreelancerId = newFreelancer.Id
+        //                     });
+        //                 }
+        //             }
+        //             freelancerImportList.Add(newFreelancer);
+        //         }
+        //     }
+        //     if (freelancerImportList.Count > 0)
+        //     {
+        //         await _unitOfWork.FreelancerRepository.AddRangeAsync(freelancerImportList);
+        //         await _unitOfWork.SaveChangeAsync();
+        //         if (response.DuplicatedFreelancer != null)
+        //         {
+        //             return new FreelancerImportResponseModel
+        //             {
+        //                 DuplicatedFreelancer = response.DuplicatedFreelancer,
+        //                 AddedFreelancer = _mapper.Map<List<FreelancerImportModel>>(freelancerImportList),
+        //                 Message = "These freelancers have been successfully added and some freelancers are existed",
+        //                 Status = true
+        //             };
+        //         }
+        //         else
+        //         {
+        //             return new FreelancerImportResponseModel
+        //             {
+        //                 AddedFreelancer = _mapper.Map<List<FreelancerImportModel>>(freelancerImportList),
+        //                 Message = "These freelancers have been successfully added",
+        //                 Status = true
+        //             };
+        //         }
+        //     }
+        //     if (response.DuplicatedFreelancer != null)
+        //     {
+        //         response.Message = "Importing process have duplicated problems";
+        //         response.Status = false;
+        //         return response;
+        //     }
+        // }
+        // catch (Exception)
+        // {
+        //     throw;
+        // }
         throw new NotImplementedException();
     }
 

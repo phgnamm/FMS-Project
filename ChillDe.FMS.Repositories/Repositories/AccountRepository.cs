@@ -3,6 +3,7 @@ using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.Models.AccountModels;
+using ChillDe.FMS.Repositories.Models.QueryModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChillDe.FMS.Repositories.Repositories
@@ -21,13 +22,15 @@ namespace ChillDe.FMS.Repositories.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(x => x.Code == code);
         }
 
-        public async Task<List<AccountModel>> GetAllAsync(
+        public async Task<QueryResultModel<List<AccountModel>>> GetAllAsync(
             Expression<Func<AccountModel, bool>> filter = null,
             Func<IQueryable<AccountModel>, IOrderedQueryable<AccountModel>> orderBy = null,
             string includeProperties = "",
             int? pageIndex = null,
             int? pageSize = null)
         {
+            int totalCount = 0;
+
             IQueryable<AccountModel> query =
                 from user in _dbContext.Users
                 join userRole in _dbContext.UserRoles on user.Id equals userRole.UserId
@@ -55,6 +58,8 @@ namespace ChillDe.FMS.Repositories.Repositories
                 query = query.Where(filter);
             }
 
+            totalCount = await query.CountAsync();
+
             foreach (var includeProperty in includeProperties.Split
                          (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
@@ -79,7 +84,11 @@ namespace ChillDe.FMS.Repositories.Repositories
                 query = query.Skip(validPageIndex * validPageSize).Take(validPageSize);
             }
 
-            return query.ToList();
+            return new QueryResultModel<List<AccountModel>>()
+            {
+                TotalCount = totalCount,
+                Data = query.ToList(),
+            };
         }
     }
 }
