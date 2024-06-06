@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Interfaces;
+using ChillDe.FMS.Repositories.Models.QueryModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChillDe.FMS.Repositories.Repositories
@@ -25,7 +26,7 @@ namespace ChillDe.FMS.Repositories.Repositories
             return result;
         }
 
-        public async Task<List<TEntity>> GetAllAsync(
+        public async Task<QueryResultModel<List<TEntity>>> GetAllAsync(
             Expression<Func<TEntity, bool>> filter = null, // Các hàm filter
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, // Các hàm sort
             Expression<Func<TEntity, object>>[] includes = null, // Include các bảng khác nếu cần
@@ -33,11 +34,16 @@ namespace ChillDe.FMS.Repositories.Repositories
             int? pageIndex = null,
             int? pageSize = null)
         {
+            int totalCount = 0;
+            
             IQueryable<TEntity> query = _dbSet;
 
-            foreach (var include in includes)
+            if (includes != null)
             {
-                query = query.Include(include);
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
             }
 
             if (filter != null)
@@ -69,7 +75,11 @@ namespace ChillDe.FMS.Repositories.Repositories
                 query = query.Skip(validPageIndex * validPageSize).Take(validPageSize);
             }
 
-            return query.ToList();
+            return new QueryResultModel<List<TEntity>>()
+            {
+                TotalCount = totalCount,
+                Data = query.ToList(),
+            };
         }
         public async Task<int> Count(Expression<Func<TEntity, bool>> filter = null)
         {

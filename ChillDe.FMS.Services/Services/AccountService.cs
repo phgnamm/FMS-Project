@@ -630,8 +630,7 @@ namespace ChillDe.FMS.Services
 
             if (accountList != null)
             {
-                var totalCount = await _userManager.Users.CountAsync();
-                return new Pagination<AccountModel>(accountList, totalCount, accountFilterModel.PageIndex,
+                return new Pagination<AccountModel>(accountList.Data, accountList.TotalCount, accountFilterModel.PageIndex,
                     accountFilterModel.PageSize);
             }
 
