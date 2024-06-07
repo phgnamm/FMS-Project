@@ -12,10 +12,8 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
     {
         public string Order { get; set; } = "creation-date";
         public bool OrderByDescending { get; set; } = true;
-        public string? Code { get; set; }
-        public string? Name { get; set; }
-        public string? Status { get; set; }
-        public Guid? AccountId { get; set; }
+        public ProjectStatus? Status { get; set; }
+        public ProjectVisibility? Visibility { get; set; }
         public Guid? ProjectCategoryId { get; set; }
         public string? Search { get; set; }
         protected override int MinPageSize { get; set; } = PaginationConstant.DEFAULT_MIN_PAGE_SIZE;

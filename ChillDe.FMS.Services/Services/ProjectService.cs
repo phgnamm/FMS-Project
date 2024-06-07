@@ -107,11 +107,13 @@ namespace Services.Services
         {
             var projectList = await _unitOfWork.ProjectRepository.GetAllAsync(
             filter: x =>
-                x.Status == projectFilterModel.Status &&
+                (projectFilterModel.Status == null || x.Status == projectFilterModel.Status.ToString()) &&
                 (projectFilterModel.ProjectCategoryId == null || x.ProjectCategoryId == projectFilterModel.ProjectCategoryId) &&
+                (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility.ToString()) &&
                 (string.IsNullOrEmpty(projectFilterModel.Search) ||
                  x.Name.ToLower().Contains(projectFilterModel.Search.ToLower()) ||
                  x.Code.ToLower().Contains(projectFilterModel.Search.ToLower())),
+
             orderBy: x =>
             {
                 switch (projectFilterModel.Order.ToLower())
@@ -133,8 +135,9 @@ namespace Services.Services
                 }
             },
             pageIndex: projectFilterModel.PageIndex,
-            pageSize: projectFilterModel.PageSize
-            //includeProperties: "FreelancerSkills.Skill"
+            pageSize: projectFilterModel.PageSize,
+            includeProperties: "Account,ProjectCategory"
+
         );
 
             if (projectList != null)

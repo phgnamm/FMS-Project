@@ -15,6 +15,7 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
         public int Duration { get; set; } // Day
         public float? Price { get; set; }
         public string? Status { get; set; }
+        public string? Visibility { get; set; }
         public Guid? AccountId { get; set; }
         public string? AccountEmail { get; set; }
         public string? AccountFirstName { get; set; }
