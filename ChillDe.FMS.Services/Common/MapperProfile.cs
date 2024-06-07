@@ -14,6 +14,7 @@ namespace ChillDe.FMS.Repositories.Common
             // Account
             CreateMap<AccountRegisterModel, Account>();
             CreateMap<Account, AccountModel>();
+            CreateMap<AccountFilterResultModel, AccountModel>();
 
             // Freelancer
             CreateMap<Freelancer, FreelancerModel>();

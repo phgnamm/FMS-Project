@@ -9,9 +9,9 @@ namespace ChillDe.FMS.Repositories.Interfaces
     {
         Task<Account> GetAccountByCode(string code);
         
-        Task<QueryResultModel<List<AccountModel>>> GetAllAsync(
-            Expression<Func<AccountModel, bool>> filter = null,
-            Func<IQueryable<AccountModel>, IOrderedQueryable<AccountModel>> orderBy = null,
+        Task<QueryResultModel<List<AccountFilterResultModel>>> GetAllAsync(
+            Expression<Func<AccountFilterResultModel, bool>> filter = null,
+            Func<IQueryable<AccountFilterResultModel>, IOrderedQueryable<AccountFilterResultModel>> orderBy = null,
             string includeProperties = "",
             int? pageIndex = null,
             int? pageSize = null
