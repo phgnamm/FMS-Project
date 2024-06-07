@@ -6,12 +6,11 @@ namespace ChillDe.FMS.Repositories.Interfaces
 {
     public interface IGenericRepository<TEntity> where TEntity : BaseEntity
     {
-        Task<TEntity?> GetAsync(Guid id);
+        Task<TEntity?> GetAsync(Guid id, string includeProperties = "");
 
         Task<QueryResultModel<List<TEntity>>> GetAllAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
-            Expression<Func<TEntity, object>>[] includes = null,
             string includeProperties = "",
             int? pageIndex = null,
             int? pageSize = null

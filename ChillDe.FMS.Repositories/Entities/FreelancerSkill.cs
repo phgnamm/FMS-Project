@@ -1,4 +1,8 @@
-﻿namespace ChillDe.FMS.Repositories.Entities
+﻿
+
+using System.Text.Json.Serialization;
+
+namespace ChillDe.FMS.Repositories.Entities
 {
     public class FreelancerSkill : BaseEntity
     {

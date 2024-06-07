@@ -630,7 +630,8 @@ namespace ChillDe.FMS.Services
 
             if (accountList != null)
             {
-                return new Pagination<AccountModel>(accountList.Data, accountList.TotalCount, accountFilterModel.PageIndex,
+                var accountModelList = _mapper.Map<List<AccountModel>>(accountList.Data);
+                return new Pagination<AccountModel>(accountModelList, accountList.TotalCount, accountFilterModel.PageIndex,
                     accountFilterModel.PageSize);
             }
 

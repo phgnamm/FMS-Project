@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
+using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.Models.AccountModels;
 using ChillDe.FMS.Repositories.Models.QueryModels;
@@ -22,42 +23,46 @@ namespace ChillDe.FMS.Repositories.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(x => x.Code == code);
         }
 
-        public async Task<Account> GetAccountById(Guid id)
-        {
-            return await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
-        }
-
-        public async Task<QueryResultModel<List<AccountModel>>> GetAllAsync(
-            Expression<Func<AccountModel, bool>> filter = null,
-            Func<IQueryable<AccountModel>, IOrderedQueryable<AccountModel>> orderBy = null,
+        public async Task<QueryResultModel<List<AccountFilterResultModel>>> GetAllAsync(
+            Expression<Func<AccountFilterResultModel, bool>> filter = null,
+            Func<IQueryable<AccountFilterResultModel>, IOrderedQueryable<AccountFilterResultModel>> orderBy = null,
             string includeProperties = "",
             int? pageIndex = null,
             int? pageSize = null)
         {
             int totalCount = 0;
 
-            IQueryable<AccountModel> query =
-                from user in _dbContext.Users
-                join userRole in _dbContext.UserRoles on user.Id equals userRole.UserId
-                select new AccountModel
-                {
-                    Id = user.Id,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Gender = user.Gender,
-                    DateOfBirth = user.DateOfBirth,
-                    Address = user.Address,
-                    Image = user.Image,
-                    Code = user.Code,
-                    Email = user.Email,
-                    PhoneNumber = user.PhoneNumber,
-                    Role = _dbContext.Roles.FirstOrDefault(r => r.Id == userRole.RoleId).Name,
-                    RoleId = userRole.RoleId,
-                    IsDeleted = user.IsDeleted,
-                    CreationDate = user.CreationDate,
-                    // todo add other base entity fields
-                };
-
+            IQueryable<AccountFilterResultModel> query = _dbContext.Users
+                .Join(
+                    _dbContext.UserRoles,
+                    user => user.Id,
+                    userRole => userRole.UserId,
+                    (user, userRole) => new { user, userRole }
+                )
+                .Join(
+                    _dbContext.Roles,
+                    userRolePair => userRolePair.userRole.RoleId,
+                    role => role.Id,
+                    (userRolePair, role) => new AccountFilterResultModel()
+                    {
+                        Id = userRolePair.user.Id,
+                        FirstName = userRolePair.user.FirstName,
+                        LastName = userRolePair.user.LastName,
+                        Gender = userRolePair.user.Gender,
+                        DateOfBirth = userRolePair.user.DateOfBirth,
+                        Address = userRolePair.user.Address,
+                        Image = userRolePair.user.Image,
+                        Code = userRolePair.user.Code,
+                        Email = userRolePair.user.Email,
+                        PhoneNumber = userRolePair.user.PhoneNumber,
+                        Role = role.Name,
+                        RoleId = role.Id,
+                        IsDeleted = userRolePair.user.IsDeleted,
+                        CreationDate = userRolePair.user.CreationDate,
+                        // todo add other base entity fields
+                    }
+                );
+            
             if (filter != null)
             {
                 query = query.Where(filter);
@@ -89,7 +94,7 @@ namespace ChillDe.FMS.Repositories.Repositories
                 query = query.Skip(validPageIndex * validPageSize).Take(validPageSize);
             }
 
-            return new QueryResultModel<List<AccountModel>>()
+            return new QueryResultModel<List<AccountFilterResultModel>>()
             {
                 TotalCount = totalCount,
                 Data = query.ToList(),

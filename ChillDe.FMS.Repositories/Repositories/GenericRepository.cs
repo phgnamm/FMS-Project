@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using System.Collections.Generic;
+using System.Linq.Expressions;
 using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Interfaces;
@@ -18,9 +19,15 @@ namespace ChillDe.FMS.Repositories.Repositories
             _claimsService = claimsService;
         }
 
-        public async Task<TEntity?> GetAsync(Guid id)
+        public async Task<TEntity?> GetAsync(Guid id, string includeProperties = "")
         {
-            var result = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            IQueryable<TEntity> query = _dbSet;
+            foreach (var includeProperty in includeProperties.Split
+                         (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+            var result = await query.FirstOrDefaultAsync(x => x.Id == id);
             // todo should throw exception when result is not found
             return result;
         }
@@ -28,7 +35,6 @@ namespace ChillDe.FMS.Repositories.Repositories
         public async Task<QueryResultModel<List<TEntity>>> GetAllAsync(
             Expression<Func<TEntity, bool>> filter = null, // Các hàm filter
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, // Các hàm sort
-            Expression<Func<TEntity, object>>[] includes = null, // Include các bảng khác nếu cần
             string includeProperties = "", // Chỉ định lấy field nào của object
             int? pageIndex = null,
             int? pageSize = null)
@@ -36,14 +42,6 @@ namespace ChillDe.FMS.Repositories.Repositories
             int totalCount = 0;
             
             IQueryable<TEntity> query = _dbSet;
-
-            if (includes != null)
-            {
-                foreach (var include in includes)
-                {
-                    query = query.Include(include);
-                }
-            }
 
             if (filter != null)
             {
