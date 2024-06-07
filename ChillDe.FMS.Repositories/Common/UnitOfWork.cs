@@ -9,14 +9,16 @@ namespace ChillDe.FMS.Repositories.Common
 		private readonly IFreelancerRepository _freelancerRepository;
 		private readonly IProjectRepository _projectRepository;
 		private readonly ISkillRepository _skillRepository;
+		private readonly IFreelancerSkillRepository _freelancerSkillRepository;
 
-		public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IFreelancerRepository freelancerRepository, IProjectRepository projectRepository, ISkillRepository skillRepository)
+		public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, IFreelancerRepository freelancerRepository, IProjectRepository projectRepository, ISkillRepository skillRepository, IFreelancerSkillRepository freelancerSkillRepository)
 		{
 			_dbContext = dbContext;
 			_accountRepository = accountRepository;
 			_freelancerRepository = freelancerRepository;
 			_projectRepository = projectRepository;
 			_skillRepository = skillRepository;
+			_freelancerSkillRepository = freelancerSkillRepository;
 		}
 
 		public AppDbContext DbContext => _dbContext;
@@ -24,6 +26,7 @@ namespace ChillDe.FMS.Repositories.Common
 		public IFreelancerRepository FreelancerRepository => _freelancerRepository;
 		public IProjectRepository ProjectRepository => _projectRepository;
 		public ISkillRepository SkillRepository => _skillRepository;
+		public IFreelancerSkillRepository FreelancerSkillRepository => _freelancerSkillRepository;
 
 		public async Task<int> SaveChangeAsync()
 		{
