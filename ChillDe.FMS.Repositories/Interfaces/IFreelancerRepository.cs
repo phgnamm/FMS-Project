@@ -1,8 +1,4 @@
-﻿using AutoMapper;
-using ChillDe.FMS.Repositories.Common;
-using ChillDe.FMS.Repositories.Entities;
-using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
-using System.Linq.Expressions;
+﻿using ChillDe.FMS.Repositories.Entities;
 
 namespace ChillDe.FMS.Repositories.Interfaces;
 

@@ -15,7 +15,7 @@ namespace ChillDe.FMS.Repositories.ViewModels.FreelancerModels
         public bool OrderByDescending { get; set; } = true;
         public  string? SkillName { get; set; }
         public  string? SkillType { get; set; }
-        public FreelancerStatus? Status { get; set; }
+        public FreelancerStatus? Status { get; set; } = FreelancerStatus.Available;
         public Gender? Gender { get; set; }
         public string? Search { get; set; }
         protected override int MinPageSize { get; set; } = PaginationConstant.ACCOUNT_MIN_PAGE_SIZE;
