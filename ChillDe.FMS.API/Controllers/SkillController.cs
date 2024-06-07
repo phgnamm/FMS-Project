@@ -16,26 +16,22 @@ namespace ChillDe.FMS.API.Controllers
             _skillService = skillService;
         }
 
-        [HttpGet]
+        [HttpGet("group-by-type")]
         // [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetAllSkillsGroupByType([FromQuery] SkillFilterModel skillFilterModel)
         {
             try
             {
-                // todo modify this function to return based on GroupByType
                 var result = await _skillService.GetAllSkillsGroupByType(skillFilterModel);
 
-                if (!skillFilterModel.GroupByType)
+                var metadata = new
                 {
-                    var metadata = new
-                    {
-                        result.PageSize,
-                        result.CurrentPage,
-                        result.TotalPages,
-                    };
+                    result.PageSize,
+                    result.CurrentPage,
+                    result.TotalPages,
+                };
 
-                    Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
-                }
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
 
                 return Ok(result);
             }
