@@ -8,6 +8,7 @@
         public int Duration { get; set; } // Day
         public float? Price { get; set; }
         public string? Status { get; set; }
+        public string? Visibility { get; set; }
 
         // Foreign key
         public Guid? AccountId { get; set; }
