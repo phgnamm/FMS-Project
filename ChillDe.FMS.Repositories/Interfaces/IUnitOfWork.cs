@@ -7,6 +7,7 @@
         IFreelancerRepository FreelancerRepository { get; }
         IProjectRepository ProjectRepository { get; }
         ISkillRepository SkillRepository { get; }
+        IFreelancerSkillRepository FreelancerSkillRepository { get; }
 
 		public Task<int> SaveChangeAsync();
 	}

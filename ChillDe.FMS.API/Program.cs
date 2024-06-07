@@ -8,7 +8,6 @@ using ChillDe.FMS.Repositories;
 using ChillDe.FMS.Repositories.Common;
 using System.Text;
 using ChillDe.FMS.API.Services;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 

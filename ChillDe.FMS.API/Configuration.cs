@@ -66,6 +66,8 @@ namespace ChillDe.FMS.API
             services.AddScoped<ISkillService, SkillService>();
             services.AddScoped<ISkillRepository, SkillRepository>();
 
+			// FreelancerSkill
+			services.AddScoped<IFreelancerSkillRepository, FreelancerSkillRepository>();
 
 
             return services;
