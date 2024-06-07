@@ -1,4 +1,5 @@
-﻿using Repositories.Interfaces;
+﻿using ChillDe.FMS.Repositories.Repositories;
+using Repositories.Interfaces;
 
 namespace ChillDe.FMS.Repositories.Interfaces
 {
@@ -12,6 +13,7 @@ namespace ChillDe.FMS.Repositories.Interfaces
         IProjectDeliverableRepository ProjectDeliverableRepository { get; }
         IDeliverableTypeRepository DeliverableTypeRepository { get; }
         IProjectCategoryReposioty ProjectCategoryReposioty { get; }
+        IFreelancerSkillRepository FreelancerSkillRepository {  get; }
 
         public Task<int> SaveChangeAsync();
 	}

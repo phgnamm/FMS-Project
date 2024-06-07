@@ -13,11 +13,13 @@ namespace ChillDe.FMS.Repositories.Common
 		private readonly IProjectDeliverableRepository _projectDeliverableRepository;
         private readonly IDeliverableTypeRepository _deliverableTypeRepository;
         private readonly IProjectCategoryReposioty _projectCategoryReposioty;
+		private readonly IFreelancerSkillRepository _freelancerSkillRepository;
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, 
 			IFreelancerRepository freelancerRepository, IProjectRepository projectRepository, 
 			ISkillRepository skillRepository, IProjectDeliverableRepository projectDeliverableRepository,
-			IDeliverableTypeRepository deliverableTypeRepository, IProjectCategoryReposioty projectCategoryReposioty)
+			IDeliverableTypeRepository deliverableTypeRepository, IProjectCategoryReposioty projectCategoryReposioty,
+			IFreelancerSkillRepository freelancerSkillRepository)
 		{
 			_dbContext = dbContext;
 			_accountRepository = accountRepository;
@@ -27,6 +29,7 @@ namespace ChillDe.FMS.Repositories.Common
 			_projectDeliverableRepository = projectDeliverableRepository;
 			_deliverableTypeRepository = deliverableTypeRepository;
 			_projectCategoryReposioty = projectCategoryReposioty;
+			_freelancerSkillRepository = freelancerSkillRepository;
 		}
 
 		public AppDbContext DbContext => _dbContext;
@@ -38,6 +41,7 @@ namespace ChillDe.FMS.Repositories.Common
         public IDeliverableTypeRepository DeliverableTypeRepository => _deliverableTypeRepository;
         public IProjectCategoryReposioty ProjectCategoryReposioty => _projectCategoryReposioty;
 
+		public IFreelancerSkillRepository FreelancerSkillRepository => _freelancerSkillRepository;
         public async Task<int> SaveChangeAsync()
 		{
 			return await _dbContext.SaveChangesAsync();
