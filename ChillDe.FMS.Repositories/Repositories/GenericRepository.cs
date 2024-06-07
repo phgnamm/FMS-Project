@@ -19,9 +19,15 @@ namespace ChillDe.FMS.Repositories.Repositories
             _claimsService = claimsService;
         }
 
-        public async Task<TEntity?> GetAsync(Guid id)
+        public async Task<TEntity?> GetAsync(Guid id, string includeProperties = "")
         {
-            var result = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+            IQueryable<TEntity> query = _dbSet;
+            foreach (var includeProperty in includeProperties.Split
+                         (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
+            var result = await query.FirstOrDefaultAsync(x => x.Id == id);
             // todo should throw exception when result is not found
             return result;
         }
