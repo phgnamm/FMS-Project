@@ -6,19 +6,20 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:8.0 as build
 ARG BUILD_CONFIGURATION=Release
 
-COPY ["API/API.csproj", "API/"]
-COPY ["Services/Services.csproj", "Services/"]
-COPY ["Repositories/Repositories.csproj", "Repositories/"]
-RUN dotnet restore API/API.csproj
+COPY ["ChillDe.FMS.API/ChillDe.FMS.API.csproj", "ChillDe.FMS.API/"]
+COPY ["ChillDe.FMS.Services/ChillDe.FMS.Services.csproj", "ChillDe.FMS.Services/"]
+COPY ["ChillDe.FMS.Repositories/ChillDe.FMS.Repositories.csproj", "ChillDe.FMS.Repositories/"]
+RUN dotnet restore ChillDe.FMS.API/ChillDe.FMS.API.csproj
 COPY . .
-WORKDIR "/API"
-RUN dotnet build API.csproj -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/ChillDe.FMS.API"
+RUN dotnet build ChillDe.FMS.API.csproj -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-WORKDIR /API
-RUN dotnet publish API.csproj -c $BUILD_CONFIGURATION -o /app/publish
+WORKDIR /ChillDe.FMS.API
+RUN dotnet publish ChillDe.FMS.API.csproj -c $BUILD_CONFIGURATION -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "API.dll"]
+ENV PORT=8080
+ENTRYPOINT ["dotnet", "ChillDe.FMS.API.dll"]
