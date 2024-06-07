@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace ChillDe.FMS.Services.Models.ProjectModels
 {
-    public class ProjectDetailModel
+    public class ProjectModel
     {
+        public Guid Id { get; set; }
         public string? Code { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
@@ -15,9 +16,11 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
         public float? Price { get; set; }
         public string? Status { get; set; }
         public Guid? AccountId { get; set; }
-        public string? AccountName { get; set; }
-        public Guid? CategoryId { get; set; }
-        public string? CategoryName { get; set; }
+        public string? AccountEmail { get; set; }
+        public string? AccountFirstName { get; set; }
+        public string? AccountLastName { get; set; }
+        public Guid? ProjectCategoryId { get; set; }
+        public string? ProjectCategoryName { get; set; }
 
     }
 }

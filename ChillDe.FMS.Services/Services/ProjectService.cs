@@ -3,6 +3,7 @@ using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
+using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Services.Interfaces;
@@ -31,7 +32,7 @@ namespace Services.Services
                     Status = false
                 };
             }
-            
+
             var account = await _unitOfWork.AccountRepository.GetAccountById(projectModel.AccountId);
             if (account == null)
             {
@@ -65,27 +66,162 @@ namespace Services.Services
             };
         }
 
-        public async Task<Pagination<ProjectDetailModel>> GetProjectsByFilter
-            (PaginationParameter paginationParameter, ProjectDetailModel projectDetailModel)
+        public async Task<ResponseDataModel<ProjectModel>> GetProject(Guid id)
         {
-            //var projects = await _unitOfWork.FreelancerRepository.GetFreelancersByFilter(paginationParameter, freelancerFilterModel);
+            var project = await _unitOfWork.ProjectRepository.GetAsync(id);
 
-            //// Pagination
-            //if (freelancerList != null)
-            //{
-            //    var totalCount = freelancerList.Count();
-            //    // var freelancerListModel = _mapper.Map<List<FreelancerModel>>(freelancerList);
+            if (project == null)
+            {
+                return new ResponseDataModel<ProjectModel>()
+                {
+                    Status = false,
+                    Message = "Project not found"
+                };
+            }
 
-            //    var paginationList = freelancerList
-            //        .Skip((paginationParameter.PageIndex - 1) * paginationParameter.PageSize)
-            //        .Take(paginationParameter.PageSize)
-            //        .ToList();
+            var projectModel = _mapper.Map<ProjectModel>(project);
 
-            //    return new Pagination<FreelancerDetailModel>(paginationList, totalCount, paginationParameter.PageIndex,
-            //        paginationParameter.PageSize);
-            //}
+            var account = await _unitOfWork.AccountRepository.GetAccountById((Guid)project.AccountId);
+            if (account != null)
+            {
+                projectModel.AccountEmail = account.Email;
+                projectModel.AccountFirstName = account.FirstName;
+                projectModel.AccountLastName = account.LastName;
+            }
+
+            var category = await _unitOfWork.ProjectCategoryReposioty.GetAsync((Guid)project.ProjectCategoryId);
+            if (category != null)
+            {
+                projectModel.ProjectCategoryName = category.Name;
+            }
+
+            return new ResponseDataModel<ProjectModel>()
+            {
+                Status = true,
+                Message = "Get project successfully",
+                Data = projectModel
+            };
+        }
+
+        public async Task<Pagination<ProjectModel>> GetAllProjects(ProjectFilterModel projectFilterModel)
+        {
+            var projectList = await _unitOfWork.ProjectRepository.GetAllAsync(
+            filter: x =>
+                x.Status == projectFilterModel.Status &&
+                (projectFilterModel.ProjectCategoryId == null || x.ProjectCategoryId == projectFilterModel.ProjectCategoryId) &&
+                (string.IsNullOrEmpty(projectFilterModel.Search) ||
+                 x.Name.ToLower().Contains(projectFilterModel.Search.ToLower()) ||
+                 x.Code.ToLower().Contains(projectFilterModel.Search.ToLower())),
+            orderBy: x =>
+            {
+                switch (projectFilterModel.Order.ToLower())
+                {
+                    case "name":
+                        return projectFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.Name)
+                            : x.OrderBy(x => x.Name);
+                    case "price":
+                        return projectFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.Price)
+                            : x.OrderBy(x => x.Price);
+                    case "code":
+                        return projectFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.Code)
+                            : x.OrderBy(x => x.Code);
+                    default:
+                        return x.OrderBy(x => x.CreationDate);
+                }
+            },
+            pageIndex: projectFilterModel.PageIndex,
+            pageSize: projectFilterModel.PageSize
+            //includeProperties: "FreelancerSkills.Skill"
+        );
+
+            if (projectList != null)
+            {
+                var projectDetailList = projectList.Data.Select(p => new ProjectModel
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Code = p.Code,
+                    Description = p.Description,
+                    Duration = p.Duration,
+                    Price = p.Price,
+                    Status = p.Status,
+                    AccountId = p.AccountId,
+                    AccountEmail = p.Account.Email,
+                    AccountFirstName = p.Account.FirstName,
+                    AccountLastName = p.Account.LastName,
+                    ProjectCategoryId = p.ProjectCategoryId,
+                    ProjectCategoryName = p.ProjectCategory.Name
+                }).ToList();
+
+                return new Pagination<ProjectModel>(projectDetailList, projectList.TotalCount, projectFilterModel.PageIndex, projectFilterModel.PageSize);
+            }
 
             return null;
+
+        }
+
+        public async Task<ResponseDataModel<ProjectModel>> UpdateProject(Guid id, ProjectAddModel updateProject)
+        {
+            var existingProject = await _unitOfWork.ProjectRepository.GetAsync(id);
+            if (existingProject != null)
+            {
+                existingProject = _mapper.Map(updateProject, existingProject);
+                _unitOfWork.ProjectRepository.Update(existingProject);
+                await _unitOfWork.SaveChangeAsync();
+                var result = _mapper.Map<ProjectModel>(existingProject);
+                if (result != null)
+                {
+                    return new ResponseDataModel<ProjectModel>()
+                    {
+                        Status = true,
+                        Message = "Update project successfully",
+                        Data = result
+                    };
+                }
+                return new ResponseDataModel<ProjectModel>()
+                {
+                    Status = false,
+                    Message = "Update project fail"
+                };
+            }
+            return new ResponseDataModel<ProjectModel>()
+            {
+                Status = false,
+                Message = "Project not found"
+            };
+        }
+
+        public async Task<ResponseDataModel<ProjectModel>> DeleteProject(Guid id)
+        {
+            var project = await _unitOfWork.ProjectRepository.GetAsync(id);
+            if (project != null)
+            {
+                var result = _mapper.Map<ProjectModel>(project);
+                _unitOfWork.ProjectRepository.SoftDelete(project);
+                await _unitOfWork.SaveChangeAsync();
+                if (result != null)
+                {
+                    return new ResponseDataModel<ProjectModel>()
+                    {
+                        Status = true,
+                        Message = "Delete project successfully",
+                        Data = result
+                    };
+                }
+                return new ResponseDataModel<ProjectModel>()
+                {
+                    Status = false,
+                    Message = "Delete project failed"
+                };
+            }
+            return new ResponseDataModel<ProjectModel>()
+            {
+                Status = false,
+                Message = "Project not found"
+            };
         }
     }
 }

@@ -40,6 +40,7 @@ namespace ChillDe.FMS.Repositories.Common
 
             //Project
             CreateMap<ProjectAddModel, Project>();
+            CreateMap<Project, ProjectModel>();
 
             //ProjectDeliverable
             CreateMap<ProjectDeliverableCreateModel, ProjectDeliverable>();

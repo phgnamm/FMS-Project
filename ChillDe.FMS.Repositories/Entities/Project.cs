@@ -1,6 +1,3 @@
-using ChillDe.FMS.Repositories.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
-
 ﻿namespace ChillDe.FMS.Repositories.Entities
 {
     public class Project : BaseEntity
