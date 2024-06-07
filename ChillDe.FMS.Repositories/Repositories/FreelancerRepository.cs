@@ -1,11 +1,7 @@
-﻿using ChillDe.FMS.Repositories.Common;
-using ChillDe.FMS.Repositories.Entities;
+﻿using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using ChillDe.FMS.Repositories.Enums;
-using System.Linq.Expressions;
-using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
+
 
 namespace ChillDe.FMS.Repositories.Repositories;
 

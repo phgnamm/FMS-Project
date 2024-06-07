@@ -5,10 +5,8 @@ using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
+using ChillDe.FMS.Services.ViewModels.FreelancerModels;
 using Services.Interfaces;
-using System.Linq.Expressions;
-using System.Linq;
-using Microsoft.AspNetCore.Identity;
 
 namespace ChillDe.FMS.Services;
 
@@ -25,22 +23,22 @@ public class FreelancerService : IFreelancerService
         _claimsService = claimsService;
     }
 
-    public async Task<ResponseDataModel<FreelancerModel>> GetFreelancer(Guid id)
+    public async Task<ResponseDataModel<FreelancerDetailModel>> GetFreelancer(Guid id)
     {
-        var user = await _unitOfWork.FreelancerRepository.GetAsync(id);
+        var user = await _unitOfWork.FreelancerRepository.GetFreelancerById(id);
 
         if (user == null)
         {
-            return new ResponseDataModel<FreelancerModel>()
+            return new ResponseDataModel<FreelancerDetailModel>()
             {
                 Status = false,
                 Message = "User not found"
             };
         }
 
-        var userModel = _mapper.Map<FreelancerModel>(user);
+        var userModel = _mapper.Map<FreelancerDetailModel>(user);
 
-        return new ResponseDataModel<FreelancerModel>()
+        return new ResponseDataModel<FreelancerDetailModel>()
         {
             Status = true,
             Message = "Get account successfully",

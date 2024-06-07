@@ -1,10 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using ChillDe.FMS.Repositories.Common;
-using ChillDe.FMS.Repositories.ViewModels.AccountModels;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
+
 using Services.Interfaces;
-using ChillDe.FMS.Services;
+
 
 namespace ChillDe.FMS.API.Controllers
 {
