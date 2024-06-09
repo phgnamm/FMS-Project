@@ -5,6 +5,8 @@ using ChillDe.FMS.Repositories.Models.SkillModels;
 using ChillDe.FMS.Repositories.ViewModels.AccountModels;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Services.ViewModels.FreelancerModels;
+using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
+using ChillDe.FMS.Services.Models.ProjectModels;
 
 namespace ChillDe.FMS.Repositories.Common
 {
@@ -55,6 +57,13 @@ namespace ChillDe.FMS.Repositories.Common
                         })
                         .ToList();
                 });
+
+            //Project
+            CreateMap<ProjectAddModel, Project>();
+            CreateMap<Project, ProjectModel>();
+
+            //ProjectDeliverable
+            CreateMap<ProjectDeliverableCreateModel, ProjectDeliverable>();
         }
     }
 }
