@@ -21,12 +21,12 @@ namespace Services.Services
             _mapper = mapper;
         }
 
-        public async Task<ResponseDataModel<ProjectAddModel>> CreateProject(ProjectAddModel projectModel)
+        public async Task<ResponseDataModel<ProjectCreateModel>> CreateProject(ProjectCreateModel projectModel)
         {
             var existingProject = await _unitOfWork.ProjectRepository.GetProjectByCode(projectModel.Code);
             if (existingProject != null)
             {
-                return new ResponseDataModel<ProjectAddModel>()
+                return new ResponseDataModel<ProjectCreateModel>()
                 {
                     Message = "Project's code already existed!",
                     Status = false
@@ -36,7 +36,7 @@ namespace Services.Services
             var account = await _unitOfWork.AccountRepository.GetAccountById(projectModel.AccountId);
             if (account == null)
             {
-                return new ResponseDataModel<ProjectAddModel>()
+                return new ResponseDataModel<ProjectCreateModel>()
                 {
                     Message = "User not found",
                     Status = false
@@ -46,7 +46,7 @@ namespace Services.Services
             var category = await _unitOfWork.ProjectCategoryReposioty.GetAsync(projectModel.ProjectCategoryId);
             if (category == null)
             {
-                return new ResponseDataModel<ProjectAddModel>()
+                return new ResponseDataModel<ProjectCreateModel>()
                 {
                     Message = "Category not found",
                     Status = false
@@ -56,10 +56,10 @@ namespace Services.Services
             Project project = _mapper.Map<Project>(projectModel);
             project.AccountId = account.Id;
             project.ProjectCategoryId = category.Id;
-            project.Status = ProjectStatus.Pending.ToString();
+            project.Status = ProjectStatus.Pending;
             await _unitOfWork.ProjectRepository.AddAsync(project);
             await _unitOfWork.SaveChangeAsync();
-            return new ResponseDataModel<ProjectAddModel>()
+            return new ResponseDataModel<ProjectCreateModel>()
             {
                 Message = "Create project successfully!",
                 Status = true
@@ -107,9 +107,9 @@ namespace Services.Services
         {
             var projectList = await _unitOfWork.ProjectRepository.GetAllAsync(
             filter: x =>
-                (projectFilterModel.Status == null || x.Status == projectFilterModel.Status.ToString()) &&
+                (projectFilterModel.Status == null || x.Status == projectFilterModel.Status) &&
                 (projectFilterModel.ProjectCategoryId == null || x.ProjectCategoryId == projectFilterModel.ProjectCategoryId) &&
-                (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility.ToString()) &&
+                (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility) &&
                 (string.IsNullOrEmpty(projectFilterModel.Search) ||
                  x.Name.ToLower().Contains(projectFilterModel.Search.ToLower()) ||
                  x.Code.ToLower().Contains(projectFilterModel.Search.ToLower())),
@@ -166,12 +166,23 @@ namespace Services.Services
 
         }
 
-        public async Task<ResponseDataModel<ProjectModel>> UpdateProject(Guid id, ProjectAddModel updateProject)
+        public async Task<ResponseDataModel<ProjectModel>> UpdateProject(Guid id, ProjectUpdateModel updateProject)
         {
             var existingProject = await _unitOfWork.ProjectRepository.GetAsync(id);
             if (existingProject != null)
             {
+                var projectCategory = await _unitOfWork.ProjectCategoryReposioty
+                    .GetAsync(updateProject.ProjectCategoryId);
+                if (projectCategory == null)
+                {
+                    return new ResponseDataModel<ProjectModel>()
+                    {
+                        Status = false,
+                        Message = "Category not found"
+                    };
+                }
                 existingProject = _mapper.Map(updateProject, existingProject);
+
                 _unitOfWork.ProjectRepository.Update(existingProject);
                 await _unitOfWork.SaveChangeAsync();
                 var result = _mapper.Map<ProjectModel>(existingProject);

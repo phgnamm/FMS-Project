@@ -1,10 +1,12 @@
-﻿namespace ChillDe.FMS.Repositories.Entities
+﻿using ChillDe.FMS.Repositories.Enums;
+
+namespace ChillDe.FMS.Repositories.Entities
 {
     public class ProjectDeliverable : BaseEntity
     {
         public string? Name { get; set; }
         public DateTime? SubmissionDate { get; set; }
-        public string? Status { get; set; }
+        public ProjectDeliverableStatus? Status { get; set; }
 
         // Foreign Key
         public Guid? ProjectId { get; set; }

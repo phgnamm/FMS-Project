@@ -19,7 +19,7 @@ namespace API.Controllers
         }
 
         [HttpPost()]
-        public async Task<IActionResult> CreateProject(ProjectAddModel projectAddModel)
+        public async Task<IActionResult> CreateProject(ProjectCreateModel projectAddModel)
         {
             try
             {
@@ -84,13 +84,12 @@ namespace API.Controllers
             }
         }
 
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateProject(Guid id, [FromBody] ProjectAddModel project)
+        [HttpPut("{projectId}")]
+        public async Task<IActionResult> UpdateProject(Guid projectId, [FromBody] ProjectUpdateModel project)
         {
             try
             {
-                var result = await _projectService.UpdateProject(id, project);
+                var result = await _projectService.UpdateProject(projectId, project);
 
                 if (result.Status)
                 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChillDe.FMS.Repositories.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,7 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
         public string? Description { get; set; }
         public int Duration { get; set; } // Day
         public float? Price { get; set; }
-        public string? Status { get; set; }
+        public ProjectStatus? Status { get; set; }
         public string? Visibility { get; set; }
         public Guid? AccountId { get; set; }
         public string? AccountEmail { get; set; }

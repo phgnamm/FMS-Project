@@ -15,6 +15,8 @@ using Google.Apis.Auth.OAuth2;
 using Services.Services;
 using Repositories.Interfaces;
 using Repositories.Repositories;
+using ChillDe.FMS.Services.Interfaces;
+using ChillDe.FMS.Services.Services;
 
 namespace ChillDe.FMS.API
 {
@@ -74,7 +76,11 @@ namespace ChillDe.FMS.API
             services.AddScoped<IDeliverableTypeRepository, DeliverableTypeRepository>();
 
             //ProjectCategory
-            services.AddScoped<IProjectCategoryReposioty, ProjectCategoryRepository>();
+            services.AddScoped<IProjectCategoryRepository, ProjectCategoryRepository>();
+
+            //ProjectApply
+            services.AddScoped<IProjectApplyRepository, ProjectApplyRepository>();
+            services.AddScoped<IProjectApplyService, ProjectApplyService>();
 
             // Skill
             services.AddScoped<ISkillService, SkillService>();
