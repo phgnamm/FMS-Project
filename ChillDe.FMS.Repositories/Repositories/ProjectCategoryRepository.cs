@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Repositories.Interfaces;
 namespace Repositories.Repositories
 {
-    public class ProjectCategoryRepository : GenericRepository<ProjectCategory>, IProjectCategoryReposioty
+    public class ProjectCategoryRepository : GenericRepository<ProjectCategory>, IProjectCategoryRepository
     {
         private readonly AppDbContext _dbContext;
 
