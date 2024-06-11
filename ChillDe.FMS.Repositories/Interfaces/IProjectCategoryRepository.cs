@@ -4,7 +4,7 @@ using ChillDe.FMS.Repositories.Interfaces;
 
 namespace Repositories.Interfaces
 {
-    public interface IProjectCategoryReposioty : IGenericRepository<ProjectCategory>
+    public interface IProjectCategoryRepository : IGenericRepository<ProjectCategory>
     {
     }
 }

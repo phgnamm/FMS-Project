@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ChillDe.FMS.Services.Models.ProjectModels
 {
-    public class ProjectAddModel
+    public class ProjectUpdateModel
     {
         [Required(ErrorMessage = "Project's code is required")]
         public string? Code { get; set; }
@@ -25,13 +25,9 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
         [Required(ErrorMessage = "Project's price is required")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Invalid price!")]
         public float? Price { get; set; }
-        public string? Status { get; set; }
 
         [Required(ErrorMessage = "Visibility is required")]
         public string? Visibility { get; set; }
-        //public string AccountCode { get; set; }
-        public Guid AccountId { get; set; }
         public Guid ProjectCategoryId { get; set; }
-
     }
 }
