@@ -12,6 +12,11 @@ using ChillDe.FMS.API.Middlewares;
 using ChillDe.FMS.API.Services;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using Services.Services;
+using Repositories.Interfaces;
+using Repositories.Repositories;
+using ChillDe.FMS.Services.Interfaces;
+using ChillDe.FMS.Services.Services;
 
 namespace ChillDe.FMS.API
 {
@@ -61,6 +66,21 @@ namespace ChillDe.FMS.API
 			
 			// Project
 			services.AddScoped<IProjectRepository, ProjectRepository>();
+			services.AddScoped<IProjectService, ProjectService>();
+
+			//ProjectDeliverable
+			services.AddScoped<IProjectDeliverableRepository, ProjectDeliverableRepository>();
+			services.AddScoped<IProjectDeliverableService, ProjectDeliverableService>();
+
+            //DeliverableType
+            services.AddScoped<IDeliverableTypeRepository, DeliverableTypeRepository>();
+
+            //ProjectCategory
+            services.AddScoped<IProjectCategoryRepository, ProjectCategoryRepository>();
+
+            //ProjectApply
+            services.AddScoped<IProjectApplyRepository, ProjectApplyRepository>();
+            services.AddScoped<IProjectApplyService, ProjectApplyService>();
 
             // Skill
             services.AddScoped<ISkillService, SkillService>();

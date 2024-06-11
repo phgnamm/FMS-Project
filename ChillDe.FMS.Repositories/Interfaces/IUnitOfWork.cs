@@ -1,4 +1,7 @@
-﻿namespace ChillDe.FMS.Repositories.Interfaces
+﻿using ChillDe.FMS.Repositories.Repositories;
+using Repositories.Interfaces;
+
+namespace ChillDe.FMS.Repositories.Interfaces
 {
     public interface IUnitOfWork
     {
@@ -7,8 +10,12 @@
         IFreelancerRepository FreelancerRepository { get; }
         IProjectRepository ProjectRepository { get; }
         ISkillRepository SkillRepository { get; }
-        IFreelancerSkillRepository FreelancerSkillRepository { get; }
+        IProjectDeliverableRepository ProjectDeliverableRepository { get; }
+        IDeliverableTypeRepository DeliverableTypeRepository { get; }
+        IProjectCategoryRepository ProjectCategoryReposioty { get; }
+        IProjectApplyRepository ProjectApplyRepository { get; }
+        IFreelancerSkillRepository FreelancerSkillRepository {  get; }
 
-		public Task<int> SaveChangeAsync();
+        public Task<int> SaveChangeAsync();
 	}
 }
