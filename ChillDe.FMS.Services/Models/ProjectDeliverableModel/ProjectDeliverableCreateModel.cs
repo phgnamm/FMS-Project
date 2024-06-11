@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChillDe.FMS.Repositories.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace ChillDe.FMS.Services.Models.ProjectDeliverableModel
 
         [Required(ErrorMessage = "SubmissionDate is required")]
         public DateTime? SubmissionDate { get; set; }
-        public string? Status { get; set; }
+        public ProjectDeliverableStatus? Status { get; set; }
 
         [Required(ErrorMessage = "Project is required")]
         public Guid ProjectId { get; set; }
