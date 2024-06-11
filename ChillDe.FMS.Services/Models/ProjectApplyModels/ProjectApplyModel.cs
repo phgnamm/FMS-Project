@@ -16,7 +16,7 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
         public string? FreelancerFirstName { get; set; }
         public string? FreelancerLastName { get; set; }
         public string? Image {  get; set; }
-        public SkillGroupModel Skills { get; set; }
+        public List<SkillGroupModel> Skills { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public DateTime? CreationDate { get; set; }

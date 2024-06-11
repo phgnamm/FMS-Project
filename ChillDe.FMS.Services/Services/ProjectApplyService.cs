@@ -3,6 +3,7 @@ using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
+using ChillDe.FMS.Repositories.Models.SkillModels;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Interfaces;
@@ -205,6 +206,12 @@ namespace ChillDe.FMS.Services.Services
                     FreelancerId = f.Freelancer.Id,
                     FreelancerFirstName = f.Freelancer.FirstName,
                     FreelancerLastName = f.Freelancer.LastName,
+                    Skills = f.Freelancer.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
+                            .Select(group => new SkillGroupModel
+                            {
+                                SkillType = group.Key,
+                                SkillNames = group.Select(fs => fs.Skill.Name).ToList()
+                            }).ToList()
                 }).ToList();
 
                 return new Pagination<ProjectApplyModel>(projectApplyDetailList, projectApplyList.TotalCount, projectApplyFilterModel.PageIndex, projectApplyFilterModel.PageSize);
