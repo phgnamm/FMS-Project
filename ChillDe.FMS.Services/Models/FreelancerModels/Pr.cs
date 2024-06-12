@@ -1,4 +1,6 @@
 ﻿using ChillDe.FMS.Repositories.Enums;
+using ChillDe.FMS.Services.Models.ProjectApplyModels;
+using Microsoft.Identity.Client;
 
 namespace ChillDe.FMS.Services.ViewModels.FreelancerModels
 {

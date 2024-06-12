@@ -41,7 +41,7 @@ namespace Services.Services
                 };
             }
             ProjectDeliverable projectDeliverable = _mapper.Map<ProjectDeliverable>(projectDeliverableModel);
-            projectDeliverable.Status = ProjectStatus.Checking.ToString();
+            projectDeliverable.Status = ProjectDeliverableStatus.Checking;
             projectDeliverable.DeliverableTypeId = deliverableType.Id;
             projectDeliverable.ProjectId = projectDeliverableModel.ProjectId;
 

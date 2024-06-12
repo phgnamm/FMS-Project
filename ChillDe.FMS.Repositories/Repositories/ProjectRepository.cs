@@ -24,10 +24,9 @@ public class ProjectRepository : GenericRepository<Project>, IProjectRepository
             projectList = projectList.Where(x => x.IsDeleted == isDeleted);
         }
 
-        if (projectStatusList != null)
+        if (projectStatusList != null && projectStatusList.Length > 0)
         {
-            var statusStrings = projectStatusList.Select(ps => ps.ToString()).ToList();
-            projectList = projectList.Where(x => statusStrings.Contains(x.Status));
+            projectList = projectList.Where(x => x.Status.HasValue && projectStatusList.Contains(x.Status.Value));
         }
 
         return projectList.ToList();

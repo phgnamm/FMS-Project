@@ -4,7 +4,7 @@ using Services.Interfaces;
 
 namespace API.Controllers
 {
-    [Route("api/v1/projectDeliverable")]
+    [Route("api/v1/project-deliverable")]
     [ApiController]
     public class ProjectDeliverableController : ControllerBase
     {
