@@ -6,5 +6,6 @@ namespace Repositories.Interfaces
 {
     public interface IProjectCategoryRepository : IGenericRepository<ProjectCategory>
     {
+        Task<List<ProjectCategory>> GetByNames(List<string> names);
     }
 }
