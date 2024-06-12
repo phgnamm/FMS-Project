@@ -132,7 +132,9 @@ namespace Services.Services
                             ? x.OrderByDescending(x => x.Code)
                             : x.OrderBy(x => x.Code);
                     default:
-                        return x.OrderBy(x => x.CreationDate);
+                        return projectFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.CreationDate)
+                            : x.OrderBy(x => x.CreationDate);
                 }
             },
             pageIndex: projectFilterModel.PageIndex,

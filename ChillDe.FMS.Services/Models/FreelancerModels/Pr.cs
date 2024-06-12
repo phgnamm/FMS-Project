@@ -19,6 +19,7 @@ namespace ChillDe.FMS.Services.ViewModels.FreelancerModels
         public double Wallet { get; set; }
         public string Status { get; set; }
         public DateTime CreationDate { get; set; }
+        public int? Warning { get; set; }
         public List<SkillSet> Skills { get; set; }
     }
 
