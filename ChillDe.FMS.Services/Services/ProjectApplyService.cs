@@ -186,7 +186,9 @@ namespace ChillDe.FMS.Services.Services
                                 ? query.OrderByDescending(x => x.Freelancer.DateOfBirth)
                                 : query.OrderBy(x => x.Freelancer.DateOfBirth);
                         default:
-                            return query.OrderBy(x => x.CreationDate);
+                            return projectApplyFilterModel.OrderByDescending
+                                ? query.OrderByDescending(x => x.CreationDate)
+                                : query.OrderBy(x => x.CreationDate);;
                     }
                 },
                 pageIndex: projectApplyFilterModel.PageIndex,

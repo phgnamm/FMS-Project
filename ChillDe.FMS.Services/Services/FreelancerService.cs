@@ -81,7 +81,9 @@ public class FreelancerService : IFreelancerService
                             ? x.OrderByDescending(x => x.DateOfBirth)
                             : x.OrderBy(x => x.DateOfBirth);
                     default:
-                        return x.OrderBy(x => x.CreationDate);
+                        return freelancerFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.CreationDate)
+                            : x.OrderBy(x => x.CreationDate);
                 }
             },
             pageIndex: freelancerFilterModel.PageIndex,
@@ -106,6 +108,7 @@ public class FreelancerService : IFreelancerService
                 Wallet = f.Wallet,
                 Status = f.Status,
                 CreationDate = f.CreationDate,
+                Warning = f.Warning,
                 Skills = f.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
                             .Select(group => new SkillSet
                             {
@@ -157,6 +160,7 @@ public class FreelancerService : IFreelancerService
                         Wallet = newFreelancers.Wallet,
                         CreationDate = DateTime.UtcNow,
                         CreatedBy = _claimsService.GetCurrentUserId,
+                        Warning = 0,
                     };
                     // Check and add skills
                     foreach (var skillTypeModel in newFreelancers.Skills)
@@ -175,13 +179,15 @@ public class FreelancerService : IFreelancerService
                                 });
                             }
                         }
-                        return new FreelancerImportResponseModel
+                        else
                         {
-                            AddedFreelancer = _mapper.Map<List<FreelancerImportModel>>(freelancerImportList),
-                            Message = "These freelancers do not have skill",
-                            Status = false
-                        };
-
+                            return new FreelancerImportResponseModel
+                            {
+                                AddedFreelancer = _mapper.Map<List<FreelancerImportModel>>(freelancerImportList),
+                                Message = "These freelancers do not have skill",
+                                Status = false
+                            };
+                        }
                     }
                     freelancerImportList.Add(newFreelancer);
                 }
