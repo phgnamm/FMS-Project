@@ -81,7 +81,9 @@ public class FreelancerService : IFreelancerService
                             ? x.OrderByDescending(x => x.DateOfBirth)
                             : x.OrderBy(x => x.DateOfBirth);
                     default:
-                        return x.OrderBy(x => x.CreationDate);
+                        return freelancerFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.CreationDate)
+                            : x.OrderBy(x => x.CreationDate);
                 }
             },
             pageIndex: freelancerFilterModel.PageIndex,
