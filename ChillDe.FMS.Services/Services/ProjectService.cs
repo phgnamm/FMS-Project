@@ -57,6 +57,7 @@ namespace Services.Services
             project.AccountId = account.Id;
             project.ProjectCategoryId = category.Id;
             project.Status = ProjectStatus.Pending;
+            project.Visibility = projectModel.Visibility;
             await _unitOfWork.ProjectRepository.AddAsync(project);
             await _unitOfWork.SaveChangeAsync();
             return new ResponseDataModel<ProjectCreateModel>()
