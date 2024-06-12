@@ -96,7 +96,7 @@ public class FreelancerService : IFreelancerService
                 Id = f.Id,
                 FirstName = f.FirstName,
                 LastName = f.LastName,
-                Gender = f.Gender,
+                Gender = f.Gender.ToString(),
                 DateOfBirth = f.DateOfBirth,
                 Address = f.Address,
                 Image = f.Image,
@@ -104,7 +104,7 @@ public class FreelancerService : IFreelancerService
                 Email = f.Email,
                 PhoneNumber = f.PhoneNumber,
                 Wallet = f.Wallet,
-                Status = f.Status,
+                Status = f.Status.ToString(),
                 CreationDate = f.CreationDate,
                 Skills = f.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
                             .Select(group => new SkillSet
