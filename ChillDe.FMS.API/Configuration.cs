@@ -77,6 +77,7 @@ namespace ChillDe.FMS.API
 
             //ProjectCategory
             services.AddScoped<IProjectCategoryRepository, ProjectCategoryRepository>();
+			services.AddScoped<IProjectCategoryService, ProjectCategoryService>();
 
             //ProjectApply
             services.AddScoped<IProjectApplyRepository, ProjectApplyRepository>();

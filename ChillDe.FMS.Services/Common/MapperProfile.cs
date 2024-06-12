@@ -7,6 +7,7 @@ using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Services.ViewModels.FreelancerModels;
 using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
 using ChillDe.FMS.Services.Models.ProjectModels;
+using ChillDe.FMS.Services.Models.ProjectCategoryModels;
 
 namespace ChillDe.FMS.Repositories.Common
 {
@@ -62,6 +63,9 @@ namespace ChillDe.FMS.Repositories.Common
             CreateMap<ProjectCreateModel, Project>();
             CreateMap<ProjectUpdateModel, Project>();
             CreateMap<Project, ProjectModel>().ReverseMap();
+
+            //ProjectCategory
+            CreateMap<ProjectCategoryModel, ProjectCategory>().ReverseMap();
 
             //ProjectDeliverable
             CreateMap<ProjectDeliverableCreateModel, ProjectDeliverable>();
