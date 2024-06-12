@@ -109,7 +109,7 @@ namespace Services.Services
             var projectList = await _unitOfWork.ProjectRepository.GetAllAsync(
             filter: x =>
                 (projectFilterModel.Status == null || x.Status == projectFilterModel.Status) &&
-                (projectFilterModel.ProjectCategoryId == null || x.ProjectCategoryId == projectFilterModel.ProjectCategoryId) &&
+                (projectFilterModel.ProjectCategoryId == null || projectFilterModel.ProjectCategoryId.Count == 0 || projectFilterModel.ProjectCategoryId.Contains((Guid)x.ProjectCategoryId)) &&
                 (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility) &&
                 (string.IsNullOrEmpty(projectFilterModel.Search) ||
                  x.Name.ToLower().Contains(projectFilterModel.Search.ToLower()) ||
