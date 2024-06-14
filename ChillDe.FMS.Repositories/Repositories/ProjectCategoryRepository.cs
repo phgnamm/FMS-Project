@@ -15,10 +15,9 @@ namespace Repositories.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<ProjectCategory> GetByName(string name)
+        public async Task<List<ProjectCategory>> GetByNames(List<string> names)
         {
-            var projectCategory = await _dbContext.ProjectCategory.SingleOrDefaultAsync(x => x.Name == name);
-            return projectCategory;
+            return await _dbContext.ProjectCategory.Where(x => names.Contains(x.Name)).ToListAsync();
         }
     }
 }

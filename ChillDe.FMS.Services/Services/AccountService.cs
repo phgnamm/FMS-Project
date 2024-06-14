@@ -623,7 +623,9 @@ namespace ChillDe.FMS.Services
                                 ? x.OrderByDescending(x => x.DateOfBirth)
                                 : x.OrderBy(x => x.DateOfBirth);
                         default:
-                            return x.OrderBy(x => x.CreationDate);
+                            return accountFilterModel.OrderByDescending
+                                ? x.OrderByDescending(x => x.CreationDate)
+                                : x.OrderBy(x => x.CreationDate);
                     }
                 })
             );

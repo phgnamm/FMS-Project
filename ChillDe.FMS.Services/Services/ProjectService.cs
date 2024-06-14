@@ -57,6 +57,7 @@ namespace Services.Services
             project.AccountId = account.Id;
             project.ProjectCategoryId = category.Id;
             project.Status = ProjectStatus.Pending;
+            project.Visibility = projectModel.Visibility;
             await _unitOfWork.ProjectRepository.AddAsync(project);
             await _unitOfWork.SaveChangeAsync();
             return new ResponseDataModel<ProjectCreateModel>()
@@ -108,7 +109,7 @@ namespace Services.Services
             var projectList = await _unitOfWork.ProjectRepository.GetAllAsync(
             filter: x =>
                 (projectFilterModel.Status == null || x.Status == projectFilterModel.Status) &&
-                (projectFilterModel.ProjectCategoryId == null || x.ProjectCategoryId == projectFilterModel.ProjectCategoryId) &&
+                (projectFilterModel.ProjectCategoryId == null || projectFilterModel.ProjectCategoryId.Count == 0 || projectFilterModel.ProjectCategoryId.Contains((Guid)x.ProjectCategoryId)) &&
                 (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility) &&
                 (string.IsNullOrEmpty(projectFilterModel.Search) ||
                  x.Name.ToLower().Contains(projectFilterModel.Search.ToLower()) ||
@@ -131,7 +132,9 @@ namespace Services.Services
                             ? x.OrderByDescending(x => x.Code)
                             : x.OrderBy(x => x.Code);
                     default:
-                        return x.OrderBy(x => x.CreationDate);
+                        return projectFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.CreationDate)
+                            : x.OrderBy(x => x.CreationDate);
                 }
             },
             pageIndex: projectFilterModel.PageIndex,
