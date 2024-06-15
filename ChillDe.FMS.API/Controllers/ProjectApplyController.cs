@@ -22,7 +22,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPost("{projectId}")]
-        public async Task<IActionResult> ImportRangeProjectApply(List<Guid> projectApplyIds, Guid projectId)
+        public async Task<IActionResult> ImportRangeProjectApply(Guid projectApplyId, Guid projectId)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace ChillDe.FMS.API.Controllers
                 {
                     return ValidationProblem(ModelState);
                 }
-                var result = await _projectApplyService.AddRangeProjectApply(projectApplyIds, projectId);
+                var result = await _projectApplyService.ApplyFreelancer(projectApplyId, projectId);
                 if (result.Status)
                 {
                     return Ok(result);

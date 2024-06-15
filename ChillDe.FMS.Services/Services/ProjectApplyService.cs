@@ -29,8 +29,8 @@ namespace ChillDe.FMS.Services.Services
             _mapper = mapper;
         }
 
-        public async Task<ResponseDataModel<FreelancerDetailModel>> AddRangeProjectApply
-            (List<Guid> freelancerIds, Guid projectId)
+        public async Task<ResponseDataModel<FreelancerDetailModel>> ApplyFreelancer
+            (Guid freelancerId, Guid projectId)
         {
             var project = await _unitOfWork.ProjectRepository.GetAsync(projectId);
             if (project == null)
@@ -42,31 +42,23 @@ namespace ChillDe.FMS.Services.Services
                 };
             }
 
-            List<ProjectApply> projectApplies = new List<ProjectApply>();
-            foreach (var freelancerId in freelancerIds)
+            var freelancer = _unitOfWork.FreelancerRepository.GetFreelancerById(freelancerId);
+            if (freelancer == null)
             {
-                var freelancer = _unitOfWork.FreelancerRepository.GetFreelancerById(freelancerId);
-                if (freelancer == null)
+                return new ResponseDataModel<FreelancerDetailModel>
                 {
-                    return new ResponseDataModel<FreelancerDetailModel>
-                    {
-                        Message = "Freelancer not found",
-                        Data = _mapper.Map<FreelancerDetailModel>(freelancer),
-                        Status = false
-                    };
-                }
-                else
-                {
-                    var projectApply = new ProjectApply();
-                    projectApply.FreelancerId = freelancerId;
-                    projectApply.ProjectId = projectId;
-                    projectApply.StartDate = DateTime.UtcNow;
-                    projectApply.Status = ProjectApplyStatus.Accepted;
-                    projectApplies.Add(projectApply);
-                }
+                    Message = "Freelancer not found",
+                    Data = _mapper.Map<FreelancerDetailModel>(freelancer),
+                    Status = false
+                };
             }
+            var projectApply = new ProjectApply();
+            projectApply.FreelancerId = freelancerId;
+            projectApply.ProjectId = projectId;
+            projectApply.StartDate = DateTime.UtcNow;
+            projectApply.Status = ProjectApplyStatus.Accepted;
 
-            await _unitOfWork.ProjectApplyRepository.AddRangeAsync(projectApplies);
+            await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
             await _unitOfWork.SaveChangeAsync();
 
             return new ResponseDataModel<FreelancerDetailModel>
@@ -156,7 +148,9 @@ namespace ChillDe.FMS.Services.Services
         public async Task<Pagination<ProjectApplyModel>> GetProjectAppliesByFilter(ProjectApplyFilterModel projectApplyFilterModel)
         {
             var projectApplyList = await _unitOfWork.ProjectApplyRepository.GetAllAsync(
-                filter: x => x.Project.Id == projectApplyFilterModel.ProjectId &&
+                filter: x =>
+                    (projectApplyFilterModel.ProjectId == null || x.Project.Id == projectApplyFilterModel.ProjectId) &&
+                    (projectApplyFilterModel.FreelancerId == null || x.Freelancer.Id == projectApplyFilterModel.FreelancerId) &&
                     (projectApplyFilterModel.Gender == null || x.Freelancer.Gender == projectApplyFilterModel.Gender) &&
                     (projectApplyFilterModel.SkillType == null || x.Freelancer.FreelancerSkills.Any(fs => fs.Skill.Type == projectApplyFilterModel.SkillType)) &&
                     (projectApplyFilterModel.SkillName == null || x.Freelancer.FreelancerSkills.Any(fs => fs.Skill.Name.Contains(projectApplyFilterModel.SkillName))) &&
@@ -188,7 +182,7 @@ namespace ChillDe.FMS.Services.Services
                         default:
                             return projectApplyFilterModel.OrderByDescending
                                 ? query.OrderByDescending(x => x.CreationDate)
-                                : query.OrderBy(x => x.CreationDate);;
+                                : query.OrderBy(x => x.CreationDate); ;
                     }
                 },
                 pageIndex: projectApplyFilterModel.PageIndex,

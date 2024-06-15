@@ -13,8 +13,8 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
     {
         public string Order { get; set; } = "creation-date";
         public bool OrderByDescending { get; set; } = true;
-        [Required(ErrorMessage = "Project Id is required")]
-        public Guid ProjectId { get; set; }
+        public Guid? ProjectId { get; set; }
+        public Guid? FreelancerId { get; set; }
         public string? SkillName { get; set; }
         public string? SkillType { get; set; }
         public Gender? Gender { get; set; }

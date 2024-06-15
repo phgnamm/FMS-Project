@@ -23,6 +23,10 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
         [RegularExpression(@"^\d+$", ErrorMessage = "Invalid duration!")]
         public int Duration { get; set; }
 
+        [Required(ErrorMessage = "Project's deposit is required")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "Invalid deposit!")]
+        public float? Deposit { get; set; }
+
         [Required(ErrorMessage = "Project's price is required")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Invalid price!")]
         public float? Price { get; set; }
