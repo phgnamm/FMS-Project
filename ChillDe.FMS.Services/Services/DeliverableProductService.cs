@@ -38,7 +38,7 @@ namespace ChillDe.FMS.Services.Services
                 };
             }
 
-            var projectDeliverable = await _unitOfWork.ProjectRepository.GetAsync
+            var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository.GetAsync
                 ((Guid)deliverableProductModel.ProjectDeliverableId);
             if (projectDeliverable == null)
             {
@@ -56,10 +56,12 @@ namespace ChillDe.FMS.Services.Services
             if (project != null)
             {
                 project.Status = ProjectStatus.Checking;
-                _unitOfWork.ProjectRepository.Update(project);
+                
             }
 
+            _unitOfWork.ProjectRepository.Update(project);
             await _unitOfWork.DeliverableProductRepository.AddAsync(deliverableProduct);
+            
             await _unitOfWork.SaveChangeAsync();
 
             return new ResponseModel

@@ -4,17 +4,10 @@ using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.Models.SkillModels;
-using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.ProjectApplyModels;
 using ChillDe.FMS.Services.ViewModels.FreelancerModels;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChillDe.FMS.Services.Services
 {
@@ -29,44 +22,44 @@ namespace ChillDe.FMS.Services.Services
             _mapper = mapper;
         }
 
-        public async Task<ResponseDataModel<FreelancerDetailModel>> ApplyFreelancer
-            (Guid freelancerId, Guid projectId)
-        {
-            var project = await _unitOfWork.ProjectRepository.GetAsync(projectId);
-            if (project == null)
-            {
-                return new ResponseDataModel<FreelancerDetailModel>
-                {
-                    Message = "Project not found",
-                    Status = false
-                };
-            }
+        //public async Task<ResponseDataModel<FreelancerDetailModel>> ApplyFreelancer
+        //    (Guid freelancerId, Guid projectId)
+        //{
+        //    var project = await _unitOfWork.ProjectRepository.GetAsync(projectId);
+        //    if (project == null)
+        //    {
+        //        return new ResponseDataModel<FreelancerDetailModel>
+        //        {
+        //            Message = "Project not found",
+        //            Status = false
+        //        };
+        //    }
 
-            var freelancer = _unitOfWork.FreelancerRepository.GetFreelancerById(freelancerId);
-            if (freelancer == null)
-            {
-                return new ResponseDataModel<FreelancerDetailModel>
-                {
-                    Message = "Freelancer not found",
-                    Data = _mapper.Map<FreelancerDetailModel>(freelancer),
-                    Status = false
-                };
-            }
-            var projectApply = new ProjectApply();
-            projectApply.FreelancerId = freelancerId;
-            projectApply.ProjectId = projectId;
-            projectApply.StartDate = DateTime.UtcNow;
-            projectApply.Status = ProjectApplyStatus.Accepted;
+        //    var freelancer = _unitOfWork.FreelancerRepository.GetFreelancerById(freelancerId);
+        //    if (freelancer == null)
+        //    {
+        //        return new ResponseDataModel<FreelancerDetailModel>
+        //        {
+        //            Message = "Freelancer not found",
+        //            Data = _mapper.Map<FreelancerDetailModel>(freelancer),
+        //            Status = false
+        //        };
+        //    }
+        //    var projectApply = new ProjectApply();
+        //    projectApply.FreelancerId = freelancerId;
+        //    projectApply.ProjectId = projectId;
+        //    projectApply.StartDate = DateTime.UtcNow;
+        //    projectApply.Status = ProjectApplyStatus.Accepted;
 
-            await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
-            await _unitOfWork.SaveChangeAsync();
+        //    await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
+        //    await _unitOfWork.SaveChangeAsync();
 
-            return new ResponseDataModel<FreelancerDetailModel>
-            {
-                Message = "Add succesfully",
-                Status = true
-            };
-        }
+        //    return new ResponseDataModel<FreelancerDetailModel>
+        //    {
+        //        Message = "Add succesfully",
+        //        Status = true
+        //    };
+        //}
 
         public async Task<ResponseModel> AddProjectApply(ProjectApplyCreateModel projectApplyModel)
         {
@@ -97,12 +90,13 @@ namespace ChillDe.FMS.Services.Services
             {
                 projectApply.Status = ProjectApplyStatus.Checking;
             }
-            else
+            else if(project.Visibility == ProjectVisibility.Private)
             {
                 projectApply.Status = ProjectApplyStatus.Invited;
             }
 
             await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
+            _unitOfWork.ProjectRepository.Update(project);
             await _unitOfWork.SaveChangeAsync();
 
             return new ResponseModel
