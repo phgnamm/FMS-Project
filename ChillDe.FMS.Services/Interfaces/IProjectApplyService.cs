@@ -8,8 +8,8 @@ namespace ChillDe.FMS.Services.Interfaces
 {
     public interface IProjectApplyService
     {
-        Task<ResponseDataModel<FreelancerDetailModel>> AddRangeProjectApply
-            (List<Guid> freelancerIds, Guid projectId);
+        Task<ResponseDataModel<FreelancerDetailModel>> ApplyFreelancer
+            (Guid freelancerId, Guid projectId);
         Task<ResponseModel> AddProjectApply(ProjectApplyCreateModel projectApplyModel);
         Task<ResponseModel> UpdateProjectApply(ProjectApplyUpdateModel projectApplyUpdateModel);
         Task<Pagination<ProjectApplyModel>> GetProjectAppliesByFilter

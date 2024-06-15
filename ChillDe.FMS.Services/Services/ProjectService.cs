@@ -3,7 +3,6 @@ using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
-using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Services.Interfaces;
@@ -54,6 +53,16 @@ namespace Services.Services
             }
 
             Project project = _mapper.Map<Project>(projectModel);
+
+            if(project.Deposit >= project.Price)
+            {
+                return new ResponseDataModel<ProjectCreateModel>()
+                {
+                    Message = "Deposit must be less than price",
+                    Status = false
+                };
+            }
+
             project.AccountId = account.Id;
             project.ProjectCategoryId = category.Id;
             project.Status = ProjectStatus.Pending;
@@ -153,6 +162,7 @@ namespace Services.Services
                     Description = p.Description,
                     Duration = p.Duration,
                     Price = p.Price,
+                    Deposit = p.Deposit,
                     Status = p.Status,
                     AccountId = p.AccountId,
                     AccountEmail = p.Account.Email,
@@ -218,6 +228,61 @@ namespace Services.Services
             {
                 var result = _mapper.Map<ProjectModel>(project);
                 _unitOfWork.ProjectRepository.SoftDelete(project);
+                await _unitOfWork.SaveChangeAsync();
+                if (result != null)
+                {
+                    return new ResponseDataModel<ProjectModel>()
+                    {
+                        Status = true,
+                        Message = "Delete project successfully",
+                        Data = result
+                    };
+                }
+                return new ResponseDataModel<ProjectModel>()
+                {
+                    Status = false,
+                    Message = "Delete project failed"
+                };
+            }
+            return new ResponseDataModel<ProjectModel>()
+            {
+                Status = false,
+                Message = "Project not found"
+            };
+        }
+
+        public async Task<ResponseDataModel<ProjectModel>> CloseProject(Guid projectId, ProjectStatus status)
+        {
+            var project = await _unitOfWork.ProjectRepository.GetAsync(projectId);
+            if (project != null)
+            {
+                var freelancer = await _unitOfWork.FreelancerRepository.GetFreelancerByProjectId(projectId);
+                if (status == ProjectStatus.Closed)
+                {
+                    if (freelancer != null)
+                    {
+                        freelancer.Wallet += project.Deposit;
+                    }
+                }
+                if (status == ProjectStatus.Done)
+                {
+                    if (freelancer != null)
+                    {
+                        freelancer.Wallet += (float)project.Price;
+                    }
+                }
+
+                var projectApply = await _unitOfWork.ProjectApplyRepository.GetProjectApplyByProjectId(projectId);
+                if (projectApply != null)
+                {
+                    //DateTime startDate = new DateTime(projectApply.StartDate);
+                    //projectApply.EndDate = startDate.Add(TimeSpan.FromDays(project.Duration));
+                }
+
+                    project.Status = status;
+                var result = _mapper.Map<ProjectModel>(project);
+                _unitOfWork.ProjectRepository.SoftDelete(project);
+                _unitOfWork.FreelancerRepository.Update(freelancer);
                 await _unitOfWork.SaveChangeAsync();
                 if (result != null)
                 {
