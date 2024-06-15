@@ -21,27 +21,27 @@ namespace ChillDe.FMS.API.Controllers
             _projectApplyService = projectApplyService;
         }
 
-        [HttpPost("{projectId}")]
-        public async Task<IActionResult> ImportRangeProjectApply(Guid projectApplyId, Guid projectId)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                {
-                    return ValidationProblem(ModelState);
-                }
-                var result = await _projectApplyService.ApplyFreelancer(projectApplyId, projectId);
-                if (result.Status)
-                {
-                    return Ok(result);
-                }
-                return BadRequest(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
+        //[HttpPost("{projectId}")]
+        //public async Task<IActionResult> ImportRangeProjectApply(Guid projectApplyId, Guid projectId)
+        //{
+        //    try
+        //    {
+        //        if (!ModelState.IsValid)
+        //        {
+        //            return ValidationProblem(ModelState);
+        //        }
+        //        var result = await _projectApplyService.ApplyFreelancer(projectApplyId, projectId);
+        //        if (result.Status)
+        //        {
+        //            return Ok(result);
+        //        }
+        //        return BadRequest(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.Message);
+        //    }
+        //}
 
         [HttpPost()]
         public async Task<IActionResult> CreateProjectApply(ProjectApplyCreateModel projectApplyModel)

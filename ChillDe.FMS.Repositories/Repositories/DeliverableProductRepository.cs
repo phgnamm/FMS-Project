@@ -1,5 +1,6 @@
 ﻿using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,11 @@ namespace ChillDe.FMS.Repositories.Repositories
         public DeliverableProductRepository(AppDbContext dbContext, IClaimsService claimsService) : base(dbContext, claimsService)
         {
             _dbContext = dbContext;
+        }
+
+        public async Task<DeliverableProduct> GetByProjectApplyId(Guid projectApplyId)
+        {
+            return await _dbContext.DeliverableProduct.SingleOrDefaultAsync(dp => dp.ProjectApplyId == projectApplyId);
         }
     }
 }

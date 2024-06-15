@@ -19,7 +19,7 @@ namespace ChillDe.FMS.Repositories.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<ProjectApply> GetProjectApplyByProjectId(Guid projectId)
+        public async Task<ProjectApply> GetAcceptedProjectApplyByProjectId(Guid projectId)
         {
             return await _dbContext.ProjectApply
                 .SingleOrDefaultAsync(pa => pa.ProjectId == projectId && pa.Status == ProjectApplyStatus.Accepted);

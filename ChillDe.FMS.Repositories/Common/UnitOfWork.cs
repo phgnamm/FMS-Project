@@ -37,7 +37,7 @@ namespace ChillDe.FMS.Repositories.Common
 			_projectCategoryReposioty = projectCategoryReposioty;
 			_freelancerSkillRepository = freelancerSkillRepository;
 			_projectApplyRepository = projectApplyRepository;
-			_deliverableTypeRepository = deliverableTypeRepository;
+			_deliverableProductRepository = deliverableProductRepository;
 		}
 
 		public AppDbContext DbContext => _dbContext;

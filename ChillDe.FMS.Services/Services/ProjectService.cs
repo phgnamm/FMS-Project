@@ -68,7 +68,53 @@ namespace Services.Services
             project.Status = ProjectStatus.Pending;
             project.Visibility = projectModel.Visibility;
             await _unitOfWork.ProjectRepository.AddAsync(project);
+
+            //Create project deliverable
+            if(projectModel.ProjectDeliverableCreateModel != null)
+            {
+                var projectDeliverable = _mapper.Map<ProjectDeliverable>
+                    (projectModel.ProjectDeliverableCreateModel);
+                var deliverableType = await _unitOfWork.DeliverableTypeRepository
+                    .GetAsync((Guid)projectDeliverable.DeliverableTypeId);
+                if (deliverableType == null)
+                {
+                    return new ResponseDataModel<ProjectCreateModel>()
+                    {
+                        Message = "Deliverable type not found.",
+                        Status = false
+                    };
+                }
+                projectDeliverable.ProjectId = project.Id;
+                projectDeliverable.Status = ProjectDeliverableStatus.Checking;
+                await _unitOfWork.ProjectDeliverableRepository.AddAsync(projectDeliverable);
+            }
+            
+            //Create project apply
+            if(projectModel.ProjectApplyCreateModel != null)
+            {
+                var projectApply = _mapper.Map<ProjectApply>(projectModel.ProjectApplyCreateModel);
+                var freelancer = await _unitOfWork.FreelancerRepository
+                    .GetAsync((Guid)projectApply.FreelancerId);
+                if (freelancer == null)
+                {
+                    return new ResponseDataModel<ProjectCreateModel>()
+                    {
+                        Message = "Freelancer not found.",
+                        Status = false
+                    };
+                }
+                projectApply.ProjectId = project.Id;
+                projectApply.Status = ProjectApplyStatus.Accepted;
+                projectApply.StartDate = DateTime.UtcNow;
+                await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
+            }
+
             await _unitOfWork.SaveChangeAsync();
+
+            project.Status = ProjectStatus.Processing;
+            _unitOfWork.ProjectRepository.Update(project);
+            await _unitOfWork.SaveChangeAsync();
+
             return new ResponseDataModel<ProjectCreateModel>()
             {
                 Message = "Create project successfully!",
@@ -256,14 +302,32 @@ namespace Services.Services
             var project = await _unitOfWork.ProjectRepository.GetAsync(projectId);
             if (project != null)
             {
+                var projectApply = await _unitOfWork.ProjectApplyRepository
+                    .GetAcceptedProjectApplyByProjectId(projectId);
+                if (projectApply != null)
+                {
+                    DateTime startDate = (DateTime)projectApply.StartDate;
+                    projectApply.EndDate = startDate.Add(TimeSpan.FromDays(project.Duration));
+                }
+
                 var freelancer = await _unitOfWork.FreelancerRepository.GetFreelancerByProjectId(projectId);
                 if (status == ProjectStatus.Closed)
                 {
                     if (freelancer != null)
                     {
-                        freelancer.Wallet += project.Deposit;
+                        var deliverableProduct = await _unitOfWork.DeliverableProductRepository
+                            .GetByProjectApplyId(projectApply.Id);
+                        if (deliverableProduct != null)
+                        {
+                            var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository
+                            .GetAsync((Guid)deliverableProduct.ProjectDeliverableId);
+                            if (projectDeliverable != null && 
+                                projectDeliverable.SubmissionDate <= DateTime.UtcNow)
+                                freelancer.Wallet += project.Deposit;
+                        }
                     }
                 }
+
                 if (status == ProjectStatus.Done)
                 {
                     if (freelancer != null)
@@ -272,14 +336,7 @@ namespace Services.Services
                     }
                 }
 
-                var projectApply = await _unitOfWork.ProjectApplyRepository.GetProjectApplyByProjectId(projectId);
-                if (projectApply != null)
-                {
-                    //DateTime startDate = new DateTime(projectApply.StartDate);
-                    //projectApply.EndDate = startDate.Add(TimeSpan.FromDays(project.Duration));
-                }
-
-                    project.Status = status;
+                project.Status = status;
                 var result = _mapper.Map<ProjectModel>(project);
                 _unitOfWork.ProjectRepository.SoftDelete(project);
                 _unitOfWork.FreelancerRepository.Update(freelancer);
