@@ -302,27 +302,38 @@ namespace Services.Services
             var project = await _unitOfWork.ProjectRepository.GetAsync(projectId);
             if (project != null)
             {
+                var projectApply = await _unitOfWork.ProjectApplyRepository
+                    .GetAcceptedProjectApplyByProjectId(projectId);
+                if (projectApply != null)
+                {
+                    DateTime startDate = (DateTime)projectApply.StartDate;
+                    projectApply.EndDate = startDate.Add(TimeSpan.FromDays(project.Duration));
+                }
+
                 var freelancer = await _unitOfWork.FreelancerRepository.GetFreelancerByProjectId(projectId);
                 if (status == ProjectStatus.Closed)
                 {
                     if (freelancer != null)
                     {
-                        freelancer.Wallet += project.Deposit;
+                        var deliverableProduct = await _unitOfWork.DeliverableProductRepository
+                            .GetByProjectApplyId(projectApply.Id);
+                        if (deliverableProduct != null)
+                        {
+                            var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository
+                            .GetAsync((Guid)deliverableProduct.ProjectDeliverableId);
+                            if (projectDeliverable != null && 
+                                projectDeliverable.SubmissionDate <= DateTime.UtcNow)
+                                freelancer.Wallet += project.Deposit;
+                        }
                     }
                 }
+
                 if (status == ProjectStatus.Done)
                 {
                     if (freelancer != null)
                     {
                         freelancer.Wallet += (float)project.Price;
                     }
-                }
-
-                var projectApply = await _unitOfWork.ProjectApplyRepository.GetProjectApplyByProjectId(projectId);
-                if (projectApply != null)
-                {
-                    DateTime startDate = (DateTime)projectApply.StartDate;
-                    projectApply.EndDate = startDate.Add(TimeSpan.FromDays(project.Duration));
                 }
 
                 project.Status = status;

@@ -9,6 +9,6 @@ namespace ChillDe.FMS.Repositories.Interfaces
 {
     public interface IProjectApplyRepository : IGenericRepository<ProjectApply>
     {
-        Task<ProjectApply> GetProjectApplyByProjectId(Guid projectId);
+        Task<ProjectApply> GetAcceptedProjectApplyByProjectId(Guid projectId);
     }
 }

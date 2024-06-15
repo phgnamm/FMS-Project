@@ -9,5 +9,6 @@ namespace ChillDe.FMS.Repositories.Interfaces
 {
     public interface IDeliverableProductRepository : IGenericRepository<DeliverableProduct>
     {
+        Task<DeliverableProduct> GetByProjectApplyId(Guid projectApplyId);
     }
 }
