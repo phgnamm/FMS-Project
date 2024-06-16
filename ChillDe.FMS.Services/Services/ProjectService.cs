@@ -154,6 +154,7 @@ namespace Services.Services
                     Duration = p.Duration,
                     Price = p.Price,
                     Status = p.Status,
+                    Visibility = p.Visibility,
                     AccountId = p.AccountId,
                     AccountEmail = p.Account.Email,
                     AccountFirstName = p.Account.FirstName,
