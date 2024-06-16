@@ -1,6 +1,4 @@
 ﻿using ChillDe.FMS.Repositories.Enums;
-using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
-using ChillDe.FMS.Services;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;

@@ -1,12 +1,8 @@
 ﻿using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.DeliverableProductModels;
-using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
-using ChillDe.FMS.Services.Models.ProjectModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using Services.Interfaces;
-using Services.Services;
 
 namespace ChillDe.FMS.API.Controllers
 {

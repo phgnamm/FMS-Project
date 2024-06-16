@@ -74,6 +74,7 @@ namespace ChillDe.FMS.API
 
             //DeliverableType
             services.AddScoped<IDeliverableTypeRepository, DeliverableTypeRepository>();
+            services.AddScoped<IDeliverableTypeService, DeliverableTypeService>();
 
             //ProjectCategory
             services.AddScoped<IProjectCategoryRepository, ProjectCategoryRepository>();
