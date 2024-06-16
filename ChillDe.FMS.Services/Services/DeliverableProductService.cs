@@ -6,12 +6,6 @@ using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.DeliverableProductModels;
-using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChillDe.FMS.Services.Services
 {

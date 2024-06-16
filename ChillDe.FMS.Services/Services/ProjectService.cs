@@ -210,6 +210,7 @@ namespace Services.Services
                     Price = p.Price,
                     Deposit = p.Deposit,
                     Status = p.Status,
+                    Visibility = p.Visibility,
                     AccountId = p.AccountId,
                     AccountEmail = p.Account.Email,
                     AccountFirstName = p.Account.FirstName,
