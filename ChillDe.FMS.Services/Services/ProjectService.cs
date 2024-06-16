@@ -166,6 +166,7 @@ namespace Services.Services
                 (projectFilterModel.Status == null || x.Status == projectFilterModel.Status) &&
                 (projectFilterModel.ProjectCategoryId == null || projectFilterModel.ProjectCategoryId.Count == 0 || projectFilterModel.ProjectCategoryId.Contains((Guid)x.ProjectCategoryId)) &&
                 (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility) &&
+                (projectFilterModel.AccountId == null || x.AccountId == projectFilterModel.AccountId) &&
                 (string.IsNullOrEmpty(projectFilterModel.Search) ||
                  x.Name.ToLower().Contains(projectFilterModel.Search.ToLower()) ||
                  x.Code.ToLower().Contains(projectFilterModel.Search.ToLower())),

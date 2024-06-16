@@ -18,6 +18,7 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
         public string? SkillName { get; set; }
         public string? SkillType { get; set; }
         public Gender? Gender { get; set; }
+        public ProjectApplyStatus? Status { get; set; }
         public string? Search { get; set; }
         protected override int MinPageSize { get; set; } = PaginationConstant.DEFAULT_MIN_PAGE_SIZE;
         protected override int MaxPageSize { get; set; } = PaginationConstant.DEFAULT_MAX_PAGE_SIZE;

@@ -7,6 +7,7 @@ using ChillDe.FMS.Repositories.Models.SkillModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.ProjectApplyModels;
+using ChillDe.FMS.Services.Models.ProjectModels;
 using ChillDe.FMS.Services.ViewModels.FreelancerModels;
 
 namespace ChillDe.FMS.Services.Services
@@ -21,46 +22,6 @@ namespace ChillDe.FMS.Services.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-
-        //public async Task<ResponseDataModel<FreelancerDetailModel>> ApplyFreelancer
-        //    (Guid freelancerId, Guid projectId)
-        //{
-        //    var project = await _unitOfWork.ProjectRepository.GetAsync(projectId);
-        //    if (project == null)
-        //    {
-        //        return new ResponseDataModel<FreelancerDetailModel>
-        //        {
-        //            Message = "Project not found",
-        //            Status = false
-        //        };
-        //    }
-
-        //    var freelancer = _unitOfWork.FreelancerRepository.GetFreelancerById(freelancerId);
-        //    if (freelancer == null)
-        //    {
-        //        return new ResponseDataModel<FreelancerDetailModel>
-        //        {
-        //            Message = "Freelancer not found",
-        //            Data = _mapper.Map<FreelancerDetailModel>(freelancer),
-        //            Status = false
-        //        };
-        //    }
-        //    var projectApply = new ProjectApply();
-        //    projectApply.FreelancerId = freelancerId;
-        //    projectApply.ProjectId = projectId;
-        //    projectApply.StartDate = DateTime.UtcNow;
-        //    projectApply.Status = ProjectApplyStatus.Accepted;
-
-        //    await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
-        //    await _unitOfWork.SaveChangeAsync();
-
-        //    return new ResponseDataModel<FreelancerDetailModel>
-        //    {
-        //        Message = "Add succesfully",
-        //        Status = true
-        //    };
-        //}
-
         public async Task<ResponseModel> AddProjectApply(ProjectApplyCreateModel projectApplyModel)
         {
             var project = await _unitOfWork.ProjectRepository.GetAsync(projectApplyModel.ProjectId);
@@ -146,6 +107,7 @@ namespace ChillDe.FMS.Services.Services
                     (projectApplyFilterModel.ProjectId == null || x.Project.Id == projectApplyFilterModel.ProjectId) &&
                     (projectApplyFilterModel.FreelancerId == null || x.Freelancer.Id == projectApplyFilterModel.FreelancerId) &&
                     (projectApplyFilterModel.Gender == null || x.Freelancer.Gender == projectApplyFilterModel.Gender) &&
+                    (projectApplyFilterModel.Status == null || x.Status == projectApplyFilterModel.Status) &&
                     (projectApplyFilterModel.SkillType == null || x.Freelancer.FreelancerSkills.Any(fs => fs.Skill.Type == projectApplyFilterModel.SkillType)) &&
                     (projectApplyFilterModel.SkillName == null || x.Freelancer.FreelancerSkills.Any(fs => fs.Skill.Name.Contains(projectApplyFilterModel.SkillName))) &&
                     (string.IsNullOrEmpty(projectApplyFilterModel.Search) ||
@@ -181,7 +143,7 @@ namespace ChillDe.FMS.Services.Services
                 },
                 pageIndex: projectApplyFilterModel.PageIndex,
                 pageSize: projectApplyFilterModel.PageSize,
-                includeProperties: "Freelancer.FreelancerSkills.Skill, Project"
+                includeProperties: "Freelancer.FreelancerSkills.Skill, Project, Project.Account, Project.ProjectCategory"
             );
 
             if (projectApplyList != null)
@@ -196,6 +158,7 @@ namespace ChillDe.FMS.Services.Services
                     FreelancerId = f.Freelancer.Id,
                     FreelancerFirstName = f.Freelancer.FirstName,
                     FreelancerLastName = f.Freelancer.LastName,
+                    Project = _mapper.Map<ProjectModel>(f.Project),
                     Skills = f.Freelancer.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
                             .Select(group => new SkillGroupModel
                             {
