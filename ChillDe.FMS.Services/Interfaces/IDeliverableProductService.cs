@@ -1,4 +1,5 @@
-﻿using ChillDe.FMS.Repositories.Enums;
+﻿using ChillDe.FMS.Repositories.Common;
+using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Models.DeliverableProductModels;
 using System;
@@ -18,5 +19,8 @@ namespace ChillDe.FMS.Services.Interfaces
 
         Task<ResponseModel> UpdateDeliverableProduct
             (Guid deliverableProductId, DeliverableProductStatus status);
+
+        Task<Pagination<DeliverableProductModel>> GetAllDeliverableProduct
+            (DeliverableProductFilterModel deliverableProductFilterModel);
     }
 }
