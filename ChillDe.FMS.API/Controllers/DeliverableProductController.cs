@@ -1,8 +1,10 @@
 ﻿using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.DeliverableProductModels;
+using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Services.Interfaces;
 using Services.Services;
 
@@ -84,6 +86,31 @@ namespace ChillDe.FMS.API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDeliverableProductByFilter
+            ([FromQuery] DeliverableProductFilterModel deliverableProductFilterModel)
+        {
+            try
+            {
+                var result = await _deliverableProductService
+                    .GetAllDeliverableProduct(deliverableProductFilterModel);
+                var metadata = new
+                {
+                    result.PageSize,
+                    result.CurrentPage,
+                    result.TotalPages,
+                };
+
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }

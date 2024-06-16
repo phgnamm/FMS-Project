@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.DeliverableProductModels;
+using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -122,6 +124,45 @@ namespace ChillDe.FMS.Services.Services
                 Message = "Update product successfully",
                 Status = true
             };
+        }
+
+        public async Task<Pagination<DeliverableProductModel>> GetAllDeliverableProduct
+            (DeliverableProductFilterModel deliverableProductFilterModel)
+        {
+            var deliverableProductList = await _unitOfWork.DeliverableProductRepository.GetAllAsync(
+            filter: x =>
+                (x.IsDeleted != true) &&
+                (deliverableProductFilterModel.ProjectDeliverableId == null || 
+                    x.ProjectDeliverableId == deliverableProductFilterModel.ProjectDeliverableId),
+            orderBy: x =>
+            {
+                return deliverableProductFilterModel.OrderByDescending
+                    ? x.OrderByDescending(x => x.CreationDate)
+                    : x.OrderBy(x => x.CreationDate);
+            },
+            pageIndex: deliverableProductFilterModel.PageIndex,
+            pageSize: deliverableProductFilterModel.PageSize,
+            includeProperties: "ProjectDeliverable"
+            );
+            if (deliverableProductList != null)
+            {
+                var deliverableProductDetailList = deliverableProductList.Data
+                    .Select(p => new DeliverableProductModel
+                    {
+                        Id = p.Id,
+                        Name = p.Name,
+                        URL = p.URL,
+                        Status = p.Status,
+                        ProjectApplyId = p.ProjectApplyId,
+                        ProjectDeliverableId = p.ProjectDeliverableId,
+                        ProjectDeliverableName = p.ProjectDeliverable.Name
+                    }).ToList();
+
+                return new Pagination<DeliverableProductModel>(deliverableProductDetailList,
+                    deliverableProductList.TotalCount, deliverableProductFilterModel.PageIndex,
+                    deliverableProductFilterModel.PageSize);
+            }
+            return null;
         }
     }
 }
