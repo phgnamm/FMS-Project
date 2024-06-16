@@ -1,5 +1,4 @@
-﻿using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
-using ChillDe.FMS.Services;
+﻿using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -124,6 +123,28 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 return BadRequest(ex);
+            }
+        }
+
+        [HttpPut("close")]
+        public async Task<IActionResult> CloseProject(Guid projectId, ProjectStatus status)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return ValidationProblem(ModelState);
+                }
+                var result = await _projectService.CloseProject(projectId, status);
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }
