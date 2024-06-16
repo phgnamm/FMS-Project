@@ -11,6 +11,9 @@ using ChillDe.FMS.Services.Models.ProjectCategoryModels;
 using ChillDe.FMS.Services.Models.DeliverableProductModels;
 using ChillDe.FMS.Services.Models.ProjectApplyModels;
 using ChillDe.FMS.Services.Models.DeliverableTypeModels;
+using ChillDe.FMS.Services.Models.SkillModels;
+using Repositories.ViewModels.ProjectCategoryModels;
+using ProjectCategoryModel = ChillDe.FMS.Services.Models.ProjectCategoryModels.ProjectCategoryModel;
 
 
 namespace ChillDe.FMS.Repositories.Common
