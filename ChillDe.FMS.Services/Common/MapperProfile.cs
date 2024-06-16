@@ -8,6 +8,10 @@ using ChillDe.FMS.Services.ViewModels.FreelancerModels;
 using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using ChillDe.FMS.Services.Models.ProjectCategoryModels;
+using Repositories.ViewModels.ProjectCategoryModels;
+using ProjectCategoryModel = ChillDe.FMS.Services.Models.ProjectCategoryModels.ProjectCategoryModel;
+using ChillDe.FMS.Services.Models.SkillModels;
+
 
 namespace ChillDe.FMS.Repositories.Common
 {
@@ -58,6 +62,8 @@ namespace ChillDe.FMS.Repositories.Common
                         })
                         .ToList();
                 });
+            CreateMap<SkillModel,SkillFilterResultModel>().ReverseMap();
+            CreateMap<Skill, SkillCreateModel>().ReverseMap();  
 
             //Project
             CreateMap<ProjectCreateModel, Project>();
@@ -66,6 +72,9 @@ namespace ChillDe.FMS.Repositories.Common
 
             //ProjectCategory
             CreateMap<ProjectCategoryModel, ProjectCategory>().ReverseMap();
+            CreateMap<ProjectCategory,ProjectCategoryFilterResultModel>().ReverseMap();
+            CreateMap<ProjectCategoryUpdateModel, ProjectCategory>();
+            CreateMap<ProjectCategoryCreateModel, ProjectCategory>();
 
             //ProjectDeliverable
             CreateMap<ProjectDeliverableCreateModel, ProjectDeliverable>();
