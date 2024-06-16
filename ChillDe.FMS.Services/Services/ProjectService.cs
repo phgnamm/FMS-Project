@@ -220,9 +220,7 @@ namespace Services.Services
 
                 return new Pagination<ProjectModel>(projectDetailList, projectList.TotalCount, projectFilterModel.PageIndex, projectFilterModel.PageSize);
             }
-
             return null;
-
         }
 
         public async Task<ResponseDataModel<ProjectModel>> UpdateProject(Guid id, ProjectUpdateModel updateProject)
