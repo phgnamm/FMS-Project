@@ -40,7 +40,9 @@ namespace ChillDe.FMS.Services
                                 ? x.OrderByDescending(x => x.Type)
                                 : x.OrderBy(x => x.Type);
                         default:
-                            return x.OrderBy(x => x.CreationDate);
+                            return skillFilterModel.OrderByDescending
+                                ? x.OrderByDescending(x => x.CreationDate)
+                                : x.OrderBy(x => x.CreationDate);
                     }
                 })
             );

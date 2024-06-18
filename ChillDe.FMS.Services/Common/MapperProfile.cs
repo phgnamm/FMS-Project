@@ -4,6 +4,13 @@ using ChillDe.FMS.Repositories.Models.AccountModels;
 using ChillDe.FMS.Repositories.Models.SkillModels;
 using ChillDe.FMS.Repositories.ViewModels.AccountModels;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
+using ChillDe.FMS.Services.ViewModels.FreelancerModels;
+using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
+using ChillDe.FMS.Services.Models.ProjectModels;
+using ChillDe.FMS.Services.Models.ProjectCategoryModels;
+using ChillDe.FMS.Services.Models.DeliverableProductModels;
+using ChillDe.FMS.Services.Models.ProjectApplyModels;
+using ChillDe.FMS.Services.Models.DeliverableTypeModels;
 
 namespace ChillDe.FMS.Repositories.Common
 {
@@ -54,6 +61,27 @@ namespace ChillDe.FMS.Repositories.Common
                         })
                         .ToList();
                 });
+
+            //Project
+            CreateMap<ProjectCreateModel, Project>();
+            CreateMap<ProjectUpdateModel, Project>();
+            CreateMap<Project, ProjectModel>().ReverseMap();
+
+            //ProjectCategory
+            CreateMap<ProjectCategoryModel, ProjectCategory>().ReverseMap();
+
+            //ProjectDeliverable
+            CreateMap<ProjectDeliverableCreateModel, ProjectDeliverable>();
+            CreateMap<ProjectDeliverable, ProjectDeliverableModel>();
+
+            //DeliverableProduct
+            CreateMap<DeliverableProductCreateModel, DeliverableProduct>();
+
+            //DeliverableType
+            CreateMap<DeliverableTypeCreateModel, DeliverableType>();
+
+            //ProjectApply
+            CreateMap<ProjectApplyCreateModel, ProjectApply>();
         }
     }
 }

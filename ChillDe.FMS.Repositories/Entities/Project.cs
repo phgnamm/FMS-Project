@@ -1,4 +1,6 @@
-﻿namespace ChillDe.FMS.Repositories.Entities
+﻿using ChillDe.FMS.Repositories.Enums;
+
+namespace ChillDe.FMS.Repositories.Entities
 {
     public class Project : BaseEntity
     {
@@ -7,8 +9,9 @@
         public string? Description { get; set; }
         public int Duration { get; set; } // Day
         public float? Price { get; set; }
-        public string? Status { get; set; }
-        public string? Visibility { get; set; }
+        public float Deposit { get; set; }
+        public ProjectStatus? Status { get; set; }
+        public ProjectVisibility? Visibility { get; set; }
 
         // Foreign key
         public Guid? AccountId { get; set; }

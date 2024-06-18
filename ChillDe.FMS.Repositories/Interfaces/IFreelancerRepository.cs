@@ -1,8 +1,4 @@
-﻿using AutoMapper;
-using ChillDe.FMS.Repositories.Common;
-using ChillDe.FMS.Repositories.Entities;
-using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
-using System.Linq.Expressions;
+﻿using ChillDe.FMS.Repositories.Entities;
 
 namespace ChillDe.FMS.Repositories.Interfaces;
 
@@ -10,4 +6,5 @@ public interface IFreelancerRepository : IGenericRepository<Freelancer>
 {
     Task<Freelancer> GetFreelancerByEmail(string email);
     Task<Freelancer> GetFreelancerById(Guid id);
+    Task<Freelancer> GetFreelancerByProjectId(Guid projectId);
 }

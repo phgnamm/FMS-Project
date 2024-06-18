@@ -1,6 +1,7 @@
 ﻿using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
+using ChillDe.FMS.Repositories.Models.ProjectModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace ChillDe.FMS.Repositories.Repositories;
@@ -23,12 +24,17 @@ public class ProjectRepository : GenericRepository<Project>, IProjectRepository
             projectList = projectList.Where(x => x.IsDeleted == isDeleted);
         }
 
-        if (projectStatusList != null)
+        if (projectStatusList != null && projectStatusList.Length > 0)
         {
-            var statusStrings = projectStatusList.Select(ps => ps.ToString()).ToList();
-            projectList = projectList.Where(x => statusStrings.Contains(x.Status));
+            projectList = projectList.Where(x => x.Status.HasValue && projectStatusList.Contains(x.Status.Value));
         }
 
         return projectList.ToList();
+    }
+
+    public async Task<Project> GetProjectByCode(string code)
+    {
+        var project = await _dbContext.Project.FirstOrDefaultAsync(p => code == p.Code);
+        return project;
     }
 }

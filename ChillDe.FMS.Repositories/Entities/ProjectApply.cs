@@ -1,4 +1,6 @@
-﻿namespace ChillDe.FMS.Repositories.Entities
+﻿using ChillDe.FMS.Repositories.Enums;
+
+namespace ChillDe.FMS.Repositories.Entities
 {
     public class ProjectApply : BaseEntity
     {
@@ -7,7 +9,7 @@
         public Guid? FreelancerId { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
-        public string? Status { get; set; }
+        public ProjectApplyStatus? Status { get; set; }
 
         // Relationship
         public virtual Project? Project { get; set; }

@@ -23,6 +23,11 @@ namespace ChillDe.FMS.Repositories.Repositories
             return await _dbContext.Users.FirstOrDefaultAsync(x => x.Code == code);
         }
 
+        public async Task<Account> GetAccountById(Guid id)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+        }
+
         public async Task<QueryResultModel<List<AccountFilterResultModel>>> GetAllAsync(
             Expression<Func<AccountFilterResultModel, bool>> filter = null,
             Func<IQueryable<AccountFilterResultModel>, IOrderedQueryable<AccountFilterResultModel>> orderBy = null,

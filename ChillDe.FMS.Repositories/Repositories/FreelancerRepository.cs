@@ -1,11 +1,8 @@
-﻿using ChillDe.FMS.Repositories.Common;
-using ChillDe.FMS.Repositories.Entities;
-using ChillDe.FMS.Repositories.Interfaces;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
-using System.Linq.Expressions;
-using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
+using ChillDe.FMS.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
+
 
 namespace ChillDe.FMS.Repositories.Repositories;
 
@@ -31,5 +28,15 @@ public class FreelancerRepository : GenericRepository<Freelancer>, IFreelancerRe
             .FirstOrDefaultAsync(f => f.Id == id);
     }
 
+    public async Task<Freelancer> GetFreelancerByProjectId(Guid projectId)
+    {
+         var result = await _dbContext.ProjectApply
+        .Include(f => f.Freelancer)
+        .Where(f => f.ProjectId == projectId && f.Status == ProjectApplyStatus.Accepted)
+        .Select(p => p.Freelancer).FirstOrDefaultAsync();
 
+        return result;
+
+        //return _dbContext.Freelancer.Include(f => f.ProjectApplies).Where(f => f.ProjectApplies.FirstOrDefault(p => p.ProjectId == projectId).)
+    }
 }

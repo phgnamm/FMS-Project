@@ -1,10 +1,12 @@
-﻿namespace ChillDe.FMS.Repositories.Entities
+﻿using ChillDe.FMS.Repositories.Enums;
+
+namespace ChillDe.FMS.Repositories.Entities
 {
     public class DeliverableProduct : BaseEntity
     {
         public string? Name { get; set; }
         public string? URL { get; set; }
-        public string? Status { get; set; }
+        public DeliverableProductStatus? Status { get; set; }
         public string? Feedback { get; set; }
 
         // Foreign Key

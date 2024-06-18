@@ -5,10 +5,9 @@ using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
+using ChillDe.FMS.Services.ViewModels.FreelancerModels;
 using Services.Interfaces;
-using System.Linq.Expressions;
-using System.Linq;
-using Microsoft.AspNetCore.Identity;
+using System.Net.Http.Headers;
 
 namespace ChillDe.FMS.Services;
 
@@ -25,22 +24,22 @@ public class FreelancerService : IFreelancerService
         _claimsService = claimsService;
     }
 
-    public async Task<ResponseDataModel<FreelancerModel>> GetFreelancer(Guid id)
+    public async Task<ResponseDataModel<FreelancerDetailModel>> GetFreelancer(Guid id)
     {
-        var user = await _unitOfWork.FreelancerRepository.GetAsync(id);
+        var user = await _unitOfWork.FreelancerRepository.GetFreelancerById(id);
 
         if (user == null)
         {
-            return new ResponseDataModel<FreelancerModel>()
+            return new ResponseDataModel<FreelancerDetailModel>()
             {
                 Status = false,
                 Message = "User not found"
             };
         }
 
-        var userModel = _mapper.Map<FreelancerModel>(user);
+        var userModel = _mapper.Map<FreelancerDetailModel>(user);
 
-        return new ResponseDataModel<FreelancerModel>()
+        return new ResponseDataModel<FreelancerDetailModel>()
         {
             Status = true,
             Message = "Get account successfully",
@@ -82,7 +81,9 @@ public class FreelancerService : IFreelancerService
                             ? x.OrderByDescending(x => x.DateOfBirth)
                             : x.OrderBy(x => x.DateOfBirth);
                     default:
-                        return x.OrderBy(x => x.CreationDate);
+                        return freelancerFilterModel.OrderByDescending
+                            ? x.OrderByDescending(x => x.CreationDate)
+                            : x.OrderBy(x => x.CreationDate);
                 }
             },
             pageIndex: freelancerFilterModel.PageIndex,
@@ -97,7 +98,7 @@ public class FreelancerService : IFreelancerService
                 Id = f.Id,
                 FirstName = f.FirstName,
                 LastName = f.LastName,
-                Gender = f.Gender,
+                Gender = f.Gender.ToString(),
                 DateOfBirth = f.DateOfBirth,
                 Address = f.Address,
                 Image = f.Image,
@@ -105,8 +106,9 @@ public class FreelancerService : IFreelancerService
                 Email = f.Email,
                 PhoneNumber = f.PhoneNumber,
                 Wallet = f.Wallet,
-                Status = f.Status,
+                Status = f.Status.ToString(),
                 CreationDate = f.CreationDate,
+                Warning = f.Warning,
                 Skills = f.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
                             .Select(group => new SkillSet
                             {
@@ -158,6 +160,7 @@ public class FreelancerService : IFreelancerService
                         Wallet = newFreelancers.Wallet,
                         CreationDate = DateTime.UtcNow,
                         CreatedBy = _claimsService.GetCurrentUserId,
+                        Warning = 0,
                     };
                     // Check and add skills
                     foreach (var skillTypeModel in newFreelancers.Skills)
@@ -165,14 +168,25 @@ public class FreelancerService : IFreelancerService
                         var validSkills = existingSkills.Data
                             .Where(skill => skillTypeModel.SkillNames.Contains(skill.Name) && skill.Type == skillTypeModel.SkillType)
                             .ToList();
-
-                        foreach (var skill in validSkills)
+                        if (validSkills != null)
                         {
-                            newFreelancer.FreelancerSkills.Add(new FreelancerSkill
+                            foreach (var skill in validSkills)
                             {
-                                SkillId = skill.Id,
-                                FreelancerId = newFreelancer.Id
-                            });
+                                newFreelancer.FreelancerSkills.Add(new FreelancerSkill
+                                {
+                                    SkillId = skill.Id,
+                                    FreelancerId = newFreelancer.Id
+                                });
+                            }
+                        }
+                        else
+                        {
+                            return new FreelancerImportResponseModel
+                            {
+                                AddedFreelancer = _mapper.Map<List<FreelancerImportModel>>(freelancerImportList),
+                                Message = "These freelancers do not have skill",
+                                Status = false
+                            };
                         }
                     }
                     freelancerImportList.Add(newFreelancer);
@@ -232,35 +246,52 @@ public class FreelancerService : IFreelancerService
         {
             var skillNames = new HashSet<string>(updateFreelancer.Skills.SelectMany(skill => skill.SkillNames).Distinct());
             var validSkills = (await _unitOfWork.SkillRepository.GetAllAsync(skill => skillNames.Contains(skill.Name))).Data;
+            var freelacerSkills = _unitOfWork.FreelancerSkillRepository.GetFreelancerSKill(id);
             var freelancerSkillsToAdd = new List<FreelancerSkill>();
-            foreach (var skillTypeModel in updateFreelancer.Skills)
+            if (validSkills != null && validSkills.Count > 0)
             {
-                foreach (var skillName in skillTypeModel.SkillNames)
+                if (freelacerSkills != null && freelacerSkills.Count > 0)
                 {
-                    var existingSkill = validSkills.FirstOrDefault(skill =>
-                        skill.Name.Equals(skillName, StringComparison.OrdinalIgnoreCase) && skill.Type == skillTypeModel.SkillType);
-
-                    if (existingSkill != null)
+                    _unitOfWork.FreelancerSkillRepository.HardDeleteRange(freelacerSkills);
+                    await _unitOfWork.SaveChangeAsync();
+                }
+                foreach (var skillTypeModel in updateFreelancer.Skills)
+                {
+                    foreach (var skillName in skillTypeModel.SkillNames)
                     {
-                        var existingFreelancerSkill = existingFreelancer.FreelancerSkills.FirstOrDefault(fs =>
-                            fs.SkillId == existingSkill.Id && fs.FreelancerId == existingFreelancer.Id);
+                        var existingSkill = validSkills.FirstOrDefault(skill =>
+                            skill.Name.Equals(skillName, StringComparison.OrdinalIgnoreCase) && skill.Type == skillTypeModel.SkillType);
 
-                        if (existingFreelancerSkill == null)
+                        if (existingSkill != null)
                         {
-                            freelancerSkillsToAdd.Add(new FreelancerSkill
+                            var existingFreelancerSkill = existingFreelancer.FreelancerSkills.FirstOrDefault(fs =>
+                                fs.SkillId == existingSkill.Id && fs.FreelancerId == existingFreelancer.Id);
+
+                            if (existingFreelancerSkill == null)
                             {
-                                SkillId = existingSkill.Id,
-                                FreelancerId = existingFreelancer.Id
-                            });
+                                freelancerSkillsToAdd.Add(new FreelancerSkill
+                                {
+                                    SkillId = existingSkill.Id,
+                                    FreelancerId = existingFreelancer.Id
+                                });
+                            }
                         }
                     }
                 }
+                foreach (var skill in freelancerSkillsToAdd)
+                {
+                    existingFreelancer.FreelancerSkills.Add(skill);
+                }
+            }
+            else
+            {
+                return new ResponseDataModel<FreelancerDetailModel>()
+                {
+                    Status = false,
+                    Message = "Skill is not existed",
+                };
             }
 
-            foreach (var skill in freelancerSkillsToAdd)
-            {
-                existingFreelancer.FreelancerSkills.Add(skill);
-            }
         }
         _mapper.Map(updateFreelancer, existingFreelancer);
 
@@ -349,7 +380,8 @@ public class FreelancerService : IFreelancerService
                 Status = true,
                 Message = "Restore Freelancer successfully",
             };
-        }catch (Exception ex)
+        }
+        catch (Exception ex)
         {
             return new ResponseModel
             {
