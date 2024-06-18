@@ -15,6 +15,7 @@ namespace ChillDe.FMS.Repositories.Interfaces
         IProjectCategoryRepository ProjectCategoryReposioty { get; }
         IProjectApplyRepository ProjectApplyRepository { get; }
         IFreelancerSkillRepository FreelancerSkillRepository {  get; }
+        IDeliverableProductRepository DeliverableProductRepository { get; }
 
         public Task<int> SaveChangeAsync();
 	}

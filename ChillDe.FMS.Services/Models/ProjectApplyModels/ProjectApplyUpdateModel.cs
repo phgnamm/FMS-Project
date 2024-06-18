@@ -10,8 +10,6 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
     public class ProjectApplyUpdateModel
     {
         public Guid Id { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
         public int? Status { get; set; }
     }
 }

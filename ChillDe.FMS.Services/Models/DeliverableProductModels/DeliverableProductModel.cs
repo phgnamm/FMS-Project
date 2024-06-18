@@ -1,20 +1,21 @@
 ﻿using ChillDe.FMS.Repositories.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace ChillDe.FMS.Repositories.Entities
+namespace ChillDe.FMS.Services.Models.DeliverableProductModels
 {
-    public class DeliverableProduct : BaseEntity
+    public class DeliverableProductModel
     {
+        public Guid Id { get; set; }
         public string? Name { get; set; }
         public string? URL { get; set; }
         public DeliverableProductStatus? Status { get; set; }
         public string? Feedback { get; set; }
-
-        // Foreign Key
         public Guid? ProjectApplyId { get; set; }
         public Guid? ProjectDeliverableId { get; set; }
-
-        // Relationship
-        public ProjectApply? ProjectApply { get; set; }
-        public ProjectDeliverable? ProjectDeliverable { get; set; }
+        public string? ProjectDeliverableName { get; set; }
     }
 }

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace ChillDe.FMS.Repositories.Interfaces
 {
-    public interface IProjectApplyRepository : IGenericRepository<ProjectApply>
+    public interface IDeliverableProductRepository : IGenericRepository<DeliverableProduct>
     {
-        Task<ProjectApply> GetAcceptedProjectApplyByProjectId(Guid projectId);
+        Task<DeliverableProduct> GetByProjectApplyId(Guid projectApplyId);
     }
 }

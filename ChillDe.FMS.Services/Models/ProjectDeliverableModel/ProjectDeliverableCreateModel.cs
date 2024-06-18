@@ -15,7 +15,6 @@ namespace ChillDe.FMS.Services.Models.ProjectDeliverableModel
 
         [Required(ErrorMessage = "SubmissionDate is required")]
         public DateTime? SubmissionDate { get; set; }
-        public ProjectDeliverableStatus? Status { get; set; }
 
         [Required(ErrorMessage = "Project is required")]
         public Guid ProjectId { get; set; }

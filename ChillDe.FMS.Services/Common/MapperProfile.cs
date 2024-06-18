@@ -8,6 +8,9 @@ using ChillDe.FMS.Services.ViewModels.FreelancerModels;
 using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using ChillDe.FMS.Services.Models.ProjectCategoryModels;
+using ChillDe.FMS.Services.Models.DeliverableProductModels;
+using ChillDe.FMS.Services.Models.ProjectApplyModels;
+using ChillDe.FMS.Services.Models.DeliverableTypeModels;
 
 namespace ChillDe.FMS.Repositories.Common
 {
@@ -69,6 +72,16 @@ namespace ChillDe.FMS.Repositories.Common
 
             //ProjectDeliverable
             CreateMap<ProjectDeliverableCreateModel, ProjectDeliverable>();
+            CreateMap<ProjectDeliverable, ProjectDeliverableModel>();
+
+            //DeliverableProduct
+            CreateMap<DeliverableProductCreateModel, DeliverableProduct>();
+
+            //DeliverableType
+            CreateMap<DeliverableTypeCreateModel, DeliverableType>();
+
+            //ProjectApply
+            CreateMap<ProjectApplyCreateModel, ProjectApply>();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
+﻿using ChillDe.FMS.Repositories.Common;
+using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
 namespace Services.Interfaces
 {
@@ -6,5 +7,8 @@ namespace Services.Interfaces
     {
         Task<ResponseDataModel<ProjectDeliverableCreateModel>> CreateProjectDeliverable
             (ProjectDeliverableCreateModel projectDeliverableModel);
+        Task<Pagination<ProjectDeliverableModel>> GetAllProjectDeliverable
+            (ProjectDeliverableFilterModel projectDeliverableFilter);
+        Task<ResponseModel> DeleteProjectDeliverable(Guid id);
     }
 }
