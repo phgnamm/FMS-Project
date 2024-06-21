@@ -70,6 +70,7 @@ namespace ChillDe.FMS.Repositories.Common
 
             //Project
             CreateMap<ProjectCreateModel, Project>();
+            CreateMap<Project, ProjectCreateModel>();
             CreateMap<ProjectUpdateModel, Project>();
             CreateMap<Project, ProjectModel>().ReverseMap();
 

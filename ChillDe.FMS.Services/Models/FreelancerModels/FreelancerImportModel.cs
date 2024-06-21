@@ -40,6 +40,8 @@ namespace ChillDe.FMS.Repositories.ViewModels.FreelancerModels
     
         public string? Address { get; set; }
         public float Wallet { get; set; } = 0;
+        [Range(0, 3)]
+        public int? Warning { get; set; }
 
         [Required(ErrorMessage = "Skills are required!")]
         public List<SkillInputModel> Skills { get; set; } = new List<SkillInputModel>();
