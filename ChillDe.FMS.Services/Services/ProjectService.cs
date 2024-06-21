@@ -70,31 +70,30 @@ namespace Services.Services
             await _unitOfWork.ProjectRepository.AddAsync(project);
 
             //Create project deliverable
-            if(projectModel.ProjectDeliverableCreateModel != null)
-            {
-                var projectDeliverable = _mapper.Map<ProjectDeliverable>
-                    (projectModel.ProjectDeliverableCreateModel);
-                var deliverableType = await _unitOfWork.DeliverableTypeRepository
-                    .GetAsync((Guid)projectDeliverable.DeliverableTypeId);
-                if (deliverableType == null)
-                {
-                    return new ResponseDataModel<ProjectCreateModel>()
-                    {
-                        Message = "Deliverable type not found.",
-                        Status = false
-                    };
-                }
-                projectDeliverable.ProjectId = project.Id;
-                projectDeliverable.Status = ProjectDeliverableStatus.Checking;
-                await _unitOfWork.ProjectDeliverableRepository.AddAsync(projectDeliverable);
-            }
+            //if(projectModel.ProjectDeliverableCreateModel != null)
+            //{
+            //    var projectDeliverable = _mapper.Map<ProjectDeliverable>
+            //        (projectModel.ProjectDeliverableCreateModel);
+            //    var deliverableType = await _unitOfWork.DeliverableTypeRepository
+            //        .GetAsync((Guid)projectDeliverable.DeliverableTypeId);
+            //    if (deliverableType == null)
+            //    {
+            //        return new ResponseDataModel<ProjectCreateModel>()
+            //        {
+            //            Message = "Deliverable type not found.",
+            //            Status = false
+            //        };
+            //    }
+            //    projectDeliverable.ProjectId = project.Id;
+            //    projectDeliverable.Status = ProjectDeliverableStatus.Checking;
+            //    await _unitOfWork.ProjectDeliverableRepository.AddAsync(projectDeliverable);
+            //}
             
             //Create project apply
-            if(projectModel.ProjectApplyCreateModel != null)
+            if(projectModel.FreelancerId != null)
             {
-                var projectApply = _mapper.Map<ProjectApply>(projectModel.ProjectApplyCreateModel);
                 var freelancer = await _unitOfWork.FreelancerRepository
-                    .GetAsync((Guid)projectApply.FreelancerId);
+                    .GetAsync((Guid)projectModel.FreelancerId);
                 if (freelancer == null)
                 {
                     return new ResponseDataModel<ProjectCreateModel>()
@@ -103,6 +102,10 @@ namespace Services.Services
                         Status = false
                     };
                 }
+                ProjectApply projectApply = new()
+                {
+                    FreelancerId = projectModel.FreelancerId,
+                };
                 projectApply.ProjectId = project.Id;
                 projectApply.Status = ProjectApplyStatus.Accepted;
                 projectApply.StartDate = DateTime.UtcNow;
@@ -115,11 +118,14 @@ namespace Services.Services
             _unitOfWork.ProjectRepository.Update(project);
             await _unitOfWork.SaveChangeAsync();
 
+            ProjectCreateModel projectCreateModel = _mapper.Map<ProjectCreateModel>(project);
+            projectCreateModel.FreelancerId = projectModel.FreelancerId;
+
             return new ResponseDataModel<ProjectCreateModel>()
             {
                 Message = "Create project successfully!",
                 Status = true,
-                Data = _mapper.Map<ProjectCreateModel>(project)
+                Data = projectCreateModel
             };
         }
 
