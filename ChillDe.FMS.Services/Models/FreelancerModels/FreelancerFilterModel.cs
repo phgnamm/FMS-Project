@@ -17,6 +17,7 @@ namespace ChillDe.FMS.Repositories.ViewModels.FreelancerModels
         public  string? SkillType { get; set; }
         public FreelancerStatus? Status { get; set; } = FreelancerStatus.Available;
         public Gender? Gender { get; set; }
+        public Guid? ProjectId { get; set; }
         public string? Search { get; set; }
         protected override int MinPageSize { get; set; } = PaginationConstant.ACCOUNT_MIN_PAGE_SIZE;
         protected override int MaxPageSize { get; set; } = PaginationConstant.ACCOUNT_MAX_PAGE_SIZE;
