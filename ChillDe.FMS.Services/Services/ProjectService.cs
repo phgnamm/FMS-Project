@@ -118,7 +118,8 @@ namespace Services.Services
             return new ResponseDataModel<ProjectCreateModel>()
             {
                 Message = "Create project successfully!",
-                Status = true
+                Status = true,
+                Data = _mapper.Map<ProjectCreateModel>(project)
             };
         }
 
