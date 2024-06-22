@@ -10,4 +10,7 @@ public static class PaginationConstant
     
     public const int SKILL_MIN_PAGE_SIZE = 100;
     public const int SKILL_MAX_PAGE_SIZE = 250;
+    
+    public const int PROJECCT_CATEGORY_MIN_PAGE_SIZE = 100;
+    public const int PROJECCT_CATEGORY_MAX_PAGE_SIZE = 250;
 }
