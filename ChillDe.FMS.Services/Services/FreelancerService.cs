@@ -53,7 +53,6 @@ public class FreelancerService : IFreelancerService
             filter: x =>
                 x.Status == freelancerFilterModel.Status &&
                 (freelancerFilterModel.Gender == null || x.Gender == freelancerFilterModel.Gender) &&
-                (freelancerFilterModel.ProjectId == null || x.ProjectApplies.Any(x => x.ProjectId == freelancerFilterModel.ProjectId)) &&
                 (freelancerFilterModel.SkillType == null || x.FreelancerSkills.Any(fs => fs.Skill.Type == freelancerFilterModel.SkillType)) &&
                 (freelancerFilterModel.SkillName == null || x.FreelancerSkills.Any(fs => fs.Skill.Name.Contains(freelancerFilterModel.SkillName))) &&
                 (string.IsNullOrEmpty(freelancerFilterModel.Search) ||
@@ -110,7 +109,7 @@ public class FreelancerService : IFreelancerService
                 Status = f.Status.ToString(),
                 CreationDate = f.CreationDate,
                 Warning = f.Warning,
-                Invited = f.ProjectApplies.Any(pa => pa.Status == ProjectApplyStatus.Invited || pa.ProjectId == freelancerFilterModel.ProjectId),
+                Invited = f.ProjectApplies.Any(pa => pa.Status == ProjectApplyStatus.Invited && pa.ProjectId == freelancerFilterModel.ProjectId),
                 Skills = f.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
                             .Select(group => new SkillSet
                             {
