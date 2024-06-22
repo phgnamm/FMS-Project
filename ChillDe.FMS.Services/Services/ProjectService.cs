@@ -20,12 +20,12 @@ namespace Services.Services
             _mapper = mapper;
         }
 
-        public async Task<ResponseDataModel<ProjectCreateModel>> CreateProject(ProjectCreateModel projectModel)
+        public async Task<ResponseDataModel<ProjectModel>> CreateProject(ProjectCreateModel projectModel)
         {
             var existingProject = await _unitOfWork.ProjectRepository.GetProjectByCode(projectModel.Code);
             if (existingProject != null)
             {
-                return new ResponseDataModel<ProjectCreateModel>()
+                return new ResponseDataModel<ProjectModel>()
                 {
                     Message = "Project's code already existed!",
                     Status = false
@@ -35,7 +35,7 @@ namespace Services.Services
             var account = await _unitOfWork.AccountRepository.GetAccountById(projectModel.AccountId);
             if (account == null)
             {
-                return new ResponseDataModel<ProjectCreateModel>()
+                return new ResponseDataModel<ProjectModel>()
                 {
                     Message = "User not found",
                     Status = false
@@ -45,7 +45,7 @@ namespace Services.Services
             var category = await _unitOfWork.ProjectCategoryReposioty.GetAsync(projectModel.ProjectCategoryId);
             if (category == null)
             {
-                return new ResponseDataModel<ProjectCreateModel>()
+                return new ResponseDataModel<ProjectModel>()
                 {
                     Message = "Category not found",
                     Status = false
@@ -56,7 +56,7 @@ namespace Services.Services
 
             if(project.Deposit >= project.Price)
             {
-                return new ResponseDataModel<ProjectCreateModel>()
+                return new ResponseDataModel<ProjectModel>()
                 {
                     Message = "Deposit must be less than price",
                     Status = false
@@ -96,7 +96,7 @@ namespace Services.Services
                     .GetAsync((Guid)projectModel.FreelancerId);
                 if (freelancer == null)
                 {
-                    return new ResponseDataModel<ProjectCreateModel>()
+                    return new ResponseDataModel<ProjectModel>()
                     {
                         Message = "Freelancer not found.",
                         Status = false
@@ -120,12 +120,14 @@ namespace Services.Services
 
             ProjectCreateModel projectCreateModel = _mapper.Map<ProjectCreateModel>(project);
             projectCreateModel.FreelancerId = projectModel.FreelancerId;
+            
+           var result = _mapper.Map<ProjectModel>(project); 
 
-            return new ResponseDataModel<ProjectCreateModel>()
+            return new ResponseDataModel<ProjectModel>()
             {
                 Message = "Create project successfully!",
                 Status = true,
-                Data = projectCreateModel
+                Data = result
             };
         }
 

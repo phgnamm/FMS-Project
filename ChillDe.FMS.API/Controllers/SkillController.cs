@@ -41,7 +41,7 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpGet("get-by-filter")]
+        [HttpGet]
         public async Task<IActionResult> GetAllSkillsByFilter([FromQuery] SkillFilterModel skillFilterModel)
         {
             try

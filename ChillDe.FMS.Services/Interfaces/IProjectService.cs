@@ -9,7 +9,7 @@ namespace Services.Interfaces
 {
     public interface IProjectService
     {
-        Task<ResponseDataModel<ProjectCreateModel>> CreateProject(ProjectCreateModel projectModel);
+        Task<ResponseDataModel<ProjectModel>> CreateProject(ProjectCreateModel projectModel);
         Task<ResponseDataModel<ProjectModel>> GetProject(Guid id);
         Task<ResponseDataModel<ProjectModel>> UpdateProject(Guid projectId, ProjectUpdateModel updateProject);
         Task<ResponseDataModel<ProjectModel>> DeleteProject(Guid id);

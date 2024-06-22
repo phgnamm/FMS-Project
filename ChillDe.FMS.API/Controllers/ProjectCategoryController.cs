@@ -21,7 +21,7 @@ namespace ChillDe.FMS.API.Controllers
             _projectCategoryService = projectCategoryService;
         }
 
-        [HttpGet()]
+        [HttpGet("get-by-name")]
         public async Task<IActionResult> GetProjectCategoriesByNames([FromQuery] List<string> names)
         {
             try
@@ -41,7 +41,7 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex);
             }
         }
-        [HttpGet("filter")]
+        [HttpGet]
         public async Task<IActionResult> GetProjectCategoriesByFilterAsync([FromQuery] ProjectCategoryFilterModel filterModel)
         {
 
@@ -105,7 +105,7 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        [HttpPut("block/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> BlockProjectCategoryAsync(Guid id)
         {
             try
