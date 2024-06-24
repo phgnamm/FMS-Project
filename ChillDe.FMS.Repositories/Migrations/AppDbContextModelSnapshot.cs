@@ -192,9 +192,9 @@ namespace ChillDe.FMS.Repositories.Migrations
                     b.Property<Guid?>("ProjectDeliverableId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Status")
+                    b.Property<int?>("Status")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("int");
 
                     b.Property<string>("URL")
                         .HasColumnType("nvarchar(max)");
@@ -399,6 +399,9 @@ namespace ChillDe.FMS.Repositories.Migrations
 
                     b.Property<DateTime?>("DeletionDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<float>("Deposit")
+                        .HasColumnType("real");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");

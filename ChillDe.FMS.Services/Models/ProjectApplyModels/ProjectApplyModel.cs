@@ -1,5 +1,6 @@
 ﻿using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Models.SkillModels;
+using ChillDe.FMS.Services.Models.ProjectModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,7 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
         public string? FreelancerLastName { get; set; }
         public string? Image {  get; set; }
         public List<SkillGroupModel> Skills { get; set; }
+        public ProjectModel? Project { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public DateTime? CreationDate { get; set; }

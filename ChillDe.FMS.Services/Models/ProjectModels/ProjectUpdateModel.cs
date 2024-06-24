@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ChillDe.FMS.Repositories.Enums;
 
 namespace ChillDe.FMS.Services.Models.ProjectModels
 {
@@ -27,7 +28,7 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
         public float? Price { get; set; }
 
         [Required(ErrorMessage = "Visibility is required")]
-        public string? Visibility { get; set; }
+        public ProjectVisibility? Visibility { get; set; }
         public Guid ProjectCategoryId { get; set; }
     }
 }

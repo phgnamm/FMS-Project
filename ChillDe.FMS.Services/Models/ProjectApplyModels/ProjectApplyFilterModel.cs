@@ -13,11 +13,12 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
     {
         public string Order { get; set; } = "creation-date";
         public bool OrderByDescending { get; set; } = true;
-        [Required(ErrorMessage = "Project Id is required")]
-        public Guid ProjectId { get; set; }
+        public Guid? ProjectId { get; set; }
+        public Guid? FreelancerId { get; set; }
         public string? SkillName { get; set; }
         public string? SkillType { get; set; }
         public Gender? Gender { get; set; }
+        public ProjectApplyStatus? Status { get; set; }
         public string? Search { get; set; }
         protected override int MinPageSize { get; set; } = PaginationConstant.DEFAULT_MIN_PAGE_SIZE;
         protected override int MaxPageSize { get; set; } = PaginationConstant.DEFAULT_MAX_PAGE_SIZE;
