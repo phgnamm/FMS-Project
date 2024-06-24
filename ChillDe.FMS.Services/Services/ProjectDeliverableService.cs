@@ -24,7 +24,7 @@ namespace Services.Services
         public async Task<ResponseDataModel<ProjectDeliverableCreateModel>> CreateProjectDeliverable
             (ProjectDeliverableCreateModel projectDeliverableModel)
         {
-            var project = _unitOfWork.ProjectRepository.GetAsync(projectDeliverableModel.ProjectId);
+            var project = await _unitOfWork.ProjectRepository.GetAsync(projectDeliverableModel.ProjectId);
             if (project == null)
             {
                 return new ResponseDataModel<ProjectDeliverableCreateModel>()

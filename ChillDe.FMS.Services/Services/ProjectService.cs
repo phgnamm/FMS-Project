@@ -114,7 +114,7 @@ namespace Services.Services
 
             await _unitOfWork.SaveChangeAsync();
 
-            project.Status = ProjectStatus.Processing;
+            project.Status = ProjectStatus.Pending;
             _unitOfWork.ProjectRepository.Update(project);
             await _unitOfWork.SaveChangeAsync();
 

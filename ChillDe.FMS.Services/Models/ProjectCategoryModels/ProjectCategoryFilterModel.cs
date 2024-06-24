@@ -18,7 +18,7 @@ namespace ChillDe.FMS.Services.Models.ProjectCategoryModels
         public bool IsDeleted { get; set; } = false;
       
         public string? Search { get; set; }
-        protected override int MinPageSize { get; set; } = PaginationConstant.PROJECCT_CATEGORY_MIN_PAGE_SIZE;
-        protected override int MaxPageSize { get; set; } = PaginationConstant.PROJECCT_CATEGORY_MAX_PAGE_SIZE;
+        protected override int MinPageSize { get; set; } = PaginationConstant.PROJECT_CATEGORY_MIN_PAGE_SIZE;
+        protected override int MaxPageSize { get; set; } = PaginationConstant.PROJECT_CATEGORY_MAX_PAGE_SIZE;
     }
 }
