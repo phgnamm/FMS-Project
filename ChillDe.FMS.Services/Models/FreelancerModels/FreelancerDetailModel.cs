@@ -20,6 +20,7 @@ namespace ChillDe.FMS.Services.ViewModels.FreelancerModels
         public string Status { get; set; }
         public DateTime CreationDate { get; set; }
         public int? Warning { get; set; }
+        public bool Invited { get; set; }
         public List<SkillSet> Skills { get; set; }
     }
 

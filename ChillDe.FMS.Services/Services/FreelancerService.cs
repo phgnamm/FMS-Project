@@ -88,7 +88,7 @@ public class FreelancerService : IFreelancerService
             },
             pageIndex: freelancerFilterModel.PageIndex,
             pageSize: freelancerFilterModel.PageSize,
-            includeProperties: "FreelancerSkills.Skill"
+            includeProperties: "FreelancerSkills.Skill, ProjectApplies"
         );
 
         if (freelancerList != null)
@@ -109,6 +109,7 @@ public class FreelancerService : IFreelancerService
                 Status = f.Status.ToString(),
                 CreationDate = f.CreationDate,
                 Warning = f.Warning,
+                Invited = f.ProjectApplies.Any(pa => pa.Status == ProjectApplyStatus.Invited && pa.ProjectId == freelancerFilterModel.ProjectId),
                 Skills = f.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
                             .Select(group => new SkillSet
                             {

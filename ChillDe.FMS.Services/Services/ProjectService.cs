@@ -20,12 +20,12 @@ namespace Services.Services
             _mapper = mapper;
         }
 
-        public async Task<ResponseDataModel<ProjectCreateModel>> CreateProject(ProjectCreateModel projectModel)
+        public async Task<ResponseDataModel<ProjectModel>> CreateProject(ProjectCreateModel projectModel)
         {
             var existingProject = await _unitOfWork.ProjectRepository.GetProjectByCode(projectModel.Code);
             if (existingProject != null)
             {
-                return new ResponseDataModel<ProjectCreateModel>()
+                return new ResponseDataModel<ProjectModel>()
                 {
                     Message = "Project's code already existed!",
                     Status = false
@@ -35,7 +35,7 @@ namespace Services.Services
             var account = await _unitOfWork.AccountRepository.GetAccountById(projectModel.AccountId);
             if (account == null)
             {
-                return new ResponseDataModel<ProjectCreateModel>()
+                return new ResponseDataModel<ProjectModel>()
                 {
                     Message = "User not found",
                     Status = false
@@ -45,7 +45,7 @@ namespace Services.Services
             var category = await _unitOfWork.ProjectCategoryReposioty.GetAsync(projectModel.ProjectCategoryId);
             if (category == null)
             {
-                return new ResponseDataModel<ProjectCreateModel>()
+                return new ResponseDataModel<ProjectModel>()
                 {
                     Message = "Category not found",
                     Status = false
@@ -56,7 +56,7 @@ namespace Services.Services
 
             if(project.Deposit >= project.Price)
             {
-                return new ResponseDataModel<ProjectCreateModel>()
+                return new ResponseDataModel<ProjectModel>()
                 {
                     Message = "Deposit must be less than price",
                     Status = false
@@ -70,39 +70,42 @@ namespace Services.Services
             await _unitOfWork.ProjectRepository.AddAsync(project);
 
             //Create project deliverable
-            if(projectModel.ProjectDeliverableCreateModel != null)
-            {
-                var projectDeliverable = _mapper.Map<ProjectDeliverable>
-                    (projectModel.ProjectDeliverableCreateModel);
-                var deliverableType = await _unitOfWork.DeliverableTypeRepository
-                    .GetAsync((Guid)projectDeliverable.DeliverableTypeId);
-                if (deliverableType == null)
-                {
-                    return new ResponseDataModel<ProjectCreateModel>()
-                    {
-                        Message = "Deliverable type not found.",
-                        Status = false
-                    };
-                }
-                projectDeliverable.ProjectId = project.Id;
-                projectDeliverable.Status = ProjectDeliverableStatus.Checking;
-                await _unitOfWork.ProjectDeliverableRepository.AddAsync(projectDeliverable);
-            }
+            //if(projectModel.ProjectDeliverableCreateModel != null)
+            //{
+            //    var projectDeliverable = _mapper.Map<ProjectDeliverable>
+            //        (projectModel.ProjectDeliverableCreateModel);
+            //    var deliverableType = await _unitOfWork.DeliverableTypeRepository
+            //        .GetAsync((Guid)projectDeliverable.DeliverableTypeId);
+            //    if (deliverableType == null)
+            //    {
+            //        return new ResponseDataModel<ProjectCreateModel>()
+            //        {
+            //            Message = "Deliverable type not found.",
+            //            Status = false
+            //        };
+            //    }
+            //    projectDeliverable.ProjectId = project.Id;
+            //    projectDeliverable.Status = ProjectDeliverableStatus.Checking;
+            //    await _unitOfWork.ProjectDeliverableRepository.AddAsync(projectDeliverable);
+            //}
             
             //Create project apply
-            if(projectModel.ProjectApplyCreateModel != null)
+            if(projectModel.FreelancerId != null)
             {
-                var projectApply = _mapper.Map<ProjectApply>(projectModel.ProjectApplyCreateModel);
                 var freelancer = await _unitOfWork.FreelancerRepository
-                    .GetAsync((Guid)projectApply.FreelancerId);
+                    .GetAsync((Guid)projectModel.FreelancerId);
                 if (freelancer == null)
                 {
-                    return new ResponseDataModel<ProjectCreateModel>()
+                    return new ResponseDataModel<ProjectModel>()
                     {
                         Message = "Freelancer not found.",
                         Status = false
                     };
                 }
+                ProjectApply projectApply = new()
+                {
+                    FreelancerId = projectModel.FreelancerId,
+                };
                 projectApply.ProjectId = project.Id;
                 projectApply.Status = ProjectApplyStatus.Accepted;
                 projectApply.StartDate = DateTime.UtcNow;
@@ -111,14 +114,27 @@ namespace Services.Services
 
             await _unitOfWork.SaveChangeAsync();
 
-            project.Status = ProjectStatus.Processing;
+            if (projectModel.FreelancerId != null)
+            {
+                project.Status = ProjectStatus.Processing;
+            }
+            else
+            {
+                project.Status = ProjectStatus.Pending;
+            }
             _unitOfWork.ProjectRepository.Update(project);
             await _unitOfWork.SaveChangeAsync();
 
-            return new ResponseDataModel<ProjectCreateModel>()
+            ProjectCreateModel projectCreateModel = _mapper.Map<ProjectCreateModel>(project);
+            projectCreateModel.FreelancerId = projectModel.FreelancerId;
+            
+           var result = _mapper.Map<ProjectModel>(project); 
+
+            return new ResponseDataModel<ProjectModel>()
             {
                 Message = "Create project successfully!",
-                Status = true
+                Status = true,
+                Data = result
             };
         }
 
@@ -163,6 +179,7 @@ namespace Services.Services
         {
             var projectList = await _unitOfWork.ProjectRepository.GetAllAsync(
             filter: x =>
+                x.IsDeleted == projectFilterModel.IsDeleted &&
                 (projectFilterModel.Status == null || x.Status == projectFilterModel.Status) &&
                 (projectFilterModel.ProjectCategoryId == null || projectFilterModel.ProjectCategoryId.Count == 0 || projectFilterModel.ProjectCategoryId.Contains((Guid)x.ProjectCategoryId)) &&
                 (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility) &&
@@ -338,7 +355,7 @@ namespace Services.Services
 
                 project.Status = status;
                 var result = _mapper.Map<ProjectModel>(project);
-                _unitOfWork.ProjectRepository.SoftDelete(project);
+                _unitOfWork.ProjectRepository.Update(project);
                 _unitOfWork.FreelancerRepository.Update(freelancer);
                 await _unitOfWork.SaveChangeAsync();
                 if (result != null)

@@ -39,9 +39,10 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
         public Guid ProjectCategoryId { get; set; }
 
         //ProjectDeliverabe
-        public ProjectDeliverableCreateModel? ProjectDeliverableCreateModel { get; set; }
+        //public ProjectDeliverableCreateModel? ProjectDeliverableCreateModel { get; set; }
 
         //ProjectApply
-        public ProjectApplyCreateModel? ProjectApplyCreateModel { get; set; }
+        //public ProjectApplyCreateModel? ProjectApplyCreateModel { get; set; }
+        public Guid? FreelancerId { get; set; }
     }
 }
