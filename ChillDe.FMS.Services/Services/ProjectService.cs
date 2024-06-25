@@ -114,7 +114,14 @@ namespace Services.Services
 
             await _unitOfWork.SaveChangeAsync();
 
-            project.Status = ProjectStatus.Pending;
+            if (projectModel.FreelancerId != null)
+            {
+                project.Status = ProjectStatus.Processing;
+            }
+            else
+            {
+                project.Status = ProjectStatus.Pending;
+            }
             _unitOfWork.ProjectRepository.Update(project);
             await _unitOfWork.SaveChangeAsync();
 
@@ -172,6 +179,7 @@ namespace Services.Services
         {
             var projectList = await _unitOfWork.ProjectRepository.GetAllAsync(
             filter: x =>
+                x.IsDeleted == projectFilterModel.IsDeleted &&
                 (projectFilterModel.Status == null || x.Status == projectFilterModel.Status) &&
                 (projectFilterModel.ProjectCategoryId == null || projectFilterModel.ProjectCategoryId.Count == 0 || projectFilterModel.ProjectCategoryId.Contains((Guid)x.ProjectCategoryId)) &&
                 (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility) &&

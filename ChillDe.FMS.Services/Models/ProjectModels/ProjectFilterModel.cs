@@ -12,6 +12,7 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
     {
         public string Order { get; set; } = "creation-date";
         public bool OrderByDescending { get; set; } = true;
+        public bool IsDeleted { get; set; } = false;
         public ProjectStatus? Status { get; set; }
         public ProjectVisibility? Visibility { get; set; }
         public List<Guid>? ProjectCategoryId { get; set; }
