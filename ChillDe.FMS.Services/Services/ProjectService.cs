@@ -355,7 +355,7 @@ namespace Services.Services
 
                 project.Status = status;
                 var result = _mapper.Map<ProjectModel>(project);
-                _unitOfWork.ProjectRepository.SoftDelete(project);
+                _unitOfWork.ProjectRepository.Update(project);
                 _unitOfWork.FreelancerRepository.Update(freelancer);
                 await _unitOfWork.SaveChangeAsync();
                 if (result != null)
