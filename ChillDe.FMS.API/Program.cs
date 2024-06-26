@@ -25,15 +25,15 @@ builder.Services.AddSwaggerGen(x =>
     x.SwaggerDoc("v1", new OpenApiInfo { Title = "FMS NextBean Edition", Version = "v1" });
 });
 
-// Local Database
-// builder.Services.AddDbContext<AppDbContext>(options =>
-// {
-//     options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
-// });
+ //Local Database
+ builder.Services.AddDbContext<AppDbContext>(options =>
+ {
+     options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
+});
 
 // ===================== FOR DEPLOY AZURE =======================
 
-var connection = String.Empty;
+/*var connection = String.Empty;
 if (builder.Environment.IsDevelopment())
 {
 	builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
@@ -45,7 +45,7 @@ else
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
- options.UseSqlServer(connection));
+ options.UseSqlServer(connection));*/
 
 // ==================== NO EDIT OR REMOVE COMMENT =======================
 
