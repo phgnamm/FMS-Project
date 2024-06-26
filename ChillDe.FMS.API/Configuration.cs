@@ -95,6 +95,9 @@ namespace ChillDe.FMS.API
 			// FreelancerSkill
 			services.AddScoped<IFreelancerSkillRepository, FreelancerSkillRepository>();
 
+			// Transaction
+			services.AddScoped<ITransactionService, TransactionService>();
+			services.AddScoped<ITransactionRepository, TransactionRepository>();
 
             return services;
 		}

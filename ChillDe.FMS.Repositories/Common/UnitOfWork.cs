@@ -16,6 +16,7 @@ namespace ChillDe.FMS.Repositories.Common
 		private readonly IFreelancerSkillRepository _freelancerSkillRepository;
         private readonly IProjectApplyRepository _projectApplyRepository;
         private readonly IDeliverableProductRepository _deliverableProductRepository;
+		private readonly ITransactionRepository _transactionRepository;
 
 
         public UnitOfWork(AppDbContext dbContext, IAccountRepository accountRepository, 
@@ -25,7 +26,9 @@ namespace ChillDe.FMS.Repositories.Common
 			IProjectCategoryRepository projectCategoryReposioty,
 			IFreelancerSkillRepository freelancerSkillRepository, 
 			IProjectApplyRepository projectApplyRepository, 
-			IDeliverableProductRepository deliverableProductRepository)
+			IDeliverableProductRepository deliverableProductRepository,
+			ITransactionRepository transactionRepository
+			)
 		{
 			_dbContext = dbContext;
 			_accountRepository = accountRepository;
@@ -38,6 +41,7 @@ namespace ChillDe.FMS.Repositories.Common
 			_freelancerSkillRepository = freelancerSkillRepository;
 			_projectApplyRepository = projectApplyRepository;
 			_deliverableProductRepository = deliverableProductRepository;
+			_transactionRepository = transactionRepository;
 		}
 
 		public AppDbContext DbContext => _dbContext;
@@ -51,6 +55,7 @@ namespace ChillDe.FMS.Repositories.Common
 		public IProjectApplyRepository ProjectApplyRepository => _projectApplyRepository;
 		public IFreelancerSkillRepository FreelancerSkillRepository => _freelancerSkillRepository;
         public IDeliverableProductRepository DeliverableProductRepository => _deliverableProductRepository;
+		public ITransactionRepository TransactionRepository => _transactionRepository;
 
         public async Task<int> SaveChangeAsync()
 		{
