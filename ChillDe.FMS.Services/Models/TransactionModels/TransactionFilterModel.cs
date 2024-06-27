@@ -18,7 +18,7 @@ namespace ChillDe.FMS.Services.Models.TransactionModels
         public bool IsDeleted { get; set; } = false;
         public Guid? ProjectId { get; set; }
         public Guid? FreelancerId { get; set; }
-        public bool Status { get; set; }
+        public bool Status { get; set; } = true;
         public string? Search { get; set; }
         protected override int MinPageSize { get; set; } = PaginationConstant.ACCOUNT_MIN_PAGE_SIZE;
         protected override int MaxPageSize { get; set; } = PaginationConstant.ACCOUNT_MAX_PAGE_SIZE;

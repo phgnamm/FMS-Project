@@ -1,6 +1,7 @@
 ﻿using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.TransactionModels;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace ChillDe.FMS.API.Controllers
 {
@@ -28,7 +29,7 @@ namespace ChillDe.FMS.API.Controllers
                     result.TotalPages,
                 };
 
-                Response.Headers.Add("X-Pagination", Newtonsoft.Json.JsonConvert.SerializeObject(metadata));
+                Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
 
                 return Ok(result);
             }
