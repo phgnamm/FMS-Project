@@ -51,7 +51,7 @@ namespace ChillDe.FMS.Services.Services
             {
                 projectApply.Status = ProjectApplyStatus.Checking;
             }
-            else if(project.Visibility == ProjectVisibility.Private)
+            else if (project.Visibility == ProjectVisibility.Private)
             {
                 projectApply.Status = ProjectApplyStatus.Invited;
             }
@@ -96,6 +96,33 @@ namespace ChillDe.FMS.Services.Services
             return new ResponseModel
             {
                 Message = "Update successfully",
+                Status = true
+            };
+        }
+
+        public async Task<ResponseModel> DeleteProjectApply(Guid projectApplyId)
+        {
+            var existingProjectApply = await _unitOfWork.ProjectApplyRepository.GetAsync(projectApplyId);
+            if (existingProjectApply == null)
+            {
+                return new ResponseModel
+                {
+                    Message = "ProjectApply not found",
+                    Status = false
+                };
+            }
+            if (existingProjectApply.Status == ProjectApplyStatus.Invited)
+            {
+                _unitOfWork.ProjectApplyRepository.SoftDelete(existingProjectApply);
+            }
+            else if (existingProjectApply.Status == ProjectApplyStatus.Checking)
+            {
+                _unitOfWork.ProjectApplyRepository.HardDelete(existingProjectApply);
+            }
+            await _unitOfWork.SaveChangeAsync();
+            return new ResponseModel
+            {
+                Message = "Delete successfully",
                 Status = true
             };
         }
