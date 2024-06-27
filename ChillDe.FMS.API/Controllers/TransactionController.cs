@@ -38,5 +38,26 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPost("submit-project/{projectApplyId}")]
+        public async Task<IActionResult> SubmitProject(Guid projectApplyId)
+        {
+            try
+            {
+                var result = await _transactionService.SubmitProject(projectApplyId);
+
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
