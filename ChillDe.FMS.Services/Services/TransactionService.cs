@@ -30,7 +30,7 @@ namespace ChillDe.FMS.Services.Services
         {
             // Lấy danh sách giao dịch từ repository với các bộ lọc được áp dụng
             var transactionList = await _unitOfWork.TransactionRepository.GetAllAsync(
-                filter: x =>
+               filter: x =>
                     (x.IsDeleted == transactionFilterModel.IsDeleted) &&
                     (transactionFilterModel.ProjectId == null || x.ProjectId == transactionFilterModel.ProjectId) &&
                     (transactionFilterModel.FreelancerId == null || x.FreelancerId == transactionFilterModel.FreelancerId) &&
