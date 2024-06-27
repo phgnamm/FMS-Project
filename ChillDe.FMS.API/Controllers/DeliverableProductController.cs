@@ -61,14 +61,14 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("{deliverableProductId}")]
         public async Task<IActionResult> UpdateProject
-            (Guid deliverableProductId, DeliverableProductStatus status)
+            (Guid deliverableProductId, [FromBody] DeliverableProductUpdateModel deliverableProductUpdateModel)
         {
             try
             {
                 var result = await _deliverableProductService.UpdateDeliverableProduct
-                    (deliverableProductId, status);
+                    (deliverableProductId, deliverableProductUpdateModel.status, deliverableProductUpdateModel.feedback);
 
                 if (result.Status)
                 {
