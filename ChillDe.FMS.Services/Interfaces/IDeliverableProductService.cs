@@ -18,7 +18,7 @@ namespace ChillDe.FMS.Services.Interfaces
         Task<ResponseModel> DeleteDeliverableProduct(Guid deliverableProductId);
 
         Task<ResponseModel> UpdateDeliverableProduct
-            (Guid deliverableProductId, DeliverableProductStatus status);
+            (Guid deliverableProductId, DeliverableProductStatus status, string feedback);
 
         Task<Pagination<DeliverableProductModel>> GetAllDeliverableProduct
             (DeliverableProductFilterModel deliverableProductFilterModel);

@@ -70,7 +70,7 @@ namespace ChillDe.FMS.Services.Services
         public async Task<ResponseModel> UpdateProjectApply(ProjectApplyUpdateModel projectApplyUpdateModel)
         {
             var existingProjectApply = await _unitOfWork.ProjectApplyRepository
-                .GetAsync(projectApplyUpdateModel.Id);
+                .GetAsync(projectApplyUpdateModel.Id, includeProperties:"Project");
             if (existingProjectApply == null)
             {
                 return new ResponseModel
@@ -80,16 +80,23 @@ namespace ChillDe.FMS.Services.Services
                 };
             }
 
-            if (projectApplyUpdateModel.Status == 2)
+            if (projectApplyUpdateModel.Status == ProjectApplyStatus.Accepted)
             {
                 existingProjectApply.StartDate = DateTime.UtcNow;
-                existingProjectApply.Status = ProjectApplyStatus.Accepted;
+                existingProjectApply.EndDate = DateTime.UtcNow.AddDays(existingProjectApply.Project.Duration);
+                // existingProjectApply.Status = ProjectApplyStatus.Accepted;
+                existingProjectApply.Project.Status = ProjectStatus.Processing;
             }
-            if (projectApplyUpdateModel.Status == 3)
+            // if (projectApplyUpdateModel.Status == 3)
+            // {
+            //     existingProjectApply.Status = ProjectApplyStatus.Rejected;
+            // }
+            if (projectApplyUpdateModel.Status != null)
             {
-                existingProjectApply.Status = ProjectApplyStatus.Rejected;
+                existingProjectApply.Status = projectApplyUpdateModel.Status;
             }
 
+            _unitOfWork.ProjectRepository.Update(existingProjectApply.Project);
             _unitOfWork.ProjectApplyRepository.Update(existingProjectApply);
             await _unitOfWork.SaveChangeAsync();
 
@@ -159,6 +166,8 @@ namespace ChillDe.FMS.Services.Services
                     FreelancerFirstName = f.Freelancer.FirstName,
                     FreelancerLastName = f.Freelancer.LastName,
                     Project = _mapper.Map<ProjectModel>(f.Project),
+                    StartDate = f.StartDate,
+                    EndDate = f.EndDate,
                     Skills = f.Freelancer.FreelancerSkills.GroupBy(fs => fs.Skill.Type)
                             .Select(group => new SkillGroupModel
                             {
