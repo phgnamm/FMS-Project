@@ -20,13 +20,13 @@ builder.Services.AddSwaggerGen(x =>
 });
 
 //Local Database
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-	options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
-});
+// builder.Services.AddDbContext<AppDbContext>(options =>
+// {
+// 	options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDB"));
+// });
 
 // ===================== FOR DEPLOY AZURE =======================
-/*
+
 var connection = String.Empty;
 if (builder.Environment.IsDevelopment())
 {
@@ -39,7 +39,7 @@ else
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-  options.UseSqlServer(connection));*/
+  options.UseSqlServer(connection));
 
 // ==================== NO EDIT OR REMOVE COMMENT =======================
 
