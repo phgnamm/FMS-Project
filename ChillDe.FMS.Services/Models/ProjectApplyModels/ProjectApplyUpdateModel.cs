@@ -10,6 +10,6 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
     public class ProjectApplyUpdateModel
     {
         public Guid Id { get; set; }
-        public int? Status { get; set; }
+        public ProjectApplyStatus? Status { get; set; }
     }
 }

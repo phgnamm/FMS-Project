@@ -23,16 +23,16 @@ namespace ChillDe.FMS.Services.Services
         public async Task<ResponseModel> CreateDeliverableProduct
             (DeliverableProductCreateModel deliverableProductModel)
         {
-            var projectApply = await _unitOfWork.ProjectApplyRepository.GetAsync
-                ((Guid)deliverableProductModel.ProjectApplyId);
-            if (projectApply == null)
-            {
-                return new ResponseModel
-                {
-                    Message = "Freelancer has not applied this project yet.",
-                    Status = false
-                };
-            }
+            // var projectApply = await _unitOfWork.ProjectApplyRepository.GetAsync
+            //     ((Guid)deliverableProductModel.ProjectApplyId);
+            // if (projectApply == null)
+            // {
+            //     return new ResponseModel
+            //     {
+            //         Message = "Freelancer has not applied this project yet.",
+            //         Status = false
+            //     };
+            // }
 
             var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository.GetAsync
                 ((Guid)deliverableProductModel.ProjectDeliverableId);
@@ -48,14 +48,19 @@ namespace ChillDe.FMS.Services.Services
             DeliverableProduct deliverableProduct = _mapper.Map<DeliverableProduct>(deliverableProductModel);
             deliverableProduct.Status = DeliverableProductStatus.Checking;
 
-            var project = await _unitOfWork.ProjectRepository.GetAsync((Guid)projectApply.ProjectId);
-            if (project != null)
+            if (deliverableProductModel.ProjectId != null)
             {
-                project.Status = ProjectStatus.Checking;
+                // var project = await _unitOfWork.ProjectRepository.GetAsync((Guid)projectApply.ProjectId);
+                var project = await _unitOfWork.ProjectRepository.GetAsync(deliverableProductModel.ProjectId);
+                if (project != null)
+                {
+                    project.Status = ProjectStatus.Checking;
                 
+                }
+                _unitOfWork.ProjectRepository.Update(project);
             }
 
-            _unitOfWork.ProjectRepository.Update(project);
+           
             await _unitOfWork.DeliverableProductRepository.AddAsync(deliverableProduct);
             
             await _unitOfWork.SaveChangeAsync();
@@ -92,9 +97,9 @@ namespace ChillDe.FMS.Services.Services
         }
 
         public async Task<ResponseModel> UpdateDeliverableProduct
-            (Guid deliverableProductId, DeliverableProductStatus status)
+            (Guid deliverableProductId, DeliverableProductStatus status, string feedback)
         {
-            var delivarableProduct = await _unitOfWork.DeliverableProductRepository .GetAsync(deliverableProductId);
+            var delivarableProduct = await _unitOfWork.DeliverableProductRepository.GetAsync(deliverableProductId);
             if (delivarableProduct == null)
             {
                 return new ResponseModel
@@ -104,6 +109,7 @@ namespace ChillDe.FMS.Services.Services
                 };
             }
             delivarableProduct.Status = status;
+            delivarableProduct.Feedback = feedback;
 
             var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository 
                 .GetAsync((Guid)delivarableProduct.ProjectDeliverableId);
@@ -149,7 +155,8 @@ namespace ChillDe.FMS.Services.Services
                         Status = p.Status,
                         ProjectApplyId = p.ProjectApplyId,
                         ProjectDeliverableId = p.ProjectDeliverableId,
-                        ProjectDeliverableName = p.ProjectDeliverable.Name
+                        ProjectDeliverableName = p.ProjectDeliverable.Name,
+                        Feedback = p.Feedback
                     }).ToList();
 
                 return new Pagination<DeliverableProductModel>(deliverableProductDetailList,
