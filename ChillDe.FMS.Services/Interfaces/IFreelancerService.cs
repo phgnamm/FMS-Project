@@ -14,6 +14,6 @@ public interface IFreelancerService
     Task<ResponseDataModel<List<FreelancerModel>>> DeleteFreelancer(List<Guid> freelancerIds);
     Task<Pagination<FreelancerDetailModel>> GetFreelancersByFilter(FreelancerFilterModel freelancerFilterModel);
     Task<ResponseModel> RestoreFreelancer(Guid id);
-    Task<ResponseModel> SubmitProject(Guid projectApplyId);
+    
 
 }

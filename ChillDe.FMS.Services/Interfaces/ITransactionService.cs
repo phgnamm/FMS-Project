@@ -1,5 +1,6 @@
 ﻿using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
+using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Models.TransactionModels;
 using ChillDe.FMS.Services.ViewModels.FreelancerModels;
 using System;
@@ -13,5 +14,6 @@ namespace ChillDe.FMS.Services.Interfaces
     public interface ITransactionService
     {
         Task<Pagination<TransactionDetailModel>> GetTransactionByFilter(TransactionFilterModel transactionFilterModel);
+        Task<ResponseModel> SubmitProject(Guid projectApplyId);
     }
 }

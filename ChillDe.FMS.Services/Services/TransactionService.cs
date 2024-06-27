@@ -2,6 +2,7 @@
 using ChillDe.FMS.Repositories.Common;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
+using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.TransactionModels;
 using System;
@@ -84,5 +85,52 @@ namespace ChillDe.FMS.Services.Services
             }
             return null;
         }
+
+        public async Task<ResponseModel> SubmitProject(Guid projectApplyId)
+        {
+            var response = new ResponseModel();
+
+            try
+            {
+                // Lấy thông tin ProjectApply từ repository
+                var projectApply = await _unitOfWork.ProjectApplyRepository.GetAsync(projectApplyId, "Project,Freelancer");
+
+                if (projectApply == null)
+                {
+                    response.Message = "ProjectApply not found.";
+                    return response;
+                }
+
+                // Tạo transaction từ ProjectApply
+                var transaction = new Repositories.Entities.Transaction
+                {
+                    ProjectId = projectApply.ProjectId,
+                    FreelancerId = projectApply.FreelancerId,
+                    Price = projectApply.Project.Price ?? 0,
+                    Description = $"Submit for project {projectApply.Project.Name} by {projectApply.Freelancer.FirstName} ",
+                    Status = true,
+                    Project = projectApply.Project,
+                    Freelancer = projectApply.Freelancer,
+                    CreationDate = DateTime.UtcNow,
+                    CreatedBy = _claimsService.GetCurrentUserId
+                    // Các thuộc tính khác nếu có
+                };
+                // Lưu transaction vào repository
+                await _unitOfWork.TransactionRepository.AddAsync(transaction);
+                int saveChange = await _unitOfWork.SaveChangeAsync();
+                if (saveChange > 0)
+                {
+                    response.Status = true;
+                    response.Message = "Project submitted successfully.";
+                }
+            }
+            catch (Exception ex)
+            {
+                response.Message = ex.Message;
+            }
+
+            return response;
+        }
+
     }
 }
