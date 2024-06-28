@@ -104,6 +104,7 @@ namespace ChillDe.FMS.Services.Services
                 // Tạo transaction từ ProjectApply
                 var transaction = new Repositories.Entities.Transaction
                 {
+                    Code = GenerateRamdomString(10),
                     ProjectId = projectApply.ProjectId,
                     FreelancerId = projectApply.FreelancerId,
                     Price = projectApply.Project.Price ?? 0,
@@ -131,6 +132,24 @@ namespace ChillDe.FMS.Services.Services
 
             return response;
         }
+
+        // hàm này để generate một chuỗi string 
+        public string GenerateRamdomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            StringBuilder stringBuilder = new StringBuilder();
+            Random random = new Random();
+
+            for (int i = 0; i < length; i++)
+            {
+                int index = random.Next(chars.Length);
+                stringBuilder.Append(chars[index]);
+            }
+
+            return stringBuilder.ToString();
+        }
+
+
 
     }
 }
