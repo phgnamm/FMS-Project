@@ -45,6 +45,7 @@ namespace ChillDe.FMS.Services.Services
                 };
             }
 
+
             DeliverableProduct deliverableProduct = _mapper.Map<DeliverableProduct>(deliverableProductModel);
             deliverableProduct.Status = DeliverableProductStatus.Checking;
 
@@ -58,6 +59,10 @@ namespace ChillDe.FMS.Services.Services
                 
                 }
                 _unitOfWork.ProjectRepository.Update(project);
+
+                var projectApply = await _unitOfWork.ProjectApplyRepository
+                .GetAcceptedProjectApplyByProjectId(deliverableProductModel.ProjectId);
+                deliverableProduct.ProjectApplyId = projectApply.Id;
             }
 
            

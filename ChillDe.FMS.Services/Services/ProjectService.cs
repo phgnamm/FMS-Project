@@ -54,7 +54,7 @@ namespace Services.Services
 
             Project project = _mapper.Map<Project>(projectModel);
 
-            if(project.Deposit >= project.Price)
+            if (project.Deposit >= project.Price)
             {
                 return new ResponseDataModel<ProjectModel>()
                 {
@@ -88,9 +88,9 @@ namespace Services.Services
             //    projectDeliverable.Status = ProjectDeliverableStatus.Checking;
             //    await _unitOfWork.ProjectDeliverableRepository.AddAsync(projectDeliverable);
             //}
-            
+
             //Create project apply
-            if(projectModel.FreelancerId != null)
+            if (projectModel.FreelancerId != null)
             {
                 var freelancer = await _unitOfWork.FreelancerRepository
                     .GetAsync((Guid)projectModel.FreelancerId);
@@ -127,8 +127,8 @@ namespace Services.Services
 
             ProjectCreateModel projectCreateModel = _mapper.Map<ProjectCreateModel>(project);
             projectCreateModel.FreelancerId = projectModel.FreelancerId;
-            
-           var result = _mapper.Map<ProjectModel>(project); 
+
+            var result = _mapper.Map<ProjectModel>(project);
 
             return new ResponseDataModel<ProjectModel>()
             {
@@ -338,7 +338,7 @@ namespace Services.Services
                         {
                             var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository
                             .GetAsync((Guid)deliverableProduct.ProjectDeliverableId);
-                            if (projectDeliverable != null && 
+                            if (projectDeliverable != null &&
                                 projectDeliverable.SubmissionDate <= DateTime.UtcNow)
                                 freelancer.Wallet += project.Deposit;
                         }
