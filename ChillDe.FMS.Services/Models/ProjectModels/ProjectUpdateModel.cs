@@ -27,6 +27,10 @@ namespace ChillDe.FMS.Services.Models.ProjectModels
         [RegularExpression(@"^\d+$", ErrorMessage = "Invalid price!")]
         public float? Price { get; set; }
 
+        [Required(ErrorMessage = "Project's price is required")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "Invalid price!")]
+        public float? Deposit { get; set; }
+
         [Required(ErrorMessage = "Visibility is required")]
         public ProjectVisibility? Visibility { get; set; }
         public Guid ProjectCategoryId { get; set; }
