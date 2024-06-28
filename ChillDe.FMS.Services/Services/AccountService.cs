@@ -51,7 +51,6 @@ namespace ChillDe.FMS.Services
         {
             // Check if Email already exists
             var existedEmail = await _userManager.FindByEmailAsync(accountRegisterModel.Email);
-
             if (existedEmail != null)
             {
                 return new ResponseModel

@@ -54,7 +54,7 @@ namespace Services.Services
 
             Project project = _mapper.Map<Project>(projectModel);
 
-            if(project.Deposit >= project.Price)
+            if (project.Deposit >= project.Price)
             {
                 return new ResponseDataModel<ProjectModel>()
                 {
@@ -88,9 +88,9 @@ namespace Services.Services
             //    projectDeliverable.Status = ProjectDeliverableStatus.Checking;
             //    await _unitOfWork.ProjectDeliverableRepository.AddAsync(projectDeliverable);
             //}
-            
+
             //Create project apply
-            if(projectModel.FreelancerId != null)
+            if (projectModel.FreelancerId != null)
             {
                 var freelancer = await _unitOfWork.FreelancerRepository
                     .GetAsync((Guid)projectModel.FreelancerId);
@@ -109,19 +109,27 @@ namespace Services.Services
                 projectApply.ProjectId = project.Id;
                 projectApply.Status = ProjectApplyStatus.Accepted;
                 projectApply.StartDate = DateTime.UtcNow;
+                projectApply.EndDate = DateTime.UtcNow.AddDays(project.Duration);
                 await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
             }
 
             await _unitOfWork.SaveChangeAsync();
 
-            project.Status = ProjectStatus.Processing;
+            if (projectModel.FreelancerId != null)
+            {
+                project.Status = ProjectStatus.Processing;
+            }
+            else
+            {
+                project.Status = ProjectStatus.Pending;
+            }
             _unitOfWork.ProjectRepository.Update(project);
             await _unitOfWork.SaveChangeAsync();
 
             ProjectCreateModel projectCreateModel = _mapper.Map<ProjectCreateModel>(project);
             projectCreateModel.FreelancerId = projectModel.FreelancerId;
-            
-           var result = _mapper.Map<ProjectModel>(project); 
+
+            var result = _mapper.Map<ProjectModel>(project);
 
             return new ResponseDataModel<ProjectModel>()
             {
@@ -172,6 +180,7 @@ namespace Services.Services
         {
             var projectList = await _unitOfWork.ProjectRepository.GetAllAsync(
             filter: x =>
+                x.IsDeleted == projectFilterModel.IsDeleted &&
                 (projectFilterModel.Status == null || x.Status == projectFilterModel.Status) &&
                 (projectFilterModel.ProjectCategoryId == null || projectFilterModel.ProjectCategoryId.Count == 0 || projectFilterModel.ProjectCategoryId.Contains((Guid)x.ProjectCategoryId)) &&
                 (projectFilterModel.Visibility == null || x.Visibility == projectFilterModel.Visibility) &&
@@ -330,8 +339,7 @@ namespace Services.Services
                         {
                             var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository
                             .GetAsync((Guid)deliverableProduct.ProjectDeliverableId);
-                            if (projectDeliverable != null && 
-                                projectDeliverable.SubmissionDate <= DateTime.UtcNow)
+                            if (projectDeliverable != null)
                                 freelancer.Wallet += project.Deposit;
                         }
                     }
@@ -347,7 +355,7 @@ namespace Services.Services
 
                 project.Status = status;
                 var result = _mapper.Map<ProjectModel>(project);
-                _unitOfWork.ProjectRepository.SoftDelete(project);
+                _unitOfWork.ProjectRepository.Update(project);
                 _unitOfWork.FreelancerRepository.Update(freelancer);
                 await _unitOfWork.SaveChangeAsync();
                 if (result != null)

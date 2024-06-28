@@ -13,7 +13,7 @@ namespace ChillDe.FMS.Services.Models.ProjectDeliverableModel
         [Required(ErrorMessage = "Name is required")]
         public string? Name { get; set; }
 
-        [Required(ErrorMessage = "SubmissionDate is required")]
+        // [Required(ErrorMessage = "SubmissionDate is required")]
         public DateTime? SubmissionDate { get; set; }
 
         [Required(ErrorMessage = "Project is required")]

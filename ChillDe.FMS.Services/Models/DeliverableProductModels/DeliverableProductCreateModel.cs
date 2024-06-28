@@ -14,6 +14,7 @@ namespace ChillDe.FMS.Services.Models.DeliverableProductModels
         [Required(ErrorMessage = "Project's URL is required")]
         public string? URL { get; set; }
         public Guid? ProjectApplyId { get; set; }
+        public Guid ProjectId { get; set; }
         public Guid? ProjectDeliverableId { get; set; }
     }
 }
