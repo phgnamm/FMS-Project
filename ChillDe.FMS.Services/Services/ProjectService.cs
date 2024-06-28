@@ -247,6 +247,16 @@ namespace Services.Services
             var existingProject = await _unitOfWork.ProjectRepository.GetAsync(id);
             if (existingProject != null)
             {
+                var existingCode = await _unitOfWork.ProjectRepository.GetProjectByCode(updateProject.Code);
+                if (existingCode != null && existingCode.Code != updateProject.Code)
+                {
+                    return new ResponseDataModel<ProjectModel>()
+                    {
+                        Message = "Project's code already existed!",
+                        Status = false
+                    };
+                }
+
                 var projectCategory = await _unitOfWork.ProjectCategoryReposioty
                     .GetAsync(updateProject.ProjectCategoryId);
                 if (projectCategory == null)
@@ -257,6 +267,33 @@ namespace Services.Services
                         Message = "Category not found"
                     };
                 }
+
+                if (updateProject.Deposit >= updateProject.Price)
+                {
+                    return new ResponseDataModel<ProjectModel>()
+                    {
+                        Message = "Deposit must be less than price",
+                        Status = false
+                    };
+                }
+
+                if (existingProject.Duration != updateProject.Duration)
+                {
+                    var projectApply = await _unitOfWork.ProjectApplyRepository
+                        .GetAcceptedProjectApplyByProjectId(id);
+                    if (projectApply.StartDate.Value.AddDays(updateProject.Duration) <=
+                        DateTime.UtcNow)
+                    {
+                        return new ResponseDataModel<ProjectModel>()
+                        {
+                            Status = false,
+                            Message = "Duration is out of time."
+                        };
+                    }
+                    projectApply.EndDate = projectApply.StartDate.Value.AddDays(updateProject.Duration);
+                    _unitOfWork.ProjectApplyRepository.Update(projectApply);
+                }
+
                 existingProject = _mapper.Map(updateProject, existingProject);
 
                 _unitOfWork.ProjectRepository.Update(existingProject);

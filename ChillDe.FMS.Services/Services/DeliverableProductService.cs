@@ -64,7 +64,6 @@ namespace ChillDe.FMS.Services.Services
                 .GetAcceptedProjectApplyByProjectId(deliverableProductModel.ProjectId);
                 deliverableProduct.ProjectApplyId = projectApply.Id;
             }
-
            
             await _unitOfWork.DeliverableProductRepository.AddAsync(deliverableProduct);
             
