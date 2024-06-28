@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ChillDe.FMS.Repositories.Enums;
 
 namespace ChillDe.FMS.Repositories.Repositories
 {
@@ -20,7 +21,8 @@ namespace ChillDe.FMS.Repositories.Repositories
 
         public async Task<DeliverableProduct> GetByProjectApplyId(Guid projectApplyId)
         {
-            return await _dbContext.DeliverableProduct.SingleOrDefaultAsync(dp => dp.ProjectApplyId == projectApplyId);
+            // return await _dbContext.DeliverableProduct.SingleOrDefaultAsync(dp => dp.ProjectApplyId == projectApplyId);
+            return await _dbContext.DeliverableProduct.FirstOrDefaultAsync(dp => dp.ProjectApplyId == projectApplyId && dp.Status == DeliverableProductStatus.Accepted);
         }
     }
 }

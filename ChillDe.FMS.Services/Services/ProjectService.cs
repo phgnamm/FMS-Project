@@ -109,6 +109,7 @@ namespace Services.Services
                 projectApply.ProjectId = project.Id;
                 projectApply.Status = ProjectApplyStatus.Accepted;
                 projectApply.StartDate = DateTime.UtcNow;
+                projectApply.EndDate = DateTime.UtcNow.AddDays(project.Duration);
                 await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
             }
 
@@ -338,8 +339,7 @@ namespace Services.Services
                         {
                             var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository
                             .GetAsync((Guid)deliverableProduct.ProjectDeliverableId);
-                            if (projectDeliverable != null &&
-                                projectDeliverable.SubmissionDate <= DateTime.UtcNow)
+                            if (projectDeliverable != null)
                                 freelancer.Wallet += project.Deposit;
                         }
                     }
