@@ -50,6 +50,14 @@ namespace ChillDe.FMS.API
             services.AddQuartz(configure =>
             {
                 configure.UseMicrosoftDependencyInjectionJobFactory();
+               /* var jobKey = new JobKey("WarningEmailJob");
+                configure.AddJob<WarningEmailJob>(opts => opts.WithIdentity(jobKey));
+
+                // Tạo trigger cho công việc gửi email cảnh báo
+                configure.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("WarningEmailJob-trigger")
+                    .WithCronSchedule("0 0 0 * * ?")); // Chạy hàng ngày vào lúc nửa đêm*/
             });
 
             services.AddQuartzHostedService(options =>
