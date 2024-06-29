@@ -17,6 +17,9 @@ using Repositories.Interfaces;
 using Repositories.Repositories;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Services;
+using Quartz;
+using ChillDe.FMS.Services.Common;
+using Quartz.Impl;
 
 namespace ChillDe.FMS.API
 {
@@ -42,6 +45,28 @@ namespace ChillDe.FMS.API
             {
                 Credential = GoogleCredential.FromFile("credentials.json"),
             });
+
+            // Đăng ký Quartz.NET
+            services.AddQuartz(configure =>
+            {
+                configure.UseMicrosoftDependencyInjectionJobFactory();
+            });
+
+            services.AddQuartzHostedService(options =>
+            {
+                options.WaitForJobsToComplete = true;
+            });
+
+            // Đăng ký ISchedulerFactory và IScheduler
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton(provider =>
+            {
+                var schedulerFactory = provider.GetRequiredService<ISchedulerFactory>();
+                var scheduler = schedulerFactory.GetScheduler().GetAwaiter().GetResult();
+                scheduler.Start().GetAwaiter().GetResult();
+                return scheduler;
+            });
+
             // Middlewares
             services.AddSingleton<GlobalExceptionMiddleware>();
 			services.AddSingleton<PerformanceMiddleware>();
