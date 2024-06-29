@@ -29,7 +29,7 @@ namespace ChillDe.FMS.Services.Common
             {
                 string toEmail = projectApply.Freelancer.Email;
                 string subject = "Project Deadline Reminder";
-                string body = $"Dear {projectApply.Freelancer.FirstName},\n\nThis is a reminder that the deadline for the project '{projectApply.Project.Name}' is tomorrow.\n\nBest regards,\nYour Company";
+                string body = $"Dear {projectApply.Freelancer.FirstName},\n\nThis is a reminder that the deadline for the project '{projectApply.Project.Name}' is tomorrow.\n\nBest regards,\nFMS Managerment";
 
                 await _emailService.SendEmailAsync(toEmail, subject, body, false);
 
