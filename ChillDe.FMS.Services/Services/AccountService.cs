@@ -191,7 +191,7 @@ namespace ChillDe.FMS.Services
                     Message = "Invalid Access Token or Refresh Token"
                 };
             }
-
+            
             var user = await _userManager.FindByIdAsync(principal.FindFirst("userId").Value);
 
             if (user == null || user.RefreshToken != refreshTokenFromClient ||
@@ -215,6 +215,68 @@ namespace ChillDe.FMS.Services
             var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)
+            {
+                return new ResponseDataModel<TokenModel>
+                {
+                    Status = false,
+                    Message = "Cannot refresh the Token"
+                };
+            }
+
+            var jwtToken = TokenTools.CreateJWTToken(principal.Claims.ToList(), _configuration);
+
+            return new ResponseDataModel<TokenModel>
+            {
+                Status = true,
+                Message = "Refresh Token successfully",
+                Data = new TokenModel
+                {
+                    AccessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken),
+                    AccessTokenExpiryTime = jwtToken.ValidTo.ToLocalTime(),
+                    RefreshToken = user.RefreshToken,
+                }
+            };
+        }
+        
+        public async Task<ResponseDataModel<TokenModel>> RefreshTokenFreelancer(RefreshTokenModel refreshTokenModel,
+            string refreshTokenFromClient)
+        {
+            // Validate Access Token and Refresh Token
+            var principal = TokenTools.GetPrincipalFromExpiredToken(refreshTokenModel.AccessToken, _configuration);
+
+            if (principal == null)
+            {
+                return new ResponseDataModel<TokenModel>
+                {
+                    Status = false,
+                    Message = "Invalid Access Token or Refresh Token"
+                };
+            }
+            
+            var user = await _unitOfWork.FreelancerRepository.GetAsync(Guid.Parse(principal.FindFirst("userId").Value));
+
+            if (user == null || user.RefreshToken != refreshTokenFromClient ||
+                user.RefreshTokenExpiryTime <= DateTime.Now)
+            {
+                return new ResponseDataModel<TokenModel>
+                {
+                    Status = false,
+                    Message = "Invalid Access Token or Refresh Token"
+                };
+            }
+
+            // Start to refresh Access Token and Refresh Token
+            var refreshToken = TokenTools.GenerateRefreshToken();
+            _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInDays"], out int refreshTokenValidityInDays);
+
+            // Update User's Refresh Token
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
+
+            _unitOfWork.FreelancerRepository.Update(user);
+            var result = await _unitOfWork.SaveChangeAsync();
+
+            if (result == 0)
             {
                 return new ResponseDataModel<TokenModel>
                 {
