@@ -16,6 +16,8 @@ namespace ChillDe.FMS.Services.Models.DeliverableProductModels
         public string? Feedback { get; set; }
         public Guid? ProjectApplyId { get; set; }
         public Guid? ProjectDeliverableId { get; set; }
+        public Guid? ProjectId { get; set; }
+        public string? ProjectName { get; set; }
         public string? ProjectDeliverableName { get; set; }
     }
 }

@@ -11,5 +11,6 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
     {
         public Guid Id { get; set; }
         public ProjectApplyStatus? Status { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
+using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Services.Interfaces;
 
@@ -13,11 +14,13 @@ namespace Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ITransactionService _transactionService;
 
-        public ProjectService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProjectService(IUnitOfWork unitOfWork, IMapper mapper, ITransactionService transactionService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _transactionService = transactionService;
         }
 
         public async Task<ResponseDataModel<ProjectModel>> CreateProject(ProjectCreateModel projectModel)
@@ -378,6 +381,8 @@ namespace Services.Services
                             .GetAsync((Guid)deliverableProduct.ProjectDeliverableId);
                             if (projectDeliverable != null)
                                 freelancer.Wallet += project.Deposit;
+                            // Create transaction
+                            await _transactionService.SubmitProject(projectApply.Id);
                         }
                     }
                 }
@@ -387,6 +392,8 @@ namespace Services.Services
                     if (freelancer != null)
                     {
                         freelancer.Wallet += (float)project.Price;
+                        // Create transaction
+                        await _transactionService.SubmitProject(projectApply.Id);
                     }
                 }
 
