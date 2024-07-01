@@ -5,10 +5,11 @@ using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.Models.SkillModels;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
+using ChillDe.FMS.Services.Common;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.ProjectApplyModels;
 using ChillDe.FMS.Services.Models.ProjectModels;
-using ChillDe.FMS.Services.ViewModels.FreelancerModels;
+using Quartz;
 
 namespace ChillDe.FMS.Services.Services
 {
@@ -16,11 +17,13 @@ namespace ChillDe.FMS.Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IScheduler _scheduler;
 
-        public ProjectApplyService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProjectApplyService(IUnitOfWork unitOfWork, IMapper mapper, IScheduler scheduler)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _scheduler = scheduler;
         }
         public async Task<ResponseModel> AddProjectApply(ProjectApplyCreateModel projectApplyModel)
         {
@@ -68,9 +71,9 @@ namespace ChillDe.FMS.Services.Services
         }
 
         public async Task<ResponseModel> UpdateProjectApply(ProjectApplyUpdateModel projectApplyUpdateModel)
-        {
+            {
             var existingProjectApply = await _unitOfWork.ProjectApplyRepository
-                .GetAsync(projectApplyUpdateModel.Id, includeProperties:"Project");
+        .GetAsync(projectApplyUpdateModel.Id, includeProperties: "Project");
             if (existingProjectApply == null)
             {
                 return new ResponseModel
@@ -84,13 +87,9 @@ namespace ChillDe.FMS.Services.Services
             {
                 existingProjectApply.StartDate = DateTime.UtcNow;
                 existingProjectApply.EndDate = DateTime.UtcNow.AddDays(existingProjectApply.Project.Duration);
-                // existingProjectApply.Status = ProjectApplyStatus.Accepted;
                 existingProjectApply.Project.Status = ProjectStatus.Processing;
             }
-            // if (projectApplyUpdateModel.Status == 3)
-            // {
-            //     existingProjectApply.Status = ProjectApplyStatus.Rejected;
-            // }
+
             if (projectApplyUpdateModel.Status != null)
             {
                 existingProjectApply.Status = projectApplyUpdateModel.Status;
@@ -99,6 +98,23 @@ namespace ChillDe.FMS.Services.Services
             _unitOfWork.ProjectRepository.Update(existingProjectApply.Project);
             _unitOfWork.ProjectApplyRepository.Update(existingProjectApply);
             await _unitOfWork.SaveChangeAsync();
+
+            // Schedule the warning email job if project apply is accepted
+             if (projectApplyUpdateModel.Status == ProjectApplyStatus.Accepted)
+            {
+                var jobData = new JobDataMap();
+                jobData.Put("projectApplyId", existingProjectApply.Id);
+
+                IJobDetail job = JobBuilder.Create<WarningEmailJob>()
+                    .UsingJobData(jobData)
+                    .Build();
+
+                ITrigger trigger = TriggerBuilder.Create()
+                    .StartAt(existingProjectApply.EndDate.Value.AddDays(-1)) // Send email one day before the end date
+                    .Build();
+
+                await _scheduler.ScheduleJob(job, trigger);
+            }
 
             return new ResponseModel
             {
