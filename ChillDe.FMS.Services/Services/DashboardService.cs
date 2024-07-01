@@ -5,6 +5,7 @@ using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.DashboardModels;
 using ChillDe.FMS.Services.Models.DeliverableProductModels;
+using ChillDe.FMS.Services.Models.ProjectApplyModels;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -19,15 +20,17 @@ public class DashboardService : IDashboardService
     private readonly UserManager<Account> _userManager;
     private readonly IProjectService _projectService;
     private readonly IDeliverableProductService _deliverableProductService;
+    private readonly IProjectApplyService _projectApplyService;
 
     public DashboardService(IUnitOfWork unitOfWork, IClaimsService claimsService, UserManager<Account> userManager,
-        IProjectService projectService, IDeliverableProductService deliverableProductService)
+        IProjectService projectService, IDeliverableProductService deliverableProductService, IProjectApplyService projectApplyService)
     {
         _unitOfWork = unitOfWork;
         _claimsService = claimsService;
         _userManager = userManager;
         _projectService = projectService;
         _deliverableProductService = deliverableProductService;
+        _projectApplyService = projectApplyService;
     }
 
     public async Task<ResponseDataModel<AdministratorDashboardModel>> GetAdminDashboard()
@@ -58,7 +61,7 @@ public class DashboardService : IDashboardService
             }
         };
     }
-    
+
     public async Task<ResponseDataModel<StaffDashboardModel>> GetStaffDashboard()
     {
         var userId = _claimsService.GetCurrentUserId;
@@ -67,8 +70,40 @@ public class DashboardService : IDashboardService
         return new ResponseDataModel<StaffDashboardModel>()
         {
             Status = true,
-            Message = "Get admin dashboard successfully",
+            Message = "Get staff dashboard successfully",
             Data = commonDashboard
+        };
+    }
+
+    public async Task<ResponseDataModel<FreelancerDashboardModel>> GetFreelancerDashboard()
+    {
+        var userId = _claimsService.GetCurrentUserId;
+        var freelancer = await _unitOfWork.FreelancerRepository.GetFreelancerById(userId.Value);
+        var remainTasks = await _unitOfWork.DbContext.ProjectDeliverable.Where(pd =>
+                pd.Project.ProjectApplies.Any(pa =>
+                    pa.FreelancerId == userId && pa.Status == ProjectApplyStatus.Accepted && pa.IsDeleted == false)).Where(x => x.Status != ProjectDeliverableStatus.Accepted && x.IsDeleted == false)
+            .CountAsync();
+        var recentProjects = await _projectApplyService.GetProjectAppliesByFilter(new ProjectApplyFilterModel()
+        {
+            FreelancerId = userId
+        });
+        var recentProducts = await _deliverableProductService.GetAllDeliverableProduct(
+            new DeliverableProductFilterModel()
+            {
+                FreelancerId = userId
+            });
+        return new ResponseDataModel<FreelancerDashboardModel>()
+        {
+            Status = true,
+            Message = "Get freelaner dashboard successfully",
+            Data = new FreelancerDashboardModel()
+            {
+                RecentProjects = recentProjects,
+                RecentProducts = recentProducts,
+                Wallet = freelancer.Wallet,
+                Warning = freelancer.Warning.Value,
+                RemainTasks = remainTasks
+            }
         };
     }
 
@@ -86,10 +121,11 @@ public class DashboardService : IDashboardService
         {
             AccountId = accountId
         });
-        var recentProducts = await _deliverableProductService.GetAllDeliverableProduct(new DeliverableProductFilterModel()
-        {
-            AccountId = accountId
-        });
+        var recentProducts = await _deliverableProductService.GetAllDeliverableProduct(
+            new DeliverableProductFilterModel()
+            {
+                AccountId = accountId
+            });
 
         return new StaffDashboardModel()
         {

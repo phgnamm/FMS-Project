@@ -44,7 +44,29 @@ namespace ChillDe.FMS.API.Controllers
         {
             try
             {
-                var result = await _dashboardService.GetAdminDashboard();
+                var result = await _dashboardService.GetStaffDashboard();
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+        
+        [Authorize(Roles = "Freelancer")]
+        [HttpGet("freelancer")]
+        public async Task<IActionResult> GetFreelancerDashboard()
+        {
+            try
+            {
+                var result = await _dashboardService.GetFreelancerDashboard();
                 if (result.Status)
                 {
                     return Ok(result);

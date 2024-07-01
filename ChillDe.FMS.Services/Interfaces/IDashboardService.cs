@@ -7,4 +7,5 @@ public interface IDashboardService
 {
     Task<ResponseDataModel<AdministratorDashboardModel>> GetAdminDashboard();
     Task<ResponseDataModel<StaffDashboardModel>> GetStaffDashboard();
+    Task<ResponseDataModel<FreelancerDashboardModel>> GetFreelancerDashboard();
 }
