@@ -17,7 +17,8 @@ namespace ChillDe.FMS.Services.Models.TransactionModels
         public string? ProjectName { get; set; }
         public Guid? ProjectId { get; set; }
         public Guid? FreelancerId { get; set; }
-     
+        public DateTime CreationDate { get; set; }
+
 
 
     }
