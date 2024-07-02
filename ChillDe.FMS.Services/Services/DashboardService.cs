@@ -23,7 +23,8 @@ public class DashboardService : IDashboardService
     private readonly IProjectApplyService _projectApplyService;
 
     public DashboardService(IUnitOfWork unitOfWork, IClaimsService claimsService, UserManager<Account> userManager,
-        IProjectService projectService, IDeliverableProductService deliverableProductService, IProjectApplyService projectApplyService)
+        IProjectService projectService, IDeliverableProductService deliverableProductService,
+        IProjectApplyService projectApplyService)
     {
         _unitOfWork = unitOfWork;
         _claimsService = claimsService;
@@ -40,7 +41,7 @@ public class DashboardService : IDashboardService
         var numOfAccount = await _userManager.Users.CountAsync();
         var totalPaid = await _unitOfWork.DbContext.Project.Where(x => x.Status == ProjectStatus.Done)
             .SumAsync(x => x.Price);
-        var numberOfProject = await _unitOfWork.DbContext.Project.CountAsync();
+        var numberOfProject = await _unitOfWork.DbContext.Project.Where(x => x.IsDeleted == false).CountAsync();
         var commonDashboard = await GetCommonDashboard(userId.Value);
 
         return new ResponseDataModel<AdministratorDashboardModel>()
@@ -79,9 +80,14 @@ public class DashboardService : IDashboardService
     {
         var userId = _claimsService.GetCurrentUserId;
         var freelancer = await _unitOfWork.FreelancerRepository.GetFreelancerById(userId.Value);
+        var numOfYourOngoingProject = await _unitOfWork.DbContext.ProjectApply.Where(x =>
+            x.Status == ProjectApplyStatus.Accepted && (x.Project.Status == ProjectStatus.Processing ||
+                                                        x.Project.Status == ProjectStatus.Checking) &&
+            x.IsDeleted == false && x.Project.IsDeleted == false).CountAsync();
         var remainTasks = await _unitOfWork.DbContext.ProjectDeliverable.Where(pd =>
                 pd.Project.ProjectApplies.Any(pa =>
-                    pa.FreelancerId == userId && pa.Status == ProjectApplyStatus.Accepted && pa.IsDeleted == false)).Where(x => x.Status != ProjectDeliverableStatus.Accepted && x.IsDeleted == false)
+                    pa.FreelancerId == userId && pa.Status == ProjectApplyStatus.Accepted && pa.IsDeleted == false))
+            .Where(x => x.Status != ProjectDeliverableStatus.Accepted && x.IsDeleted == false)
             .CountAsync();
         var recentProjects = await _projectApplyService.GetProjectAppliesByFilter(new ProjectApplyFilterModel()
         {
@@ -102,7 +108,8 @@ public class DashboardService : IDashboardService
                 RecentProducts = recentProducts,
                 Wallet = freelancer.Wallet,
                 Warning = freelancer.Warning.Value,
-                RemainTasks = remainTasks
+                RemainTasks = remainTasks,
+                NumOfYourOngoingProject = numOfYourOngoingProject
             }
         };
     }
@@ -110,10 +117,11 @@ public class DashboardService : IDashboardService
     private async Task<StaffDashboardModel> GetCommonDashboard(Guid accountId)
     {
         var numOfYourOngoingProject = await _unitOfWork.DbContext.Project
-            .Where(x => x.Status != ProjectStatus.Done && x.Status != ProjectStatus.Closed).CountAsync();
+            .Where(x => x.Status != ProjectStatus.Done && x.Status != ProjectStatus.Closed && accountId == accountId && x.IsDeleted == false)
+            .CountAsync();
         var numOfWaitingChecking = await _unitOfWork.DbContext.DeliverableProduct.Include(x => x.ProjectApply)
             .ThenInclude(x => x.Project).Where(x =>
-                x.Status == DeliverableProductStatus.Checking && x.ProjectApply.Project.AccountId == accountId)
+                x.Status == DeliverableProductStatus.Checking && x.ProjectApply.Project.AccountId == accountId && x.IsDeleted == false)
             .CountAsync();
         var yourTotalPaid = await _unitOfWork.DbContext.Project
             .Where(x => x.AccountId == accountId && x.Status == ProjectStatus.Done).SumAsync(x => x.Price);

@@ -47,6 +47,8 @@ namespace ChillDe.FMS.Repositories.Repositories
             {
                 query = query.Where(filter);
             }
+            
+            totalCount = await query.CountAsync();
 
             foreach (var includeProperty in includeProperties.Split
                          (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))

@@ -111,5 +111,19 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSkill(Guid id)
+        {
+            try
+            {
+                var result = await _skillService.GetSkill(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

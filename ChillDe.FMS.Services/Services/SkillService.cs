@@ -20,6 +20,28 @@ namespace ChillDe.FMS.Services
             _mapper = mapper;
         }
 
+        public async Task<ResponseDataModel<SkillModel>> GetSkill(Guid id)
+        {
+            var skill = await _unitOfWork.SkillRepository.GetAsync(id);
+            if (skill == null)
+            {
+                return new ResponseDataModel<SkillModel>()
+                {
+                    Status = false,
+                    Message = "Skill doesn't exist"
+                };
+            }
+
+            var result = _mapper.Map<SkillModel>(skill);
+
+            return new ResponseDataModel<SkillModel>()
+            {
+                Status = true,
+                Message = "Get skill successfully",
+                Data = result
+            };
+        }
+
         public async Task<ResponseModel> CreateSkill(List<SkillCreateModel> skillCreateModel)
         {
            var skillList = _mapper.Map<List<Skill>>(skillCreateModel);
@@ -68,7 +90,7 @@ namespace ChillDe.FMS.Services
 
         public async Task<Pagination<SkillModel>> GetAllSkill(SkillFilterModel skillFilterModel)
         {
-            var skillList = await _unitOfWork.SkillRepository.GetSkillByFilter(pageIndex: skillFilterModel.PageIndex,
+            var skillList = await _unitOfWork.SkillRepository.GetAllAsync(pageIndex: skillFilterModel.PageIndex,
                 pageSize: skillFilterModel.PageSize,
                 filter: (x =>
                     x.IsDeleted == skillFilterModel.IsDeleted &&
@@ -159,6 +181,15 @@ namespace ChillDe.FMS.Services
                 }
                 if (!string.IsNullOrEmpty(skillUpdateModel.Type))
                 {
+                    var category = await _unitOfWork.ProjectCategoryReposioty.GetByNames([skillUpdateModel.Type]);
+                    if (category.Count == 0)
+                    {
+                        return new ResponseModel()
+                        {
+                            Status = false,
+                            Message = "Type not found"
+                        };
+                    }
                     skill.Type = skillUpdateModel.Type;
                 }
                 
