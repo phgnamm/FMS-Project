@@ -71,7 +71,7 @@ namespace ChillDe.FMS.Services.Services
         }
 
         public async Task<ResponseModel> UpdateProjectApply(ProjectApplyUpdateModel projectApplyUpdateModel)
-            {
+        {
             var existingProjectApply = await _unitOfWork.ProjectApplyRepository
         .GetAsync(projectApplyUpdateModel.Id, includeProperties: "Project");
             if (existingProjectApply == null)
@@ -105,7 +105,8 @@ namespace ChillDe.FMS.Services.Services
                         Message = "End date must be later than today",
                         Status = false
                     };
-                } else if (existingProjectApply.StartDate > DateTime.UtcNow &&
+                }
+                else if (existingProjectApply.StartDate > DateTime.UtcNow &&
                            projectApplyUpdateModel.EndDate <= existingProjectApply.StartDate)
                 {
                     return new ResponseModel
@@ -125,7 +126,7 @@ namespace ChillDe.FMS.Services.Services
             await _unitOfWork.SaveChangeAsync();
 
             // Schedule the warning email job if project apply is accepted
-             if (projectApplyUpdateModel.Status == ProjectApplyStatus.Accepted)
+            if (projectApplyUpdateModel.Status == ProjectApplyStatus.Accepted)
             {
                 var jobData = new JobDataMap();
                 jobData.Put("projectApplyId", existingProjectApply.Id);
@@ -159,14 +160,11 @@ namespace ChillDe.FMS.Services.Services
                     Status = false
                 };
             }
-            if (existingProjectApply.Status == ProjectApplyStatus.Invited)
-            {
-                _unitOfWork.ProjectApplyRepository.SoftDelete(existingProjectApply);
-            }
-            else if (existingProjectApply.Status == ProjectApplyStatus.Checking)
+            if (existingProjectApply.Status == ProjectApplyStatus.Invited || existingProjectApply.Status == ProjectApplyStatus.Checking)
             {
                 _unitOfWork.ProjectApplyRepository.HardDelete(existingProjectApply);
-            }else if(existingProjectApply.Status == ProjectApplyStatus.Accepted)
+            }
+            else if (existingProjectApply.Status == ProjectApplyStatus.Accepted)
             {
                 return new ResponseModel
                 {
