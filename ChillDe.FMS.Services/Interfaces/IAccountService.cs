@@ -14,6 +14,8 @@ namespace Services.Interfaces
 
         Task<ResponseDataModel<TokenModel>> RefreshToken(RefreshTokenModel refreshTokenModel,
             string refreshTokenFromClient);
+        Task<ResponseDataModel<TokenModel>> RefreshTokenFreelancer(RefreshTokenModel refreshTokenModel,
+            string refreshTokenFromClient);
 
         Task<ResponseModel> VerifyEmail(string email, string verificationCode);
         Task<ResponseModel> ResendVerificationEmail(EmailModel? emailModel);
