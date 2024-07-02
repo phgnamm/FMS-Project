@@ -141,6 +141,13 @@ namespace ChillDe.FMS.Services.Services
             else if (existingProjectApply.Status == ProjectApplyStatus.Checking)
             {
                 _unitOfWork.ProjectApplyRepository.HardDelete(existingProjectApply);
+            }else if(existingProjectApply.Status == ProjectApplyStatus.Accepted)
+            {
+                return new ResponseModel
+                {
+                    Message = "This Apply can be Delete when accepted",
+                    Status = false
+                };
             }
             await _unitOfWork.SaveChangeAsync();
             return new ResponseModel
