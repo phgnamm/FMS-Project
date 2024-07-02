@@ -39,7 +39,7 @@ namespace ChillDe.FMS.Services.Common
                 {
                     projectApply.Freelancer.IsDeleted = true;
                     string lockSubject = "Account Locked";
-                    string lockBody = $"Dear {projectApply.Freelancer.FirstName},\n\nYour account has been locked due to exceeding the maximum number of warnings.\n\nBest regards,\nYour Company";
+                    string lockBody = $"Dear {projectApply.Freelancer.FirstName},\n\nYour account has been locked due to exceeding the maximum number of warnings.\n\nBest regards,\nFMS Managerment";
                     await _emailService.SendEmailAsync(toEmail, lockSubject, lockBody, false);
                 }
 
