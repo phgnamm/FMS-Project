@@ -95,6 +95,31 @@ namespace ChillDe.FMS.Services.Services
                 existingProjectApply.Status = projectApplyUpdateModel.Status;
             }
 
+            if (projectApplyUpdateModel.EndDate != null && existingProjectApply is { Status: ProjectApplyStatus.Accepted, StartDate: not null, EndDate: not null })
+            {
+                if (existingProjectApply.StartDate <= DateTime.UtcNow &&
+                    projectApplyUpdateModel.EndDate <= DateTime.UtcNow)
+                {
+                    return new ResponseModel
+                    {
+                        Message = "End date must be later than today",
+                        Status = false
+                    };
+                } else if (existingProjectApply.StartDate > DateTime.UtcNow &&
+                           projectApplyUpdateModel.EndDate <= existingProjectApply.StartDate)
+                {
+                    return new ResponseModel
+                    {
+                        Message = "End date must be later than start date",
+                        Status = false
+                    };
+                }
+
+                existingProjectApply.EndDate = projectApplyUpdateModel.EndDate;
+                TimeSpan? newDuration = existingProjectApply.EndDate - existingProjectApply.StartDate;
+                existingProjectApply.Project.Duration = newDuration.Value.Days;
+            }
+
             _unitOfWork.ProjectRepository.Update(existingProjectApply.Project);
             _unitOfWork.ProjectApplyRepository.Update(existingProjectApply);
             await _unitOfWork.SaveChangeAsync();

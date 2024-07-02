@@ -131,6 +131,10 @@ namespace ChillDe.FMS.API
 			// Transaction
 			services.AddScoped<ITransactionService, TransactionService>();
 			services.AddScoped<ITransactionRepository, TransactionRepository>();
+			
+			// Dashbpard
+			services.AddScoped<IDashboardService, DashboardService>();
+			services.AddScoped<IDashboardRepository, DashboardRepository>();
 
             return services;
 		}
