@@ -5,5 +5,6 @@ namespace Repositories.Interfaces
 {
     public interface IDeliverableTypeRepository : IGenericRepository<DeliverableType>
     {
+        Task<DeliverableType> GetByName(string name);
     }
 }

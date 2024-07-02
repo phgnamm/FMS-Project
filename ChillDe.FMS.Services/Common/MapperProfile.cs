@@ -67,6 +67,7 @@ namespace ChillDe.FMS.Repositories.Common
                 });
             CreateMap<SkillModel,SkillFilterResultModel>().ReverseMap();
             CreateMap<Skill, SkillCreateModel>().ReverseMap();  
+            CreateMap<Skill, SkillModel>().ReverseMap();  
 
             //Project
             CreateMap<ProjectCreateModel, Project>();
@@ -89,6 +90,7 @@ namespace ChillDe.FMS.Repositories.Common
 
             //DeliverableType
             CreateMap<DeliverableTypeCreateModel, DeliverableType>();
+            CreateMap<DeliverableType, DeliverableTypeModel>();
 
             //ProjectApply
             CreateMap<ProjectApplyCreateModel, ProjectApply>();

@@ -9,7 +9,7 @@ namespace ChillDe.FMS.Repositories.Repositories;
 public class ProjectRepository : GenericRepository<Project>, IProjectRepository
 {
     private readonly AppDbContext _dbContext;
-    
+
     public ProjectRepository(AppDbContext dbContext, IClaimsService claimsService) : base(dbContext, claimsService)
     {
         _dbContext = dbContext;
@@ -34,7 +34,15 @@ public class ProjectRepository : GenericRepository<Project>, IProjectRepository
 
     public async Task<Project> GetProjectByCode(string code)
     {
-        var project = await _dbContext.Project.FirstOrDefaultAsync(p => code == p.Code);
+        var project = await _dbContext.Project.FirstOrDefaultAsync(p => code == p.Code && p.IsDeleted == false);
         return project;
+    }
+
+    public async Task<int> CountProjectByDeliverableType(Guid id)
+    {
+        var countProjects = await _dbContext.Project.Where(x =>
+            x.IsDeleted == false && x.Status != ProjectStatus.Done && x.Status != ProjectStatus.Closed &&
+            x.ProjectDeliverables.Any(x => x.DeliverableType.Id == id)).CountAsync();
+        return countProjects;
     }
 }

@@ -64,5 +64,47 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateDeliverableType(Guid id, [FromBody] DeliverableTypeCreateModel deliverableTypeCreateModel)
+        {
+            try
+            {
+                var result = await _deliverableTypeService.UpdateDeliverableType(id, deliverableTypeCreateModel);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDeliverableType(Guid id)
+        {
+            try
+            {
+                var result = await _deliverableTypeService.DeleteDeliverableType(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetDeliverableType(Guid id)
+        {
+            try
+            {
+                var result = await _deliverableTypeService.GetDeliverableType(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

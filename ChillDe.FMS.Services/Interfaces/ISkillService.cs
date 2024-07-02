@@ -13,6 +13,7 @@ namespace Services.Interfaces
         Task<Pagination<SkillModel>> GetAllSkill (SkillFilterModel skillFilterModel);
         Task<ResponseModel> UpdateSkill(Guid id, SkillUpdateModel skillUpdateModel);
         Task<ResponseModel> DeleteSkill(Guid id);   
+        Task<ResponseDataModel<SkillModel>> GetSkill(Guid id);   
         Task <ResponseModel> CreateSkill(List<SkillCreateModel> skillCreateModel);
     }
 }
