@@ -87,6 +87,27 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProjectApply(Guid id)
+        {
+            try
+            {
+                var result = await _projectApplyService.DeleteProjectApply(id);
+                if (result.Status)
+                {
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex);
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetProjectApplyByFilter([FromQuery] ProjectApplyFilterModel projectApplyFilterModel)
         {
