@@ -220,24 +220,26 @@ namespace ChillDe.FMS.API.Controllers
 
         // This API is used for Freelancer login only
         [HttpPost("login-google")]
-        public async Task<IActionResult> LoginGoogle([FromBody] LoginGoogleIdTokenModel loginGoogleIdTokenModel)
+        public async Task<IActionResult> LoginGoogle([FromBody] LoginGoogleIdTokenModel loginGoogleIdTokenModel, [FromQuery] bool? httpOnly)
         {
             try
             {
                 var result = await _accountService.LoginGoogle(loginGoogleIdTokenModel);
                 if (result.Status)
                 {
-                    // HttpContext.Response.Cookies.Append("refreshToken", result.Data.RefreshToken,
-                    // 	new CookieOptions
-                    // 	{
-                    // 		Expires = DateTimeOffset.UtcNow.AddDays(7),
-                    // 		HttpOnly = true,
-                    // 		IsEssential = true,
-                    // 		Secure = true,
-                    // 		SameSite = SameSiteMode.None
-                    // 	});
-                    //
-                    // result.Data.RefreshToken = null;
+                    if (httpOnly == true) {
+                        HttpContext.Response.Cookies.Append("refreshToken", result.Data.RefreshToken,
+                            new CookieOptions
+                            {
+                                Expires = DateTimeOffset.UtcNow.AddDays(7),
+                                HttpOnly = true,
+                                IsEssential = true,
+                                Secure = true,
+                                SameSite = SameSiteMode.None
+                            });
+                    
+                        result.Data.RefreshToken = null;
+                    }
 
                     return Ok(result);
                 }

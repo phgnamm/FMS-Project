@@ -78,6 +78,7 @@ namespace ChillDe.FMS.API
             // Middlewares
             services.AddSingleton<GlobalExceptionMiddleware>();
 			services.AddSingleton<PerformanceMiddleware>();
+			services.AddScoped<AccountStatusMiddleware>();
 			services.AddSingleton<Stopwatch>();
 
 			// Common
