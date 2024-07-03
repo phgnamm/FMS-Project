@@ -31,13 +31,15 @@ namespace ChillDe.FMS.Services.Services
         {
             // Lấy danh sách giao dịch từ repository với các bộ lọc được áp dụng
             var transactionList = await _unitOfWork.TransactionRepository.GetAllAsync(
-               filter: x =>
+                filter: x =>
                     (x.IsDeleted == transactionFilterModel.IsDeleted) &&
                     (transactionFilterModel.ProjectId == null || x.ProjectId == transactionFilterModel.ProjectId) &&
                     (transactionFilterModel.FreelancerId == null || x.FreelancerId == transactionFilterModel.FreelancerId) &&
                     (transactionFilterModel.Status == null || x.Status == transactionFilterModel.Status) &&
                     (transactionFilterModel.MinPrice == null || x.Price >= transactionFilterModel.MinPrice) &&
                     (transactionFilterModel.MaxPrice == null || x.Price <= transactionFilterModel.MaxPrice) &&
+                    (transactionFilterModel.FromDate == null || x.CreationDate >= transactionFilterModel.FromDate) &&
+                    (transactionFilterModel.ToDate == null || x.CreationDate <= transactionFilterModel.ToDate) &&
                     (string.IsNullOrEmpty(transactionFilterModel.Search) ||
                         x.Description.Contains(transactionFilterModel.Search) ||
                         x.Code.Contains(transactionFilterModel.Search)),
@@ -75,7 +77,8 @@ namespace ChillDe.FMS.Services.Services
                         FreelancerLastName = t.Freelancer?.LastName ?? string.Empty,
                         ProjectName = t.Project?.Name ?? string.Empty,
                         ProjectId = t.ProjectId,
-                        FreelancerId = t.FreelancerId
+                        FreelancerId = t.FreelancerId,
+                        CreationDate = t.CreationDate,
                     }).ToList();
 
                 // Trả về kết quả phân trang
@@ -85,6 +88,7 @@ namespace ChillDe.FMS.Services.Services
             }
             return null;
         }
+
 
         public async Task<ResponseModel> SubmitProject(Guid projectApplyId)
         {
@@ -104,6 +108,7 @@ namespace ChillDe.FMS.Services.Services
                 // Tạo transaction từ ProjectApply
                 var transaction = new Repositories.Entities.Transaction
                 {
+                    Code = GenerateRamdomString(10),
                     ProjectId = projectApply.ProjectId,
                     FreelancerId = projectApply.FreelancerId,
                     Price = projectApply.Project.Price ?? 0,
@@ -131,6 +136,24 @@ namespace ChillDe.FMS.Services.Services
 
             return response;
         }
+
+        // hàm này để generate một chuỗi string 
+        public string GenerateRamdomString(int length)
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            StringBuilder stringBuilder = new StringBuilder();
+            Random random = new Random();
+
+            for (int i = 0; i < length; i++)
+            {
+                int index = random.Next(chars.Length);
+                stringBuilder.Append(chars[index]);
+            }
+
+            return stringBuilder.ToString();
+        }
+
+
 
     }
 }

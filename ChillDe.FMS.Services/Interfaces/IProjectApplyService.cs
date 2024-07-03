@@ -12,6 +12,7 @@ namespace ChillDe.FMS.Services.Interfaces
         //    (Guid freelancerId, Guid projectId);
         Task<ResponseModel> AddProjectApply(ProjectApplyCreateModel projectApplyModel);
         Task<ResponseModel> UpdateProjectApply(ProjectApplyUpdateModel projectApplyUpdateModel);
+        Task<ResponseModel> DeleteProjectApply(Guid projectApplyId);
         Task<Pagination<ProjectApplyModel>> GetProjectAppliesByFilter
             (ProjectApplyFilterModel projectApplyFilterModel);
     }

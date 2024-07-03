@@ -13,8 +13,8 @@ namespace ChillDe.FMS.Services.Models.SkillModels
         public string Name { get; set; }
         public string? Description { get; set; }
         [Required(ErrorMessage = "Type is required!")]
-        [RegularExpression("^(Graphic & Design ||Programming & Tech||Digital Marketing||Writing & Translation||Video & Animation||Music & Audio||Business||)$",
-           ErrorMessage = "Invalid Category Name. Must be: Programming & Tech - Programming & Tech - Digital Marketing - Writing & Translation - Video & Animation - Music & Audio - Business ")]
+        // [RegularExpression("^(Graphic & Design ||Programming & Tech||Digital Marketing||Writing & Translation||Video & Animation||Music & Audio||Business||)$",
+        //    ErrorMessage = "Invalid Category Name. Must be: Programming & Tech - Programming & Tech - Digital Marketing - Writing & Translation - Video & Animation - Music & Audio - Business ")]
         public string Type { get; set; }
     }
 }

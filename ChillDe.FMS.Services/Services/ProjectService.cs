@@ -4,6 +4,7 @@ using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.ViewModels.ResponseModels;
+using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Services.Interfaces;
 
@@ -13,11 +14,13 @@ namespace Services.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ITransactionService _transactionService;
 
-        public ProjectService(IUnitOfWork unitOfWork, IMapper mapper)
+        public ProjectService(IUnitOfWork unitOfWork, IMapper mapper, ITransactionService transactionService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _transactionService = transactionService;
         }
 
         public async Task<ResponseDataModel<ProjectModel>> CreateProject(ProjectCreateModel projectModel)
@@ -54,7 +57,7 @@ namespace Services.Services
 
             Project project = _mapper.Map<Project>(projectModel);
 
-            if(project.Deposit >= project.Price)
+            if (project.Deposit >= project.Price)
             {
                 return new ResponseDataModel<ProjectModel>()
                 {
@@ -88,9 +91,9 @@ namespace Services.Services
             //    projectDeliverable.Status = ProjectDeliverableStatus.Checking;
             //    await _unitOfWork.ProjectDeliverableRepository.AddAsync(projectDeliverable);
             //}
-            
+
             //Create project apply
-            if(projectModel.FreelancerId != null)
+            if (projectModel.FreelancerId != null)
             {
                 var freelancer = await _unitOfWork.FreelancerRepository
                     .GetAsync((Guid)projectModel.FreelancerId);
@@ -109,6 +112,7 @@ namespace Services.Services
                 projectApply.ProjectId = project.Id;
                 projectApply.Status = ProjectApplyStatus.Accepted;
                 projectApply.StartDate = DateTime.UtcNow;
+                projectApply.EndDate = DateTime.UtcNow.AddDays(project.Duration);
                 await _unitOfWork.ProjectApplyRepository.AddAsync(projectApply);
             }
 
@@ -127,8 +131,8 @@ namespace Services.Services
 
             ProjectCreateModel projectCreateModel = _mapper.Map<ProjectCreateModel>(project);
             projectCreateModel.FreelancerId = projectModel.FreelancerId;
-            
-           var result = _mapper.Map<ProjectModel>(project); 
+
+            var result = _mapper.Map<ProjectModel>(project);
 
             return new ResponseDataModel<ProjectModel>()
             {
@@ -247,6 +251,16 @@ namespace Services.Services
             var existingProject = await _unitOfWork.ProjectRepository.GetAsync(id);
             if (existingProject != null)
             {
+                var existingCode = await _unitOfWork.ProjectRepository.GetProjectByCode(updateProject.Code);
+                if (existingCode != null && existingCode.Code != updateProject.Code)
+                {
+                    return new ResponseDataModel<ProjectModel>()
+                    {
+                        Message = "Project's code already existed!",
+                        Status = false
+                    };
+                }
+
                 var projectCategory = await _unitOfWork.ProjectCategoryReposioty
                     .GetAsync(updateProject.ProjectCategoryId);
                 if (projectCategory == null)
@@ -257,6 +271,33 @@ namespace Services.Services
                         Message = "Category not found"
                     };
                 }
+
+                if (updateProject.Deposit >= updateProject.Price)
+                {
+                    return new ResponseDataModel<ProjectModel>()
+                    {
+                        Message = "Deposit must be less than price",
+                        Status = false
+                    };
+                }
+
+                if (existingProject.Duration != updateProject.Duration)
+                {
+                    var projectApply = await _unitOfWork.ProjectApplyRepository
+                        .GetAcceptedProjectApplyByProjectId(id);
+                    if (projectApply.StartDate.Value.AddDays(updateProject.Duration) <=
+                        DateTime.UtcNow)
+                    {
+                        return new ResponseDataModel<ProjectModel>()
+                        {
+                            Status = false,
+                            Message = "Duration is out of time."
+                        };
+                    }
+                    projectApply.EndDate = projectApply.StartDate.Value.AddDays(updateProject.Duration);
+                    _unitOfWork.ProjectApplyRepository.Update(projectApply);
+                }
+
                 existingProject = _mapper.Map(updateProject, existingProject);
 
                 _unitOfWork.ProjectRepository.Update(existingProject);
@@ -338,9 +379,10 @@ namespace Services.Services
                         {
                             var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository
                             .GetAsync((Guid)deliverableProduct.ProjectDeliverableId);
-                            if (projectDeliverable != null && 
-                                projectDeliverable.SubmissionDate <= DateTime.UtcNow)
+                            if (projectDeliverable != null)
                                 freelancer.Wallet += project.Deposit;
+                            // Create transaction
+                            await _transactionService.SubmitProject(projectApply.Id);
                         }
                     }
                 }
@@ -350,6 +392,8 @@ namespace Services.Services
                     if (freelancer != null)
                     {
                         freelancer.Wallet += (float)project.Price;
+                        // Create transaction
+                        await _transactionService.SubmitProject(projectApply.Id);
                     }
                 }
 

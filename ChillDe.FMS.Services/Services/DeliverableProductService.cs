@@ -45,6 +45,7 @@ namespace ChillDe.FMS.Services.Services
                 };
             }
 
+
             DeliverableProduct deliverableProduct = _mapper.Map<DeliverableProduct>(deliverableProductModel);
             deliverableProduct.Status = DeliverableProductStatus.Checking;
 
@@ -55,14 +56,17 @@ namespace ChillDe.FMS.Services.Services
                 if (project != null)
                 {
                     project.Status = ProjectStatus.Checking;
-                
                 }
+
                 _unitOfWork.ProjectRepository.Update(project);
+
+                var projectApply = await _unitOfWork.ProjectApplyRepository
+                    .GetAcceptedProjectApplyByProjectId(deliverableProductModel.ProjectId);
+                deliverableProduct.ProjectApplyId = projectApply.Id;
             }
 
-           
             await _unitOfWork.DeliverableProductRepository.AddAsync(deliverableProduct);
-            
+
             await _unitOfWork.SaveChangeAsync();
 
             return new ResponseModel
@@ -72,7 +76,7 @@ namespace ChillDe.FMS.Services.Services
             };
         }
 
-        public async Task<ResponseModel> DeleteDeliverableProduct (Guid deliverableProductId)
+        public async Task<ResponseModel> DeleteDeliverableProduct(Guid deliverableProductId)
         {
             var deliverableProduct = await _unitOfWork.DeliverableProductRepository
                 .GetAsync(deliverableProductId);
@@ -108,10 +112,11 @@ namespace ChillDe.FMS.Services.Services
                     Status = false
                 };
             }
+
             delivarableProduct.Status = status;
             delivarableProduct.Feedback = feedback;
 
-            var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository 
+            var projectDeliverable = await _unitOfWork.ProjectDeliverableRepository
                 .GetAsync((Guid)delivarableProduct.ProjectDeliverableId);
             projectDeliverable.Status = (ProjectDeliverableStatus)status;
 
@@ -130,19 +135,23 @@ namespace ChillDe.FMS.Services.Services
             (DeliverableProductFilterModel deliverableProductFilterModel)
         {
             var deliverableProductList = await _unitOfWork.DeliverableProductRepository.GetAllAsync(
-            filter: x =>
-                (x.IsDeleted != true) &&
-                (deliverableProductFilterModel.ProjectDeliverableId == null || 
-                    x.ProjectDeliverableId == deliverableProductFilterModel.ProjectDeliverableId),
-            orderBy: x =>
-            {
-                return deliverableProductFilterModel.OrderByDescending
-                    ? x.OrderByDescending(x => x.CreationDate)
-                    : x.OrderBy(x => x.CreationDate);
-            },
-            pageIndex: deliverableProductFilterModel.PageIndex,
-            pageSize: deliverableProductFilterModel.PageSize,
-            includeProperties: "ProjectDeliverable"
+                filter: x =>
+                    (x.IsDeleted != true) &&
+                    (deliverableProductFilterModel.ProjectDeliverableId == null ||
+                     x.ProjectDeliverableId == deliverableProductFilterModel.ProjectDeliverableId) &&
+                    (deliverableProductFilterModel.AccountId == null || x.ProjectApply.Project.AccountId ==
+                        deliverableProductFilterModel.AccountId) &&
+                    (deliverableProductFilterModel.FreelancerId == null ||
+                     x.ProjectApply.FreelancerId == deliverableProductFilterModel.FreelancerId),
+                orderBy: x =>
+                {
+                    return deliverableProductFilterModel.OrderByDescending
+                        ? x.OrderByDescending(x => x.CreationDate)
+                        : x.OrderBy(x => x.CreationDate);
+                },
+                pageIndex: deliverableProductFilterModel.PageIndex,
+                pageSize: deliverableProductFilterModel.PageSize,
+                includeProperties: "ProjectDeliverable, ProjectApply.Project"
             );
             if (deliverableProductList != null)
             {
@@ -156,13 +165,16 @@ namespace ChillDe.FMS.Services.Services
                         ProjectApplyId = p.ProjectApplyId,
                         ProjectDeliverableId = p.ProjectDeliverableId,
                         ProjectDeliverableName = p.ProjectDeliverable.Name,
-                        Feedback = p.Feedback
+                        Feedback = p.Feedback,
+                        ProjectId = p.ProjectApply.ProjectId,
+                        ProjectName = p.ProjectApply.Project.Name
                     }).ToList();
 
                 return new Pagination<DeliverableProductModel>(deliverableProductDetailList,
                     deliverableProductList.TotalCount, deliverableProductFilterModel.PageIndex,
                     deliverableProductFilterModel.PageSize);
             }
+
             return null;
         }
     }

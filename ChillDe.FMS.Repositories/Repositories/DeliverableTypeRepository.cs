@@ -2,6 +2,7 @@
 using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Repositories.Interfaces;
 using ChillDe.FMS.Repositories.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Repositories.Interfaces;
 
 namespace Repositories.Repositories
@@ -14,6 +15,11 @@ namespace Repositories.Repositories
             base(dbContext, claimsService)
         {
             _dbContext = dbContext;
+        }
+
+        public async Task<DeliverableType> GetByName(string name)
+        {
+            return await _dbContext.DeliverableType.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower());
         }
     }
 }

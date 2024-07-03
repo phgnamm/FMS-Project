@@ -17,6 +17,9 @@ using Repositories.Interfaces;
 using Repositories.Repositories;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Services;
+using Quartz;
+using ChillDe.FMS.Services.Common;
+using Quartz.Impl;
 
 namespace ChillDe.FMS.API
 {
@@ -42,9 +45,40 @@ namespace ChillDe.FMS.API
             {
                 Credential = GoogleCredential.FromFile("credentials.json"),
             });
+
+            // Đăng ký Quartz.NET
+            services.AddQuartz(configure =>
+            {
+                configure.UseMicrosoftDependencyInjectionJobFactory();
+				var jobKey = new JobKey("WarningEmailJob");
+				configure.AddJob<WarningEmailJob>(opts => opts.WithIdentity(jobKey));
+
+				// Tạo trigger cho công việc gửi email cảnh báo
+				configure.AddTrigger(opts => opts
+					.ForJob(jobKey)
+					.WithIdentity("WarningEmailJob-trigger")
+					.WithCronSchedule("0 0 8 * * ?")); 
+			});
+
+            services.AddQuartzHostedService(options =>
+            {
+                options.WaitForJobsToComplete = true;
+            });
+
+            // Đăng ký ISchedulerFactory và IScheduler
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton(provider =>
+            {
+                var schedulerFactory = provider.GetRequiredService<ISchedulerFactory>();
+                var scheduler = schedulerFactory.GetScheduler().GetAwaiter().GetResult();
+                scheduler.Start().GetAwaiter().GetResult();
+                return scheduler;
+            });
+
             // Middlewares
             services.AddSingleton<GlobalExceptionMiddleware>();
 			services.AddSingleton<PerformanceMiddleware>();
+			services.AddScoped<AccountStatusMiddleware>();
 			services.AddSingleton<Stopwatch>();
 
 			// Common
@@ -98,6 +132,10 @@ namespace ChillDe.FMS.API
 			// Transaction
 			services.AddScoped<ITransactionService, TransactionService>();
 			services.AddScoped<ITransactionRepository, TransactionRepository>();
+			
+			// Dashbpard
+			services.AddScoped<IDashboardService, DashboardService>();
+			services.AddScoped<IDashboardRepository, DashboardRepository>();
 
             return services;
 		}
