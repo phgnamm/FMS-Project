@@ -2,6 +2,7 @@
 using ChillDe.FMS.Services;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.ProjectCategoryModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet("get-by-name")]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetProjectCategoriesByNames([FromQuery] List<string> names)
         {
             try
@@ -42,6 +44,7 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetProjectCategoriesByFilterAsync([FromQuery] ProjectCategoryFilterModel filterModel)
         {
 
@@ -66,6 +69,7 @@ namespace ChillDe.FMS.API.Controllers
 
         }
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> UpdateProjectCategoryAsync(Guid id, [FromBody] ProjectCategoryUpdateModel updateModel)
         {
             try
@@ -86,6 +90,7 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> CreateProjetCategory(List<ProjectCategoryCreateModel> createModels)
         {
             try
@@ -106,6 +111,7 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> BlockProjectCategoryAsync(Guid id)
         {
             try

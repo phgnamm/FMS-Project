@@ -1,5 +1,6 @@
 ﻿using ChillDe.FMS.Services.Models.ProjectDeliverableModel;
 using ChillDe.FMS.Services.Models.ProjectModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Services.Interfaces;
@@ -19,6 +20,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> CreateProjectDeliverable
             (ProjectDeliverableCreateModel projectDeliverableModel)
         {
@@ -42,6 +44,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetProjectDeliverableByFilter
             ([FromQuery] ProjectDeliverableFilterModel projectDeliverableFilterModel)
         {
@@ -66,6 +69,7 @@ namespace API.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> DeleteProjectDeliverable(Guid id)
         {
             try

@@ -131,7 +131,7 @@ namespace ChillDe.FMS.Services
         public async Task<Pagination<SkillGroupModel>> GetAllSkillsGroupByType(SkillFilterModel skillFilterModel)
         {
             var skillList = await _unitOfWork.SkillRepository.GetAllAsync(pageIndex: skillFilterModel.PageIndex,
-                pageSize: skillFilterModel.PageSize,
+                pageSize: PaginationConstant.SKILL_MIN_PAGE_SIZE,
                 filter: (x =>
                     x.IsDeleted == skillFilterModel.IsDeleted &&
                     (string.IsNullOrEmpty(skillFilterModel.Search) ||
