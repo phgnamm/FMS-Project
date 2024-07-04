@@ -1,5 +1,6 @@
 ﻿using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.TransactionModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -17,6 +18,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetTransactionsByFilter([FromQuery] TransactionFilterModel transactionFilterModel)
         {
             try
@@ -39,6 +41,7 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
         [HttpPost("submit-project/{projectApplyId}")]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> SubmitProject(Guid projectApplyId)
         {
             try

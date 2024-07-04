@@ -1,6 +1,7 @@
 ﻿using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.DeliverableProductModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -18,6 +19,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Freelancer")]
         public async Task<IActionResult> CreateDeliverableProduct
             (DeliverableProductCreateModel deliverableProductCreateModel)
         {
@@ -41,6 +43,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Freelancer")]
         public async Task<IActionResult> DeleteDeliverableProduct(Guid id)
         {
             try
@@ -62,6 +65,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPut("{deliverableProductId}")]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> UpdateProject
             (Guid deliverableProductId, [FromBody] DeliverableProductUpdateModel deliverableProductUpdateModel)
         {
@@ -86,6 +90,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetDeliverableProductByFilter
             ([FromQuery] DeliverableProductFilterModel deliverableProductFilterModel)
         {

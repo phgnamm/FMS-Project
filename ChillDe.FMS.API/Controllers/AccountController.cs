@@ -40,7 +40,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet]
-        // [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> GetAllAccounts([FromQuery] AccountFilterModel accountFilterModel)
         {
             try
@@ -64,7 +64,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPut("{id}")]
-        // [Authorize(Roles = "Administrator, Staff")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> UpdateAccount([FromBody] AccountUpdateModel accountUpdateModel, Guid id)
         {
             try
@@ -86,7 +86,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        // [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteAccount(Guid id)
         {
             try
@@ -108,7 +108,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPut("restore/{id}")]
-        // [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> RestoreAccount(Guid id)
         {
             try

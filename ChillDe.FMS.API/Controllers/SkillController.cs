@@ -1,4 +1,5 @@
 using ChillDe.FMS.Services.Models.SkillModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NuGet.DependencyResolver;
@@ -18,7 +19,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet("group-by-type")]
-        // [Authorize(Roles = "Administrator, Staff, Freelancer")]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetAllSkillsGroupByType([FromQuery] SkillFilterModel skillFilterModel)
         {
             try
@@ -42,6 +43,7 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> GetAllSkillsByFilter([FromQuery] SkillFilterModel skillFilterModel)
         {
             try
@@ -65,6 +67,7 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> UpdateSkill(Guid id, [FromBody] SkillUpdateModel skillUpdateModel)
         {
             try
@@ -77,6 +80,7 @@ namespace ChillDe.FMS.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [Authorize(Roles = "Administrator")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSkill(Guid id)
         {
@@ -91,6 +95,7 @@ namespace ChillDe.FMS.API.Controllers
             }
         }
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> CreateSkillAsynce([FromBody] List<SkillCreateModel> skillCreateModels)
         {
             try
@@ -113,6 +118,7 @@ namespace ChillDe.FMS.API.Controllers
         }
         
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> GetSkill(Guid id)
         {
             try

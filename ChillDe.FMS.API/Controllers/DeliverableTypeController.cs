@@ -3,6 +3,7 @@ using ChillDe.FMS.Repositories.Entities;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.DeliverableTypeModels;
 using ChillDe.FMS.Services.Models.ProjectModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -20,6 +21,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> GetAllDeliverableType
             ([FromQuery] DeliverableTypeFilterModel deliverableTypeFilterModel)
         {
@@ -44,6 +46,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> CreateDeliverableType(DeliverableTypeCreateModel deliverableTypeCreateModel)
         {
             try
@@ -66,6 +69,7 @@ namespace ChillDe.FMS.API.Controllers
         }
         
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> UpdateDeliverableType(Guid id, [FromBody] DeliverableTypeCreateModel deliverableTypeCreateModel)
         {
             try
@@ -80,6 +84,7 @@ namespace ChillDe.FMS.API.Controllers
         }
         
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> DeleteDeliverableType(Guid id)
         {
             try
@@ -94,6 +99,7 @@ namespace ChillDe.FMS.API.Controllers
         }
         
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> GetDeliverableType(Guid id)
         {
             try
