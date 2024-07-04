@@ -1,5 +1,6 @@
 ﻿using ChillDe.FMS.Repositories.Enums;
 using ChillDe.FMS.Services.Models.ProjectModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Services.Interfaces;
@@ -18,6 +19,7 @@ namespace API.Controllers
         }
 
         [HttpPost()]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> CreateProject(ProjectCreateModel projectAddModel)
         {
             try
@@ -40,6 +42,7 @@ namespace API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetProject(Guid id)
         {
             try
@@ -61,6 +64,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetProjectByFilter([FromQuery] ProjectFilterModel projectFilterModel)
         {
             try
@@ -84,6 +88,7 @@ namespace API.Controllers
         }
 
         [HttpPut("{projectId}")]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> UpdateProject(Guid projectId, [FromBody] ProjectUpdateModel project)
         {
             try
@@ -106,6 +111,7 @@ namespace API.Controllers
         }
 
         [HttpDelete()]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> DeleteProject(Guid id)
         {
             try
@@ -127,6 +133,7 @@ namespace API.Controllers
         }
 
         [HttpPut("close")]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> CloseProject(Guid projectId, ProjectStatus status)
         {
             try

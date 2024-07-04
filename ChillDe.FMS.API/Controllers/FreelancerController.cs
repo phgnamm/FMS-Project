@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ChillDe.FMS.Repositories.ViewModels.FreelancerModels;
-
+using Microsoft.AspNetCore.Authorization;
 using Services.Interfaces;
 
 
@@ -19,6 +19,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetFreelancer(Guid id)
         {
             try
@@ -40,6 +41,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff")]
         public async Task<IActionResult> GetFreelancersByFilter([FromQuery] FreelancerFilterModel freelancerFilterModel)
         {
             try
@@ -63,6 +65,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPost()]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> ImportRangeFreelancer(List<FreelancerImportModel> freelancers)
         {
             try
@@ -85,6 +88,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Administrator, Freelancer")]
         public async Task<IActionResult> UpdateFreelancer(Guid id, [FromBody] FreelancerImportModel freelancer)
         {
             try
@@ -107,6 +111,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpDelete()]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteFreelancer(List<Guid> ids)
         {
             try
@@ -128,7 +133,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPut("restore/{id}")]
-        // [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> RestoreAccount(Guid id)
         {
             try

@@ -3,6 +3,7 @@ using ChillDe.FMS.Services;
 using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.ProjectApplyModels;
 using ChillDe.FMS.Services.Models.ProjectModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Services.Interfaces;
@@ -44,6 +45,7 @@ namespace ChillDe.FMS.API.Controllers
         //}
 
         [HttpPost()]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> CreateProjectApply(ProjectApplyCreateModel projectApplyModel)
         {
             try
@@ -66,6 +68,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpPut()]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> UpdateProjectApply(ProjectApplyUpdateModel projectApplyUpdateModel)
         {
             try
@@ -88,6 +91,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> DeleteProjectApply(Guid id)
         {
             try
@@ -109,6 +113,7 @@ namespace ChillDe.FMS.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator, Staff, Freelancer")]
         public async Task<IActionResult> GetProjectApplyByFilter([FromQuery] ProjectApplyFilterModel projectApplyFilterModel)
         {
             try
