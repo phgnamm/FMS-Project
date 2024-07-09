@@ -259,7 +259,7 @@ namespace ChillDe.FMS.API.Controllers
         {
             try
             {
-                var result = await _accountService.RefreshToken(refreshTokenModel, refreshTokenModel.RefreshToken);
+                var result = await _accountService.RefreshTokenFreelancer(refreshTokenModel, refreshTokenModel.RefreshToken);
                 if (result.Status)
                 {
                     return Ok(result);
