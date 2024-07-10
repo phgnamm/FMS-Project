@@ -117,7 +117,7 @@ public class DashboardService : IDashboardService
     private async Task<StaffDashboardModel> GetCommonDashboard(Guid accountId)
     {
         var numOfYourOngoingProject = await _unitOfWork.DbContext.Project
-            .Where(x => x.Status != ProjectStatus.Done && x.Status != ProjectStatus.Closed && accountId == accountId && x.IsDeleted == false)
+            .Where(x => x.Status != ProjectStatus.Done && x.Status != ProjectStatus.Closed && x.AccountId == accountId && x.IsDeleted == false)
             .CountAsync();
         var numOfWaitingChecking = await _unitOfWork.DbContext.DeliverableProduct.Include(x => x.ProjectApply)
             .ThenInclude(x => x.Project).Where(x =>
