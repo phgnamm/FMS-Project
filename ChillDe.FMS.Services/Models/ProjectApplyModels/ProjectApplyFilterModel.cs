@@ -13,6 +13,7 @@ namespace ChillDe.FMS.Services.Models.ProjectApplyModels
     {
         public string Order { get; set; } = "creation-date";
         public bool OrderByDescending { get; set; } = true;
+        public bool? IsDeleted { get; set; } = false;
         public Guid? ProjectId { get; set; }
         public Guid? FreelancerId { get; set; }
         public string? SkillName { get; set; }

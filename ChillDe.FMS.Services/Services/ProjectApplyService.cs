@@ -166,11 +166,18 @@ namespace ChillDe.FMS.Services.Services
             }
             else if (existingProjectApply.Status == ProjectApplyStatus.Accepted)
             {
-                return new ResponseModel
+                if (existingProjectApply.EndDate < DateTime.UtcNow)
                 {
-                    Message = "This Apply can be Delete when accepted",
-                    Status = false
-                };
+                    _unitOfWork.ProjectApplyRepository.SoftDelete(existingProjectApply);
+                }
+                else
+                {
+                    return new ResponseModel
+                    {
+                        Message = "This Apply can be Delete when accepted",
+                        Status = false
+                    };
+                }
             }
             await _unitOfWork.SaveChangeAsync();
             return new ResponseModel
@@ -184,6 +191,7 @@ namespace ChillDe.FMS.Services.Services
         {
             var projectApplyList = await _unitOfWork.ProjectApplyRepository.GetAllAsync(
                 filter: x =>
+                    x.IsDeleted == projectApplyFilterModel.IsDeleted &&
                     (projectApplyFilterModel.ProjectId == null || x.Project.Id == projectApplyFilterModel.ProjectId) &&
                     (projectApplyFilterModel.FreelancerId == null || x.Freelancer.Id == projectApplyFilterModel.FreelancerId) &&
                     (projectApplyFilterModel.Gender == null || x.Freelancer.Gender == projectApplyFilterModel.Gender) &&

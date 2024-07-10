@@ -142,7 +142,8 @@ namespace ChillDe.FMS.Services.Services
                     (deliverableProductFilterModel.AccountId == null || x.ProjectApply.Project.AccountId ==
                         deliverableProductFilterModel.AccountId) &&
                     (deliverableProductFilterModel.FreelancerId == null ||
-                     x.ProjectApply.FreelancerId == deliverableProductFilterModel.FreelancerId),
+                     x.ProjectApply.FreelancerId == deliverableProductFilterModel.FreelancerId) &&
+                    x.ProjectApply.IsDeleted == false,
                 orderBy: x =>
                 {
                     return deliverableProductFilterModel.OrderByDescending
