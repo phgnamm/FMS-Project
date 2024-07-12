@@ -10,6 +10,7 @@ using ChillDe.FMS.Services.Interfaces;
 using ChillDe.FMS.Services.Models.ProjectApplyModels;
 using ChillDe.FMS.Services.Models.ProjectModels;
 using Quartz;
+using Services.Interfaces;
 
 namespace ChillDe.FMS.Services.Services
 {
@@ -18,12 +19,14 @@ namespace ChillDe.FMS.Services.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly IScheduler _scheduler;
+        private readonly IEmailService _emailService;
 
-        public ProjectApplyService(IUnitOfWork unitOfWork, IMapper mapper, IScheduler scheduler)
+        public ProjectApplyService(IUnitOfWork unitOfWork, IMapper mapper, IScheduler scheduler, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _scheduler = scheduler;
+            _emailService = emailService;
         }
         public async Task<ResponseModel> AddProjectApply(ProjectApplyCreateModel projectApplyModel)
         {
@@ -88,6 +91,12 @@ namespace ChillDe.FMS.Services.Services
                 existingProjectApply.StartDate = DateTime.UtcNow;
                 existingProjectApply.EndDate = DateTime.UtcNow.AddDays(existingProjectApply.Project.Duration);
                 existingProjectApply.Project.Status = ProjectStatus.Processing;
+                
+                // Delete other applies
+                var otherApplies =
+                    await _unitOfWork.ProjectApplyRepository.GetNonAcceptedProjectApplies(
+                        existingProjectApply.ProjectId.Value, projectApplyUpdateModel.Id);
+                _unitOfWork.ProjectApplyRepository.SoftDeleteRange(otherApplies);
             }
 
             if (projectApplyUpdateModel.Status != null)
@@ -141,6 +150,10 @@ namespace ChillDe.FMS.Services.Services
 
                 await _scheduler.ScheduleJob(job, trigger);
             }
+            
+            // send email without await
+            _emailService.SendEmailAsync(existingProjectApply.Freelancer.Email, "You are working on a project",
+                $"You have been applied to work on {existingProjectApply.Project.Name}. Please check your work and finish on time.", true);
 
             return new ResponseModel
             {
