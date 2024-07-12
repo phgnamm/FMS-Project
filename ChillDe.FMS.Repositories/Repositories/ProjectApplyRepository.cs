@@ -24,5 +24,10 @@ namespace ChillDe.FMS.Repositories.Repositories
             return await _dbContext.ProjectApply
                 .SingleOrDefaultAsync(pa => pa.ProjectId == projectId && pa.Status == ProjectApplyStatus.Accepted);
         }
+
+        public async Task<List<ProjectApply>> GetNonAcceptedProjectApplies(Guid projectId, Guid projectApplyId)
+        {
+            return await _dbContext.ProjectApply.Where(x => x.ProjectId == projectId && x.Id != projectApplyId).ToListAsync();
+        }
     }
 }
