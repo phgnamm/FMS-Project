@@ -83,7 +83,7 @@ public class DashboardService : IDashboardService
         var numOfYourOngoingProject = await _unitOfWork.DbContext.ProjectApply.Where(x =>
             x.Status == ProjectApplyStatus.Accepted && (x.Project.Status == ProjectStatus.Processing ||
                                                         x.Project.Status == ProjectStatus.Checking) &&
-            x.IsDeleted == false && x.Project.IsDeleted == false).CountAsync();
+            x.IsDeleted == false && x.Project.IsDeleted == false && x.FreelancerId == userId.Value).CountAsync();
         var remainTasks = await _unitOfWork.DbContext.ProjectDeliverable.Where(pd =>
                 pd.Project.ProjectApplies.Any(pa =>
                     pa.FreelancerId == userId && pa.Status == ProjectApplyStatus.Accepted && pa.IsDeleted == false))
