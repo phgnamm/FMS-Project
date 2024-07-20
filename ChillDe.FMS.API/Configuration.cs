@@ -20,27 +20,26 @@ using ChillDe.FMS.Services.Services;
 using Quartz;
 using ChillDe.FMS.Services.Common;
 using Quartz.Impl;
-
 namespace ChillDe.FMS.API
 {
-	public static class Configuration
-	{
-		public static IServiceCollection AddAPIConfiguration(this IServiceCollection services)
-		{
-			// Identity
-			services
-				.AddIdentity<Account, Role>(options =>
-				{
-					options.Password.RequireNonAlphanumeric = false;
-					options.Password.RequiredLength = 8;
-				})
-				.AddRoles<Role>()
-				.AddEntityFrameworkStores<AppDbContext>()
-				.AddDefaultTokenProviders();
-			services.Configure<DataProtectionTokenProviderOptions>(options =>
-			{
-				options.TokenLifespan = TimeSpan.FromMinutes(15);
-			});
+    public static class Configuration
+    {
+        public static IServiceCollection AddAPIConfiguration(this IServiceCollection services)
+        {
+            // Identity
+            services
+                .AddIdentity<Account, Role>(options =>
+                {
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequiredLength = 8;
+                })
+                .AddRoles<Role>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
+            services.Configure<DataProtectionTokenProviderOptions>(options =>
+            {
+                options.TokenLifespan = TimeSpan.FromMinutes(15);
+            });
             FirebaseApp.Create(new AppOptions
             {
                 Credential = GoogleCredential.FromFile("credentials.json"),
@@ -50,15 +49,15 @@ namespace ChillDe.FMS.API
             services.AddQuartz(configure =>
             {
                 configure.UseMicrosoftDependencyInjectionJobFactory();
-				var jobKey = new JobKey("WarningEmailJob");
-				configure.AddJob<WarningEmailJob>(opts => opts.WithIdentity(jobKey));
+                var jobKey = new JobKey("WarningEmailJob");
+                configure.AddJob<WarningEmailJob>(opts => opts.WithIdentity(jobKey));
 
-				// Tạo trigger cho công việc gửi email cảnh báo
-				configure.AddTrigger(opts => opts
-					.ForJob(jobKey)
-					.WithIdentity("WarningEmailJob-trigger")
-					.WithCronSchedule("0 0 8 * * ?")); 
-			});
+                // Tạo trigger cho công việc gửi email cảnh báo
+                configure.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("WarningEmailJob-trigger")
+                    .WithCronSchedule("0 0 8 * * ?"));
+            });
 
             services.AddQuartzHostedService(options =>
             {
@@ -77,34 +76,34 @@ namespace ChillDe.FMS.API
 
             // Middlewares
             services.AddSingleton<GlobalExceptionMiddleware>();
-			services.AddSingleton<PerformanceMiddleware>();
-			services.AddScoped<AccountStatusMiddleware>();
-			services.AddSingleton<Stopwatch>();
+            services.AddSingleton<PerformanceMiddleware>();
+            services.AddScoped<AccountStatusMiddleware>();
+            services.AddSingleton<Stopwatch>();
 
-			// Common
-			services.AddHttpContextAccessor();
-			services.AddAutoMapper(typeof(MapperProfile).Assembly);
-			services.AddScoped<IClaimsService, ClaimsService>();
-			services.AddScoped<IUnitOfWork, UnitOfWork>();
-			services.AddTransient<IEmailService, EmailService>();
+            // Common
+            services.AddHttpContextAccessor();
+            services.AddAutoMapper(typeof(MapperProfile).Assembly);
+            services.AddScoped<IClaimsService, ClaimsService>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<IEmailService, EmailService>();
 
-			// Dependency Injection
-			// Account
-			services.AddScoped<IAccountService, AccountService>();
-			services.AddScoped<IAccountRepository, AccountRepository>();
-			
-			
-			// Freelancer
-			services.AddScoped<IFreelancerService, FreelancerService>();
-			services.AddScoped<IFreelancerRepository, FreelancerRepository>();
-			
-			// Project
-			services.AddScoped<IProjectRepository, ProjectRepository>();
-			services.AddScoped<IProjectService, ProjectService>();
+            // Dependency Injection
+            // Account
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IAccountRepository, AccountRepository>();
 
-			//ProjectDeliverable
-			services.AddScoped<IProjectDeliverableRepository, ProjectDeliverableRepository>();
-			services.AddScoped<IProjectDeliverableService, ProjectDeliverableService>();
+
+            // Freelancer
+            services.AddScoped<IFreelancerService, FreelancerService>();
+            services.AddScoped<IFreelancerRepository, FreelancerRepository>();
+
+            // Project
+            services.AddScoped<IProjectRepository, ProjectRepository>();
+            services.AddScoped<IProjectService, ProjectService>();
+
+            //ProjectDeliverable
+            services.AddScoped<IProjectDeliverableRepository, ProjectDeliverableRepository>();
+            services.AddScoped<IProjectDeliverableService, ProjectDeliverableService>();
 
             //DeliverableType
             services.AddScoped<IDeliverableTypeRepository, DeliverableTypeRepository>();
@@ -112,7 +111,7 @@ namespace ChillDe.FMS.API
 
             //ProjectCategory
             services.AddScoped<IProjectCategoryRepository, ProjectCategoryRepository>();
-			services.AddScoped<IProjectCategoryService, ProjectCategoryService>();
+            services.AddScoped<IProjectCategoryService, ProjectCategoryService>();
 
             //ProjectApply
             services.AddScoped<IProjectApplyRepository, ProjectApplyRepository>();
@@ -126,18 +125,18 @@ namespace ChillDe.FMS.API
             services.AddScoped<ISkillService, SkillService>();
             services.AddScoped<ISkillRepository, SkillRepository>();
 
-			// FreelancerSkill
-			services.AddScoped<IFreelancerSkillRepository, FreelancerSkillRepository>();
+            // FreelancerSkill
+            services.AddScoped<IFreelancerSkillRepository, FreelancerSkillRepository>();
 
-			// Transaction
-			services.AddScoped<ITransactionService, TransactionService>();
-			services.AddScoped<ITransactionRepository, TransactionRepository>();
-			
-			// Dashbpard
-			services.AddScoped<IDashboardService, DashboardService>();
-			services.AddScoped<IDashboardRepository, DashboardRepository>();
+            // Transaction
+            services.AddScoped<ITransactionService, TransactionService>();
+            services.AddScoped<ITransactionRepository, TransactionRepository>();
+
+            // Dashbpard
+            services.AddScoped<IDashboardService, DashboardService>();
+            services.AddScoped<IDashboardRepository, DashboardRepository>();
 
             return services;
-		}
-	}
+        }
+    }
 }
